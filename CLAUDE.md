@@ -8,11 +8,18 @@
   (`main`, author `founder@theteaplanet.com`, matching this org's deploy
   convention everywhere else): a placeholder `index.html` ("BTS — Coming
   Soon" holding page, `noindex`) + this file.
-- **Connected to Vercel** — team `founder-9869's projects`, project renamed
-  from the auto-generated `bts-website-cags` to **`bts-website`**. Live and
-  serving the placeholder (confirmed 200). Check the project's Settings →
-  Domains for the exact current `*.vercel.app` URL — it moved when the
-  project was renamed.
+- **Connected to Vercel** — team `founder-9869's projects`. ⚠️ **Two
+  projects got created from the same import**, ~74 seconds apart, both
+  linked to this repo: `bts-website` (`prj_xPrboy6ZdUEywrgeuoI0gaa2iDtg`,
+  created first) and `bts-website-cags` (`prj_8kS8tMGhRAivZVax5DxBSmAvq229`,
+  created second — got the auto-suffix because the plain name collided
+  with its own sibling). **`bts-website` is canonical**; verified live at
+  **https://bts-website-two.vercel.app** (the `-two` suffix is because
+  plain `bts-website.vercel.app` is already claimed by an unrelated
+  project elsewhere on Vercel — nothing to do with the duplicate above).
+  `bts-website-cags` is pending deletion by the founder (Settings →
+  Advanced → Delete Project) — if a future session finds only one project
+  linked to this repo, that cleanup is done; ignore this note.
 - **Nothing else exists yet.** No framework, no design direction, no content,
   no brand asset pack pulled in. The placeholder is throwaway — replace it
   outright rather than building on top of it.
