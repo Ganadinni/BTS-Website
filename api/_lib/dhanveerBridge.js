@@ -1,90 +1,49 @@
 // BTS orders → Dhanveer CRM, so Sales has visibility of every D2C buyer —
-// founder-required. Writes DIRECTLY into the shared `dhanveer` Postgres
-// schema, the same pattern Dhwani uses to bridge leads into Dhanveer (see
-// dhanveer-core's schema.ts + Dhwani's CLAUDE.md "lead bridge" notes),
-// rather than calling dhanveer-core's HTTP API — those endpoints require an
-// authenticated Chakra session, which a public storefront checkout has no
-// way to hold.
+// founder-required. Calls dhanveer-core's own guarded bridge endpoint over
+// HTTPS (POST /api/dhanveer/bridge/lead) rather than writing into its
+// database directly: that project's DATABASE_URL is marked Sensitive in
+// Vercel (no reveal path), and even if it weren't, handing this independent
+// storefront a live write credential to the whole `dhanveer` schema is a
+// far bigger blast radius than "create/update one lead per order." See
+// dhanveer-core's CLAUDE.md, "2026-08-28 — external-storefront lead
+// bridge", for the endpoint's own side of this.
 //
-// Uses the SAME DATABASE_URL as db.js by default (founder decision
-// 2026-08-28: connect BTS to the existing shared Neon database rather than
-// spinning up a new one — one connection string does double duty, this
-// project's own `bts` schema AND the `dhanveer` schema this file writes
-// into). DHANVEER_DATABASE_URL is an optional override only, for if the two
-// are ever deliberately split onto separate databases later.
+// Needs two env vars: DHANVEER_BRIDGE_URL (dhanveer-core's base URL) and
+// DHANVEER_BRIDGE_KEY (must match dhanveer-core's BRIDGE_API_KEY exactly).
 //
 // Best-effort: a failure here must never fail the checkout. It is NOT
 // swallowed silently, though — that exact silent-failure shape has bitten
 // this bridge before (Dhwani's CLAUDE.md), so every failure is logged loudly
-// enough to be found in Vercel's runtime logs.
-const { Pool } = require('pg');
-const { pooledUrl, getPool } = require('./db');
-
-let overridePool = null;
-function bridgePool() {
-  if (!process.env.DHANVEER_DATABASE_URL) return getPool();
-  if (!overridePool) {
-    overridePool = new Pool({ connectionString: pooledUrl(process.env.DHANVEER_DATABASE_URL), ssl: { rejectUnauthorized: false } });
-  }
-  return overridePool;
-}
-
-function newLeadId() {
-  // Namespaced distinctly from dhanveer-core's own count-minted L-#### ids
-  // (app-side, racy by design against a shared counter) so a direct-DB
-  // insert from here can never collide with one.
-  return `L-BTS-${Date.now().toString(36).toUpperCase()}`;
-}
-
-async function findLead(p, phone, email) {
-  if (phone) {
-    const r = await p.query(`SELECT id FROM dhanveer.leads WHERE phone = $1 AND is_deleted IS NOT TRUE LIMIT 1`, [phone]);
-    if (r.rows[0]) return r.rows[0].id;
-  }
-  if (email) {
-    const r = await p.query(`SELECT id FROM dhanveer.leads WHERE email = $1 AND is_deleted IS NOT TRUE LIMIT 1`, [email]);
-    if (r.rows[0]) return r.rows[0].id;
-  }
-  return null;
-}
-
-async function appendActivity(p, leadId, title, details) {
-  const id = `LA-BTS-${Date.now().toString(36).toUpperCase()}`;
-  await p.query(
-    `INSERT INTO dhanveer.lead_activities (id, lead_id, type, title, details, created_by)
-     VALUES ($1, $2, 'order', $3, $4, 'bts-website')`,
-    [id, leadId, title, details]
-  );
-  await p.query(`UPDATE dhanveer.leads SET last_interaction = now(), updated_at = now() WHERE id = $1`, [leadId]);
-}
-
-// Creates the lead on a new customer, or appends an order note + bumps
-// recency on a repeat one — never a silent no-op on repeat, which is
-// exactly the bug that once lost Dhwani's leads (create-only bridges look
-// fine on a first order and go quiet on every one after).
+// enough to be found in Vercel's runtime logs. The dedupe-and-append
+// discipline (never a silent no-op on a repeat customer) lives in
+// dhanveer-core's endpoint itself now, not here.
 async function recordOrderLead({ customer, orderName, items, total }) {
-  const p = bridgePool();
-  if (!p) {
-    console.warn('[dhanveer-bridge] No DATABASE_URL (or DHANVEER_DATABASE_URL override) configured — order', orderName, 'was NOT mirrored to Dhanveer CRM');
+  const base = process.env.DHANVEER_BRIDGE_URL;
+  const key = process.env.DHANVEER_BRIDGE_KEY;
+  if (!base || !key) {
+    console.warn('[dhanveer-bridge] DHANVEER_BRIDGE_URL/DHANVEER_BRIDGE_KEY not set — order', orderName, 'was NOT mirrored to Dhanveer CRM');
     return null;
   }
-  const itemsLine = items.map((i) => `${i.qty}× ${i.name}`).join(', ');
-  const details = `Order ${orderName} — ${itemsLine} — ₹${total} — thebubbleteastore.com`;
   try {
-    const existing = await findLead(p, customer.phone || null, customer.email || null);
-    if (existing) {
-      await appendActivity(p, existing, `BTS order ${orderName}`, details);
-      return existing;
+    const url = `${base.replace(/\/$/, '')}/api/dhanveer/bridge/lead?key=${encodeURIComponent(key)}`;
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer: { name: customer.name, email: customer.email || undefined, phone: customer.phone },
+        source: 'bts-website',
+        orderName,
+        items: items.map((i) => ({ qty: i.qty, name: i.name })),
+        total,
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    const j = await r.json().catch(() => null);
+    if (!r.ok || !j?.success) {
+      console.error('[dhanveer-bridge] FAILED to mirror order', orderName, '— HTTP', r.status, JSON.stringify(j));
+      return null;
     }
-    const id = newLeadId();
-    await p.query(
-      `INSERT INTO dhanveer.leads
-         (id, business_name, contact_person, email, phone, city, area, source, tags, status, deal_value, last_interaction, created_at, updated_at)
-       VALUES ($1, $2, $2, $3, $4, 'Unknown', '', 'BTS website', $5::jsonb, 'New', $6, now(), now(), now())`,
-      [id, customer.name || customer.email || customer.phone || 'BTS customer', customer.email || null, customer.phone || null, JSON.stringify(['bts', 'd2c']), String(total)]
-    );
-    await appendActivity(p, id, `BTS order ${orderName}`, details);
-    return id;
+    return j.data?.leadId || null;
   } catch (e) {
     console.error('[dhanveer-bridge] FAILED to mirror order', orderName, 'into Dhanveer CRM:', e?.message || e);
     return null;

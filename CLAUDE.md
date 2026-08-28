@@ -38,48 +38,57 @@ storefront, and the "exit Shopify first" ruling mentioned below is exactly what 
   affect the live theteaplanet.com checkout.
 - **Dhanveer CRM bridge** (`api/_lib/dhanveerBridge.js`) — founder-required: every paid order
   becomes or updates a lead in `dhanveer.leads` (+ a `dhanveer.lead_activities` note), so Sales
-  has visibility of BTS D2C buyers. Writes DIRECTLY into the shared `dhanveer` schema (same
-  pattern Dhwani uses to bridge its leads into Dhanveer — see dhanveer-core's schema.ts) rather
-  than calling dhanveer-core's HTTP API, because those endpoints require an authenticated
-  Chakra session that a public storefront has no way to hold. **Uses the SAME `DATABASE_URL`
-  as this project's own `bts` schema** (founder decision 2026-08-28: connect BTS to the
-  existing shared Neon database rather than a new one — simpler, one connection string does
-  both jobs); `DHANVEER_DATABASE_URL` is only needed as an override if the two are ever split
-  apart later. Best-effort — a bridge failure never blocks checkout — but logged loudly
-  (`console.error`), not swallowed: Dhwani's own CLAUDE.md documents exactly how a
-  silently-swallowed bridge failure lost leads for weeks before anyone noticed.
+  has visibility of BTS D2C buyers. **Revised 2026-08-28, second pass:** the first version wrote
+  directly into the shared `dhanveer` Postgres schema (Dhwani's own pattern) using a shared
+  `DATABASE_URL` — abandoned once it turned out dhanveer-core's `DATABASE_URL` is marked
+  **Sensitive** in Vercel (no reveal path, by design) and, separately, that handing this
+  independent storefront a live write credential to the WHOLE `dhanveer` schema was a much
+  bigger blast radius than "one lead insert per order," with real open questions (dev-env
+  exposure, who owns migrations against a shared DB). Now calls a new, narrow, key-guarded
+  endpoint on dhanveer-core instead — `POST /api/dhanveer/bridge/lead?key=$DHANVEER_BRIDGE_KEY`
+  (added to dhanveer-core's `src/server/checkout.ts` this session; see its own CLAUDE.md,
+  "2026-08-28 — external-storefront lead bridge"). No database credential crosses projects.
+  Needs `DHANVEER_BRIDGE_URL` (dhanveer-core's base URL) + `DHANVEER_BRIDGE_KEY` (must exactly
+  match dhanveer-core's `BRIDGE_API_KEY`). Best-effort — a bridge failure never blocks checkout
+  — but logged loudly (`console.error`), not swallowed: Dhwani's own CLAUDE.md documents exactly
+  how a silently-swallowed bridge failure lost leads for weeks before anyone noticed. The
+  dedupe-and-append discipline (never a silent no-op on a repeat customer) now lives in
+  dhanveer-core's endpoint itself.
 - Business decisions locked in by the founder this session: **invoice under GFF** (same entity
   as theteaplanet.com), **same Razorpay merchant account** as theteaplanet.com (its key pair is
   copied into THIS project's own env, not read from dhanveer-core), **separate checkout backend**
-  (this repo's own code, not dhanveer-core's API) **on the existing shared Neon database**
-  (its own `bts` schema inside it, not a new database).
+  (this repo's own code, not dhanveer-core's API) **on its own, separate database** (not shared
+  with dhanveer-core — see the CRM bridge note above for why).
 
 ### ⚠️ Still needed before this can take a real payment — see `.env.example`
 Nothing above is live yet; every integration is env-gated and degrades to a clear error until
 configured (`DATABASE_URL` unset → "Order storage is not configured"; `RAZORPAY_KEY_ID/SECRET`
-unset → "Payments are not configured"; Zoho unset → best-effort skip, logged).
-1. **`DATABASE_URL`** — the EXISTING shared Neon connection string (copy it from any Chakra
-   module's Vercel env, e.g. dhanveer-core's `DATABASE_URL`). This also powers the Dhanveer CRM
-   bridge — no second database or second env var needed.
+unset → "Payments are not configured"; Zoho/Dhanveer bridge unset → best-effort skip, logged).
+1. **`DATABASE_URL`** — BTS's OWN Neon Postgres connection string, separate from dhanveer-core's.
+   Easiest path: this project's Vercel Storage tab → Marketplace → Neon (creates one and injects
+   the env var automatically).
 2. **`RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`** — copy theteaplanet.com's live key pair into
    THIS Vercel project's env (per the founder's "same account" decision above).
 3. **`ZOHO_CLIENT_ID` / `ZOHO_CLIENT_SECRET`** — a Zoho Self Client app, then connect via
    `GET /api/checkout/zoho-connect?key=<BTS_ADMIN_KEY>&code=<grant code>` (mirrors
    dhanveer-core's own connect flow, but stores the refresh token in THIS project's own
    `bts.sync_state`, not dhanveer's).
-4. **Real SKUs** — `BTS-WEB-00N` are interim placeholders (same convention theteaplanet-website
+4. **`DHANVEER_BRIDGE_URL` / `DHANVEER_BRIDGE_KEY`** — set `BRIDGE_API_KEY` on dhanveer-core
+   first, then copy the SAME value here as `DHANVEER_BRIDGE_KEY` (`DHANVEER_BRIDGE_URL` defaults
+   to `https://dhanveer-core.vercel.app`).
+5. **Real SKUs** — `BTS-WEB-00N` are interim placeholders (same convention theteaplanet-website
    already uses for un-SKUed products). Per Medhavi's CLAUDE.md, **SKUs are founder-issued only,
    never inferred** — until the Product Master assigns real base SKUs/blend codes for these 6
    kits (`ganadinni-product-master/BRAND-SKUS-NEEDED-2026-08-22.csv` already has 12 BTS rows
    awaiting one), Zoho invoices will create fresh ad-hoc line items rather than matching a real
    item master row — same gap already flagged for Thai Milk Tea on theteaplanet.com.
-5. **HSN / exact GST rate per kit** — declared as 18% GST-inclusive (matching the Shopify
+6. **HSN / exact GST rate per kit** — declared as 18% GST-inclusive (matching the Shopify
    store's configured effective rate) but not yet accountant-confirmed for a bundled kit
    (tea premix + reusable plastic cups + straws don't all sit at one HSN in isolation).
-6. **First real end-to-end test order** before this goes fully live — same discipline
+7. **First real end-to-end test order** before this goes fully live — same discipline
    theteaplanet.com's own checkout followed (Magic Checkout was never flipped from 'off' to
    'optional' until one real payment verified end-to-end).
-7. **Deploy**: pushed to `claude/bts-website-migration-op900p`; this project's Vercel deploy is
+8. **Deploy**: pushed to `claude/bts-website-migration-op900p`; this project's Vercel deploy is
    already connected (see the 2026-08-25 entry below) — confirm the live build once pushed.
 
 ## State as of 2026-08-25 (handoff from the session that stood this up)
