@@ -172,11 +172,17 @@ footer.site-foot .foot-brand img { width: 58px; height: 33px; object-fit: contai
 .explainer-head p { color: var(--smoke); font-size: 15px; line-height: 1.65; }
 .explainer-head p strong { color: var(--ink); }
 .explainer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-@media (max-width: 700px) { .explainer-grid { grid-template-columns: 1fr; } }
 .explainer-item .pic { aspect-ratio: 1/1; border-radius: var(--radius-cup); overflow: hidden; margin-bottom: 12px; background: var(--paper-raise); }
 .explainer-item .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .explainer-item h4 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; margin-bottom: 4px; }
 .explainer-item p { font-size: 13px; color: var(--smoke); line-height: 1.5; margin: 0; }
+@media (max-width: 700px) {
+  /* Compact rows on mobile — a full-width square photo per item pushed
+     the heading/text off-screen before a reader reached it. */
+  .explainer-grid { grid-template-columns: 1fr; gap: 18px; }
+  .explainer-item { display: flex; align-items: flex-start; gap: 14px; }
+  .explainer-item .pic { width: 84px; height: 84px; aspect-ratio: auto; flex-shrink: 0; margin-bottom: 0; }
+}
 .explainer-cta { margin-top: 28px; font-size: 14px; color: var(--smoke); }
 .explainer-cta a { color: var(--pop); font-weight: 600; text-decoration: none; }
 

@@ -50,7 +50,7 @@
     }
     itemsEl.innerHTML = items.map(function (i) {
       return '<div class="cart-line">' +
-        '<img src="' + i.image + '&width=120" alt="">' +
+        '<img src="' + i.image + '" alt="">' +
         '<div><div class="name">' + i.name + '</div>' +
         '<div class="row2">' +
           '<button data-sku="' + i.sku + '" data-delta="-1" class="qty-dec">&minus;</button>' +
