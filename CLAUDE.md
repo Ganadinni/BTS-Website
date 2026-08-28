@@ -70,7 +70,9 @@ unset → "Payments are not configured"; Zoho/Dhanveer bridge unset → best-eff
 2. **`RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`** — copy theteaplanet.com's live key pair into
    THIS Vercel project's env (per the founder's "same account" decision above).
 3. **`ZOHO_CLIENT_ID` / `ZOHO_CLIENT_SECRET`** — a Zoho Self Client app, then connect via
-   `GET /api/checkout/zoho-connect?key=<BTS_ADMIN_KEY>&code=<grant code>` (mirrors
+   `POST /api/checkout/zoho-connect` with JSON body `{ key, code }` — **not** a GET with
+   them in the query string (fixed 2026-08-28: that would leak into browser history,
+   Vercel's access logs, and Referer headers for a value with full Books access). Mirrors
    dhanveer-core's own connect flow, but stores the refresh token in THIS project's own
    `bts.sync_state`, not dhanveer's).
 4. **`DHANVEER_BRIDGE_URL` / `DHANVEER_BRIDGE_KEY`** — set `BRIDGE_API_KEY` on dhanveer-core
@@ -90,6 +92,59 @@ unset → "Payments are not configured"; Zoho/Dhanveer bridge unset → best-eff
    'optional' until one real payment verified end-to-end).
 8. **Deploy**: pushed to `claude/bts-website-migration-op900p`; this project's Vercel deploy is
    already connected (see the 2026-08-25 entry below) — confirm the live build once pushed.
+
+### Env setup — progress as of the founder's own pass through Vercel (same day)
+- ✅ **`DATABASE_URL`** done — own Neon database (`bts-website-db`, region `sin1`/Singapore,
+  free plan, Neon Auth off), connected across Production/Preview/Development. The variable
+  PREFIX was set to `DATABASE` on creation so Neon's Vercel integration injects `DATABASE_URL`
+  directly (its default prefix would have produced `STORAGE_URL` instead — worth knowing if
+  this is ever redone). Left as **Config, not Sensitive** — deliberately, because Development
+  scope was requested and `vercel env pull` cannot retrieve a Sensitive value at all.
+- ✅ **`DHANVEER_BRIDGE_URL`** done — `https://dhanveer-core.vercel.app`, Production + Preview,
+  set as Config (it's a public URL, not a secret).
+- ⚠️ **`DHANVEER_BRIDGE_KEY`** — NOT set. Correctly refused to be minted by a Chrome agent or by
+  Claude: putting a fresh secret's value into a chat transcript is exactly the exposure the
+  "source dashboard → Vercel's field, never through a chat window" rule exists to prevent, even
+  though it's a brand-new value rather than an extracted one. **Founder generates this one
+  personally** (any long random string — a password manager, `openssl rand -hex 32` in a
+  terminal that isn't logged anywhere, etc.) and pastes the SAME value into both this project's
+  `DHANVEER_BRIDGE_KEY` and dhanveer-core's `BRIDGE_API_KEY`.
+- ❌ **`RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`** — blocked. Both are marked **Sensitive** in
+  dhanveer-core's Vercel env (no reveal, no copy — confirmed by the same padlock-vs-eye-icon
+  check used on `DATABASE_URL`). Notably `RAZORPAY_KEY_ID` is Sensitive too, which is stricter
+  than it needs to be (Key IDs are public — they ship to the browser in Razorpay's own checkout
+  widget) but that's dhanveer-core's existing configuration, not something to change here.
+  **Fallback: Razorpay's own dashboard** (`dashboard.razorpay.com` → Settings → API Keys) — Key
+  ID is always visible there; Key Secret is normally shown only once, at generation. If it isn't
+  saved anywhere (password manager etc.), the only way to get a usable one is to regenerate it
+  in Razorpay's dashboard — which ROTATES the live key and would break theteaplanet.com's
+  checkout until dhanveer-core's own env is updated to match. **Do not do this without the
+  founder explicitly choosing to, and coordinating both projects' env vars together** — it's a
+  live-payments-affecting action, not a setup step to run casually.
+- ✅ **Zoho org — already resolved, no decision needed.** The Zoho account has three orgs
+  (TPGB `60014654138` Professional · GFF `60015387691` Free · "The Tea Planet - GST"
+  `60026481586` Free) — `zoho.js`'s `ORG_GFF` already hardcodes `60015387691` (GFF), matching
+  the founder's "invoice under GFF" decision from earlier this session. `listOrganizations()`
+  in the connect response is just proof the token works across every org it can see; it is
+  informational, not a selection the founder needs to make.
+- ✅ `.in` confirmed as the correct Zoho accounts/API domain (all three orgs are `version:
+  india`) — `zoho.js`'s defaults (`accounts.zoho.in` / `www.zohoapis.in`) were already right.
+- 🔧 **Fixed the same day**: `POST /api/checkout/zoho-connect` used to take `key`/`code` as GET
+  query-string params — flagged during this setup pass as landing in browser history, Vercel's
+  access logs, and Referer headers for a value with full `ZohoBooks.fullaccess.all` access.
+  Both now go in a POST body instead; 404 (not 403) on a bad/missing key, matching every other
+  guarded route in this codebase.
+- ⚠️ **`BTS_ADMIN_KEY` also deliberately not minted here**, same reasoning as
+  `DHANVEER_BRIDGE_KEY` above — founder generates and pastes it directly.
+
+### ⚠️ The Dhanveer bridge endpoint is NOT in production yet — DHANVEER_BRIDGE_URL will 404
+`POST /api/dhanveer/bridge/lead` (commit `7cfa165` in dhanveer-core) exists only on the preview
+deployment of `claude/bts-website-migration-op900p`. `dhanveer-core.vercel.app` serves `main`,
+which doesn't have this route. **Before the bridge can work at all, that branch — or at least
+this endpoint — needs to reach dhanveer-core's production deploy.** Redeploying bts-website
+before this is done just confirms the 404, it doesn't fix it. This is a live-repo production
+promotion and needs the founder's own decision on how (merge the branch? cherry-pick just this
+commit? something else?), not something to do unilaterally.
 
 ## State as of 2026-08-25 (handoff from the session that stood this up)
 - **Repo:** `Ganadinni/BTS-Website` (GitHub renamed its canonical casing from the
