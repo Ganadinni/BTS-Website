@@ -39,18 +39,29 @@
 .btn.block { width: 100%; text-align: center; }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 
-.cup-stage { position: relative; height: 300px; display: flex; align-items: flex-end; justify-content: center; }
-.cup { width: 168px; height: 250px; background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0) 30%), var(--pop);
-  border-radius: 18px 18px 46px 46px / 18px 18px 60px 60px; position: relative;
-  box-shadow: 0 30px 60px -20px color-mix(in srgb, var(--pop) 55%, transparent); }
-.cup::before { content: ''; position: absolute; top: -14px; left: -10px; right: -10px; height: 28px;
-  background: var(--paper-raise); border-radius: 100px; border: 1px solid var(--smoke-line); }
-.cup::after { content: ''; position: absolute; left: 14px; right: 14px; bottom: 18px; height: 46px;
-  background-image: radial-gradient(circle, var(--ink) 6px, transparent 7px);
-  background-size: 22px 22px; background-position: 0 0, 11px 11px; opacity: .85; }
-.straw { position: absolute; width: 14px; height: 200px; top: -66px; right: 44px;
-  background: repeating-linear-gradient(180deg, var(--tea), var(--tea) 10px, var(--paper-raise) 10px, var(--paper-raise) 20px);
-  border-radius: 8px; transform: rotate(8deg); }
+/* hero banner slider (home) — one slide per flavour, real product photography */
+.hero-slider { position: relative; overflow: hidden; }
+.hero-slider .slide { display: none; padding: 56px 0 72px; background: color-mix(in srgb, var(--slide-accent, var(--pop)) 14%, var(--paper-raise)); }
+.hero-slider .slide.active { display: block; }
+.hero-slider .slide .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+.hero-slider .slide h1 { font-size: clamp(32px, 4.6vw, 50px); line-height: 1.02; color: var(--slide-accent, var(--pop)); }
+.hero-slider .slide p.sub { max-width: 46ch; margin-top: 14px; color: var(--smoke); font-size: 16px; line-height: 1.6; }
+.hero-slider .slide-pic { aspect-ratio: 1/1; max-width: 380px; margin-left: auto; border-radius: var(--radius-cup);
+  overflow: hidden; background: var(--paper-raise); border: 1px solid var(--smoke-line); }
+.hero-slider .slide-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-slider .slide-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 5; }
+.hero-slider .dot { width: 8px; height: 8px; border-radius: 100px; background: var(--smoke-line); border: none; cursor: pointer; padding: 0; }
+.hero-slider .dot.active { background: var(--ink); width: 22px; transition: width .2s ease; }
+.hero-slider .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: var(--paper-raise);
+  border: 1px solid var(--smoke-line); width: 40px; height: 40px; border-radius: 100px; cursor: pointer;
+  font-size: 20px; line-height: 1; z-index: 5; display: flex; align-items: center; justify-content: center; color: var(--ink); }
+.hero-slider .slide-arrow.prev { left: 16px; }
+.hero-slider .slide-arrow.next { right: 16px; }
+@media (max-width: 700px) {
+  .hero-slider .slide .wrap { grid-template-columns: 1fr; }
+  .hero-slider .slide-pic { max-width: 220px; margin: 0 auto; }
+  .hero-slider .slide-arrow { display: none; }
+}
 
 /* product shelf / grid */
 .shelf { padding: 20px 0 88px; }
@@ -59,7 +70,7 @@
 .shelf .head p { color: var(--smoke); max-width: 40ch; font-size: 14px; }
 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 @media (max-width: 860px) { .cards { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 600px) { .cards { grid-template-columns: 1fr; } .hero .wrap { grid-template-columns: 1fr; } .cup-stage { height: 220px; } }
+@media (max-width: 600px) { .cards { grid-template-columns: 1fr; } .hero .wrap { grid-template-columns: 1fr; } }
 
 .card { background: var(--paper-raise); border: 1px solid var(--smoke-line); border-radius: var(--radius-cup);
   padding: 0; position: relative; overflow: hidden; text-decoration: none; color: var(--ink); display: block; }
