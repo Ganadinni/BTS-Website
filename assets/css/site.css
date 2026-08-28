@@ -150,6 +150,21 @@ footer.site-foot a { color: var(--smoke); text-decoration: underline; }
 footer.site-foot .foot-brand { display: flex; align-items: center; gap: 16px; }
 footer.site-foot .foot-brand img { width: 58px; height: 33px; object-fit: contain; flex-shrink: 0; }
 
+/* "what is bubble tea" explainer (home) */
+.explainer { padding: 8px 0 20px; }
+.explainer-head { max-width: 640px; margin-bottom: 30px; }
+.explainer-head h2 { font-size: clamp(24px, 3.2vw, 32px); margin: 10px 0 14px; }
+.explainer-head p { color: var(--smoke); font-size: 15px; line-height: 1.65; }
+.explainer-head p strong { color: var(--ink); }
+.explainer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 700px) { .explainer-grid { grid-template-columns: 1fr; } }
+.explainer-item .pic { aspect-ratio: 1/1; border-radius: var(--radius-cup); overflow: hidden; margin-bottom: 12px; background: var(--paper-raise); }
+.explainer-item .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.explainer-item h4 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; margin-bottom: 4px; }
+.explainer-item p { font-size: 13px; color: var(--smoke); line-height: 1.5; margin: 0; }
+.explainer-cta { margin-top: 28px; font-size: 14px; color: var(--smoke); }
+.explainer-cta a { color: var(--pop); font-weight: 600; text-decoration: none; }
+
 /* lifestyle photo strip (home) */
 .lifestyle-strip { padding: 8px 0 8px; }
 .lifestyle-strip .grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px; }
