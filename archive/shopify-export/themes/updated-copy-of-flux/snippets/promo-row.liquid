@@ -1,0 +1,108 @@
+{% comment %}
+  Renders a promo row in main collection product grid
+
+  Usage:
+  {% render 'promo-row' %}
+{% endcomment %}
+
+{{ 'section-banner-two-columns.css' | asset_url | stylesheet_tag }}
+
+{%- if block.settings.banner_height == 'adapt_image' -%}
+  {%- style -%}
+    @media screen and (max-width: 749px) {
+      #Banner-{{ section.id }}::before,
+      #Banner-{{ section.id }} .media::before,
+      #Banner-{{ section.id }}:not(.banner--mobile-bottom) .banner-content::before {
+        padding-bottom: {{ 1 | divided_by: section.blocks.first.settings.image.aspect_ratio | times: 100 }}%;
+        content: '';
+        display: block;
+      }
+    }
+
+    @media screen and (min-width: 750px) {
+      #Banner-{{ section.id }}::before,
+      #Banner-{{ section.id }} .media::before {
+        padding-bottom: {{ 1 | divided_by: section.blocks.first.settings.image.aspect_ratio | times: 100 }}%;
+        content: '';
+        display: block;
+      }
+    }
+  {%- endstyle -%}
+{%- endif -%}
+
+{% comment %} Start Slideshow {% endcomment %}
+<div class="{% if section.settings.full_width %}banner-section--full-width{% endif %} banner-two-columns">
+  <div class="ignore-{{ section.settings.ignore_spacing }}">
+    <div class="banner-item">
+      <div id="Banner-{{ section.id }}" class="banner banner--{{ block.settings.banner_height }}">
+        {% comment %} Start Slideshow Content {% endcomment %}
+        <style>
+          #Cover-{{ section.id }}-{{ forloop.index }} .banner-media::after {
+            opacity: {{ block.settings.image_overlay_opacity | divided_by: 100.0 }};
+          }
+        </style>
+        <div id="Cover-{{ section.id }}-{{ forloop.index }}">
+          <div class="banner-media media{% if block.settings.image == blank %} placeholder{% endif %} {% if section.settings.animate_slider == true %} animate--slider{% endif %}">
+            {%- if block.settings.image -%}
+              {%- assign height = block.settings.image.width | divided_by: block.settings.image.aspect_ratio | round -%}
+              {{
+                block.settings.image
+                | image_url: width: 3840
+                | image_tag:
+                  loading: 'lazy',
+                  height: height,
+                  sizes: '100vw',
+                  widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+              }}
+            {%- else -%}
+              {%- assign placeholder_slide = forloop.index | modulo: 2 -%}
+              {%- if placeholder_slide == 1 -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- else -%}
+                {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+        </div>
+        <div class="banner-content {% if block.settings.show_text_box == false %} banner--desktop-transparent{% endif %}">
+          <div class="global-media-settings banner-two-columns-box content-container content-container--full-width-mobile color-{{ block.settings.color_scheme }} gradient">
+            {%- if block.settings.caption != blank -%}
+              <p
+                class="image-with-text-text image-with-text-text--caption {{ block.settings.text_style }} {{ block.settings.text_style }}--{{ block.settings.text_size }} {{ block.settings.text_style }}"
+                {{ block.shopify_attributes }}
+              >
+                {{ block.settings.caption | escape }}
+              </p>
+            {%- endif -%}
+            {%- if block.settings.heading != blank -%}
+              <{{ block.settings.heading_tag }} class="banner-heading heading-bold {{ block.settings.heading_size }}">
+                {{- block.settings.heading | escape -}}
+              </{{ block.settings.heading_tag }}>
+            {%- endif -%}
+            {%- if block.settings.subheading != blank -%}
+              <div class="banner-text" {{ block.shopify_attributes }}>
+                <span>{{ block.settings.subheading | escape }}</span>
+              </div>
+            {%- endif -%}
+            {%- if block.settings.link_label != blank -%}
+              <div class="banner-buttons">
+                <a
+                  class="button button--primary"
+                  {% if block.settings.link == blank %}
+                    role="link" aria-disabled="true"
+                  {% else %}
+                    href="{{ block.settings.link }}"
+                  {% endif %}
+                >
+                  {{- block.settings.link_label | escape -}}
+                </a>
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+        {% comment %} End Banner Content {% endcomment %}
+      </div>
+    </div>
+  </div>
+</div>
+{% comment %} End Two Columns Banner {% endcomment %}

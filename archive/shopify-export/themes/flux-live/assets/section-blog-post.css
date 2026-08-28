@@ -1,0 +1,220 @@
+.article-template > *:first-child:not(.article-template-hero-container) {
+  margin-top: 5rem;
+}
+
+.article-template-hero-small {
+  height: 11rem;
+}
+
+.article-template-hero-medium {
+  height: 22rem;
+}
+
+.article-template-hero-large {
+  height: 33rem;
+}
+
+.article-template header {
+  margin-top: 4.4rem;
+  margin-bottom: 2rem;
+  line-height: calc(0.8 / var(--font-body-scale));
+}
+
+.article-template .article-template-hero-container .media {
+  border-radius: var(--media-radius);
+}
+
+.article-template .article-content {
+  position: relative;
+}
+
+.article-template-title {
+  margin: 0;
+}
+
+.article-template-title:not(:only-child) {
+  margin-bottom: 1rem;
+}
+
+.article-template-content {
+  font-size: 1.8rem;
+}
+
+.article-template-link {
+  font-size: 1.6rem;
+  text-decoration: none;
+}
+
+.article-template-link .icon-arrow {
+  margin-right: 1rem;
+  transform: rotate(180deg);
+}
+
+.article-template-content {
+  margin-top: -2rem;
+  margin-bottom: 3rem;
+}
+
+.article-template-social-sharing {
+  position: relative;
+  z-index: 1;
+}
+
+.article-template-social-sharing + header,
+.article-template-social-sharing + .article-template-content {
+  margin-top: 1.5rem;
+}
+
+.article-template-comment-wrapper {
+  border-top: 1px solid rgba(var(--color-base-border-1));
+  border-bottom: 1px solid rgba(var(--color-base-border-1));
+  margin-top: 3rem;
+  padding: 7rem 0;
+}
+
+.article-template-comment-wrapper h2 {
+  margin-top: 0;
+}
+
+.article-template-comments {
+  margin-bottom: 5rem;
+}
+
+.article-template-comments-fields {
+  margin-bottom: 4rem;
+}
+
+.article-template-comments-comment {
+  color: rgba(var(--color-foreground), 0.75);
+  background-color: rgb(var(--color-background));
+  margin-bottom: 1.5rem;
+  padding: 2rem 2rem 1.5rem;
+}
+
+.article-template-comments-comment p {
+  margin: 0 0 1rem;
+}
+
+.article-template-comment-fields > * {
+  margin-bottom: 3rem;
+}
+
+.article-template-comment-warning {
+  font-size: 1.4rem;
+  margin: 2rem 0 2.5rem;
+}
+
+.article-template-back:last-child {
+  margin-bottom: 3.2rem;
+}
+
+.tags a {
+  border: solid 0.1rem rgba(var(--color-foreground), 0.08);
+  border-radius: var(--media-radius);
+  font-size: 1.4rem;
+  text-decoration: none;
+  padding: 2px 15px;
+  transition: all .3s ease;
+}
+
+.tags a:hover {
+  border: 1px solid rgba(var(--color-base-border-1),.4);
+  background: rgba(0,0,0,.05)
+}
+
+.previous-next-buttons {
+  padding: 20px 0;
+}
+
+.previous-next-buttons .link.right {
+  float: right;
+}
+
+.previous-next-buttons a.link.left .icon-arrow {
+  transform: rotate(180deg);
+}
+
+.previous-next-buttons a{
+  border: 1px solid #d1d1d1;
+  border-radius: var(--media-radius);
+  padding: 0 10px;
+  text-decoration: none;
+  transition: all .4s ease;
+}
+
+.previous-next-buttons a:hover {
+  border: 1px solid rgba(var(--color-base-border-1),.4);
+  background: rgba(0,0,0,.05)
+}
+
+.article-template .icon-arrow {
+  width: 1.1rem;
+}
+
+.article-template .tags {
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.article-template .social-bar.list-social:only-child {
+  justify-content: flex-start;
+  border-bottom: 1px solid rgba(var(--color-base-border-1));
+}
+
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  .article-template-hero-small {
+    height: 22rem;
+  }
+
+  .article-template-hero-medium {
+    height: 44rem;
+  }
+
+  .article-template-hero-large {
+    height: 66rem;
+  }
+}
+@media screen and (min-width: 750px) {
+  .article-template .article-content {
+    margin-top: -20rem;
+    position: relative;
+    padding: 1rem 3.5rem;
+    border-radius: var(--media-radius);
+  }
+
+  .article-template-comments {
+    margin-bottom: 7rem;
+  }
+
+  .article-template-comments-comment {
+    padding: 2rem 2.5rem;
+  }
+
+  .article-template-comment-fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 4rem;
+  }
+
+  .article-template > *:first-child:not(.article-template-hero-container) {
+    margin-top: calc(5rem + var(--page-width-margin));
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .article-template-hero-small {
+    height: 27.5rem;
+  }
+
+  .article-template-hero-medium {
+    height: 55rem;
+  }
+
+  .article-template-hero-large {
+    height: 82.5rem;
+  }
+
+  .article-template-comments .pagination-wrapper {
+    margin: 5rem 0 8rem;
+  }
+}

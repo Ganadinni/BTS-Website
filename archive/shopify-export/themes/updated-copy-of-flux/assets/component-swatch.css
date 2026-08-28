@@ -1,0 +1,46 @@
+/* swatch lives in its own file for reusability of the swatch in swatch-input and dropdown */
+.swatch {
+  display: block;
+  aspect-ratio: 1 / 1;
+  background: var(--swatch--background);
+  background-position: var(--swatch-focal-point, initial);
+  background-size: cover;
+  background-origin: border-box;
+  border-radius: 50%;
+}
+
+.facets-container .swatch {
+  width: 3rem;
+  max-width: 100%;
+}
+
+.product-form-input input[type=radio]+label.color-swatch {
+  border: none;
+}
+
+.swatch--square {
+  --swatch--border-radius: 0.2rem;
+  border-radius: .2rem;
+}
+
+.swatch--unavailable {
+  border-style: dashed;
+  border-color: rgba(var(--color-foreground), 0.5);
+}
+
+label.color-swatch.swatch-input__label:focus-visible {
+  outline: .2rem solid rgba(var(--color-foreground), .75);
+  outline-offset: -.2rem;
+  box-shadow: 0 0 .2rem rgba(var(--color-foreground), .3);
+}
+
+.product-form-input input[type=radio]:checked+.color-swatch:focus-visible {
+  outline: .2rem solid rgba(var(--color-foreground), .75);
+  outline-offset: .2rem;
+  box-shadow: 0 0 .2rem rgba(var(--color-foreground), .3);
+}
+
+span.dropdown-swatch {
+  width: 40px;
+  margin-right: 5px;
+}

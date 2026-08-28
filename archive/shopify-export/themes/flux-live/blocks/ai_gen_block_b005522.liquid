@@ -1,0 +1,1036 @@
+{% doc %}
+  @prompt
+    A review section, where customers can rate the product and leave a review of the product with comments, or comments with photos attached. Add an alignment option to edit (left, center, or right). top, bottom, left, and right paddings. Keep an editable option to remove the reviews
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-review-section-{{ ai_gen_id }} {
+    padding-top: {{ block.settings.padding_top }}px;
+    padding-bottom: {{ block.settings.padding_bottom }}px;
+    padding-left: {{ block.settings.padding_left }}px;
+    padding-right: {{ block.settings.padding_right }}px;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-review-section__container-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: {{ block.settings.alignment }};
+  }
+
+  .ai-review-section__header-{{ ai_gen_id }} {
+    margin-bottom: 40px;
+  }
+
+  .ai-review-section__title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 16px;
+  }
+
+  .ai-review-section__subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.subtitle_color }};
+    margin: 0;
+  }
+
+  .ai-review-section__reviews-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .ai-review-card-{{ ai_gen_id }} {
+    background-color: {{ block.settings.card_background }};
+    border: 1px solid {{ block.settings.card_border_color }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    padding: 24px;
+    text-align: left;
+    position: relative;
+  }
+
+  .ai-review-card__header-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    gap: 16px;
+  }
+
+  .ai-review-card__user-info-{{ ai_gen_id }} {
+    flex-grow: 1;
+  }
+
+  .ai-review-card__name-{{ ai_gen_id }} {
+    font-size: 16px;
+    font-weight: 600;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 4px;
+  }
+
+  .ai-review-card__date-{{ ai_gen_id }} {
+    font-size: 14px;
+    color: {{ block.settings.meta_color }};
+  }
+
+  .ai-review-card__rating-{{ ai_gen_id }} {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .ai-review-card__star-{{ ai_gen_id }} {
+    width: 20px;
+    height: 20px;
+    fill: {{ block.settings.star_color }};
+  }
+
+  .ai-review-card__star-{{ ai_gen_id }}.empty {
+    fill: {{ block.settings.star_empty_color }};
+  }
+
+  .ai-review-card__comment-{{ ai_gen_id }} {
+    font-size: 15px;
+    line-height: 1.6;
+    color: {{ block.settings.text_color }};
+    margin-bottom: 16px;
+  }
+
+  .ai-review-card__images-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .ai-review-card__image-wrapper-{{ ai_gen_id }} {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-review-card__image-wrapper-{{ ai_gen_id }}:hover {
+    transform: scale(1.05);
+  }
+
+  .ai-review-card__image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-review-card__remove-btn-{{ ai_gen_id }} {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: {{ block.settings.remove_button_bg }};
+    color: {{ block.settings.remove_button_color }};
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0;
+  }
+
+  .ai-review-card-{{ ai_gen_id }}:hover .ai-review-card__remove-btn-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .ai-review-card__remove-btn-{{ ai_gen_id }}:hover {
+    background: {{ block.settings.remove_button_hover_bg }};
+    transform: scale(1.1);
+  }
+
+  .ai-review-card-{{ ai_gen_id }}.removing {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .ai-review-section__empty-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 60px 20px;
+    color: {{ block.settings.meta_color }};
+    font-size: 16px;
+  }
+
+  .ai-review-section__form-{{ ai_gen_id }} {
+    margin-top: 40px;
+    padding: 32px;
+    background-color: {{ block.settings.form_background }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    border: 1px solid {{ block.settings.card_border_color }};
+  }
+
+  .ai-review-form__title-{{ ai_gen_id }} {
+    font-size: 20px;
+    font-weight: 600;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 24px;
+    text-align: left;
+  }
+
+  .ai-review-form__field-{{ ai_gen_id }} {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .ai-review-form__label-{{ ai_gen_id }} {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: {{ block.settings.text_color }};
+    margin-bottom: 8px;
+  }
+
+  .ai-review-form__input-{{ ai_gen_id }},
+  .ai-review-form__textarea-{{ ai_gen_id }} {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid {{ block.settings.card_border_color }};
+    border-radius: 8px;
+    font-size: 15px;
+    color: {{ block.settings.text_color }};
+    background-color: {{ block.settings.card_background }};
+  }
+
+  .ai-review-form__textarea-{{ ai_gen_id }} {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .ai-review-form__rating-input-{{ ai_gen_id }} {
+    display: flex;
+    gap: 8px;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
+
+  .ai-review-form__star-input-{{ ai_gen_id }} {
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    fill: {{ block.settings.star_empty_color }};
+    transition: fill 0.2s ease;
+  }
+
+  .ai-review-form__star-input-{{ ai_gen_id }}:hover,
+  .ai-review-form__star-input-{{ ai_gen_id }}.active {
+    fill: {{ block.settings.star_color }};
+  }
+
+  .ai-review-form__file-input-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  .ai-review-form__file-label-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: {{ block.settings.card_background }};
+    border: 1px solid {{ block.settings.card_border_color }};
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: {{ block.settings.text_color }};
+    transition: all 0.3s ease;
+  }
+
+  .ai-review-form__file-label-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.form_background }};
+  }
+
+  .ai-review-form__preview-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .ai-review-form__preview-item-{{ ai_gen_id }} {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .ai-review-form__preview-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-review-form__preview-remove-{{ ai_gen_id }} {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .ai-review-form__submit-{{ ai_gen_id }} {
+    background-color: {{ block.settings.button_bg }};
+    color: {{ block.settings.button_color }};
+    border: none;
+    border-radius: 8px;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .ai-review-form__submit-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_bg }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-review-section-{{ ai_gen_id }} {
+      padding-left: {{ block.settings.padding_left | times: 0.5 }}px;
+      padding-right: {{ block.settings.padding_right | times: 0.5 }}px;
+    }
+
+    .ai-review-card__header-{{ ai_gen_id }} {
+      flex-direction: column;
+    }
+
+    .ai-review-card__remove-btn-{{ ai_gen_id }} {
+      opacity: 1;
+    }
+
+    .ai-review-section__form-{{ ai_gen_id }} {
+      padding: 20px;
+    }
+  }
+{% endstyle %}
+
+<product-reviews-{{ ai_gen_id }} class="ai-review-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-review-section__container-{{ ai_gen_id }}">
+    {% if block.settings.show_header %}
+      <div class="ai-review-section__header-{{ ai_gen_id }}">
+        {% if block.settings.title != blank %}
+          <h2 class="ai-review-section__title-{{ ai_gen_id }}">{{ block.settings.title }}</h2>
+        {% endif %}
+        {% if block.settings.subtitle != blank %}
+          <p class="ai-review-section__subtitle-{{ ai_gen_id }}">{{ block.settings.subtitle }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="ai-review-section__reviews-{{ ai_gen_id }}" data-reviews-container>
+      {% if block.settings.show_sample_reviews %}
+        <div class="ai-review-card-{{ ai_gen_id }}" data-review-id="1">
+          <div class="ai-review-card__header-{{ ai_gen_id }}">
+            <div class="ai-review-card__user-info-{{ ai_gen_id }}">
+              <h3 class="ai-review-card__name-{{ ai_gen_id }}">Sarah Johnson</h3>
+              <p class="ai-review-card__date-{{ ai_gen_id }}">October 15, 2025</p>
+            </div>
+            <div class="ai-review-card__rating-{{ ai_gen_id }}">
+              {% for i in (1..5) %}
+                <svg class="ai-review-card__star-{{ ai_gen_id }}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              {% endfor %}
+            </div>
+          </div>
+          {% if block.settings.enable_remove %}
+            <button class="ai-review-card__remove-btn-{{ ai_gen_id }}" aria-label="Remove review" data-remove-review>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          {% endif %}
+          <div class="ai-review-card__comment-{{ ai_gen_id }}">
+            Absolutely love this product! The quality exceeded my expectations and it arrived quickly. The packaging was beautiful too. Highly recommend to anyone looking for a premium experience.
+          </div>
+          <div class="ai-review-card__images-{{ ai_gen_id }}">
+            <div class="ai-review-card__image-wrapper-{{ ai_gen_id }}">
+              <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+            </div>
+            <div class="ai-review-card__image-wrapper-{{ ai_gen_id }}">
+              <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-review-card-{{ ai_gen_id }}" data-review-id="2">
+          <div class="ai-review-card__header-{{ ai_gen_id }}">
+            <div class="ai-review-card__user-info-{{ ai_gen_id }}">
+              <h3 class="ai-review-card__name-{{ ai_gen_id }}">Michael Chen</h3>
+              <p class="ai-review-card__date-{{ ai_gen_id }}">October 12, 2025</p>
+            </div>
+            <div class="ai-review-card__rating-{{ ai_gen_id }}">
+              {% for i in (1..5) %}
+                {% if i <= 4 %}
+                  <svg class="ai-review-card__star-{{ ai_gen_id }}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                {% else %}
+                  <svg class="ai-review-card__star-{{ ai_gen_id }} empty" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          {% if block.settings.enable_remove %}
+            <button class="ai-review-card__remove-btn-{{ ai_gen_id }}" aria-label="Remove review" data-remove-review>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          {% endif %}
+          <div class="ai-review-card__comment-{{ ai_gen_id }}">
+            Great product overall. Works exactly as described. The only reason I'm giving 4 stars instead of 5 is because I wish it came in more color options. Otherwise, very satisfied with my purchase!
+          </div>
+        </div>
+
+        <div class="ai-review-card-{{ ai_gen_id }}" data-review-id="3">
+          <div class="ai-review-card__header-{{ ai_gen_id }}">
+            <div class="ai-review-card__user-info-{{ ai_gen_id }}">
+              <h3 class="ai-review-card__name-{{ ai_gen_id }}">Emma Williams</h3>
+              <p class="ai-review-card__date-{{ ai_gen_id }}">October 8, 2025</p>
+            </div>
+            <div class="ai-review-card__rating-{{ ai_gen_id }}">
+              {% for i in (1..5) %}
+                <svg class="ai-review-card__star-{{ ai_gen_id }}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              {% endfor %}
+            </div>
+          </div>
+          {% if block.settings.enable_remove %}
+            <button class="ai-review-card__remove-btn-{{ ai_gen_id }}" aria-label="Remove review" data-remove-review>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          {% endif %}
+          <div class="ai-review-card__comment-{{ ai_gen_id }}">
+            This is my third purchase from this brand and they never disappoint. Customer service is excellent and the product quality is consistently top-notch. Will definitely be back for more!
+          </div>
+          <div class="ai-review-card__images-{{ ai_gen_id }}">
+            <div class="ai-review-card__image-wrapper-{{ ai_gen_id }}">
+              <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="ai-review-section__empty-{{ ai_gen_id }}">
+          No reviews yet. Be the first to share your experience!
+        </div>
+      {% endif %}
+    </div>
+
+    {% if block.settings.show_form %}
+      <div class="ai-review-section__form-{{ ai_gen_id }}">
+        <h3 class="ai-review-form__title-{{ ai_gen_id }}">{{ block.settings.form_title }}</h3>
+        <form data-review-form>
+          <div class="ai-review-form__field-{{ ai_gen_id }}">
+            <label class="ai-review-form__label-{{ ai_gen_id }}" for="review-name-{{ ai_gen_id }}">Name</label>
+            <input
+              type="text"
+              id="review-name-{{ ai_gen_id }}"
+              class="ai-review-form__input-{{ ai_gen_id }}"
+              required
+              data-review-name
+            >
+          </div>
+
+          <div class="ai-review-form__field-{{ ai_gen_id }}">
+            <label class="ai-review-form__label-{{ ai_gen_id }}">Rating</label>
+            <div class="ai-review-form__rating-input-{{ ai_gen_id }}" data-rating-input>
+              {% for i in (1..5) %}
+                <svg class="ai-review-form__star-input-{{ ai_gen_id }}" data-rating="{{ 6 | minus: i }}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="ai-review-form__field-{{ ai_gen_id }}">
+            <label class="ai-review-form__label-{{ ai_gen_id }}" for="review-comment-{{ ai_gen_id }}">Comment</label>
+            <textarea
+              id="review-comment-{{ ai_gen_id }}"
+              class="ai-review-form__textarea-{{ ai_gen_id }}"
+              required
+              data-review-comment
+            ></textarea>
+          </div>
+
+          <div class="ai-review-form__field-{{ ai_gen_id }}">
+            <label class="ai-review-form__label-{{ ai_gen_id }}">Photos (optional)</label>
+            <input
+              type="file"
+              id="review-photos-{{ ai_gen_id }}"
+              class="ai-review-form__file-input-{{ ai_gen_id }}"
+              accept="image/*"
+              multiple
+              data-review-photos
+            >
+            <label for="review-photos-{{ ai_gen_id }}" class="ai-review-form__file-label-{{ ai_gen_id }}">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              Add Photos
+            </label>
+            <div class="ai-review-form__preview-{{ ai_gen_id }}" data-preview-container></div>
+          </div>
+
+          <button type="submit" class="ai-review-form__submit-{{ ai_gen_id }}">
+            {{ block.settings.submit_button_text }}
+          </button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</product-reviews-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ProductReviews{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.reviewsContainer = this.querySelector('[data-reviews-container]');
+        this.form = this.querySelector('[data-review-form]');
+        this.ratingInput = this.querySelector('[data-rating-input]');
+        this.photoInput = this.querySelector('[data-review-photos]');
+        this.previewContainer = this.querySelector('[data-preview-container]');
+        this.selectedRating = 5;
+        this.selectedFiles = [];
+      }
+
+      connectedCallback() {
+        this.setupRatingInput();
+        this.setupPhotoInput();
+        this.setupFormSubmit();
+        this.setupRemoveButtons();
+      }
+
+      setupRatingInput() {
+        if (!this.ratingInput) return;
+
+        const stars = this.ratingInput.querySelectorAll('.ai-review-form__star-input-{{ ai_gen_id }}');
+        
+        stars.forEach((star) => {
+          star.addEventListener('click', () => {
+            this.selectedRating = parseInt(star.dataset.rating);
+            this.updateStarDisplay();
+          });
+
+          star.addEventListener('mouseenter', () => {
+            const rating = parseInt(star.dataset.rating);
+            stars.forEach((s) => {
+              const starRating = parseInt(s.dataset.rating);
+              if (starRating <= rating) {
+                s.classList.add('active');
+              } else {
+                s.classList.remove('active');
+              }
+            });
+          });
+        });
+
+        this.ratingInput.addEventListener('mouseleave', () => {
+          this.updateStarDisplay();
+        });
+
+        this.updateStarDisplay();
+      }
+
+      updateStarDisplay() {
+        const stars = this.ratingInput.querySelectorAll('.ai-review-form__star-input-{{ ai_gen_id }}');
+        stars.forEach((star) => {
+          const rating = parseInt(star.dataset.rating);
+          if (rating <= this.selectedRating) {
+            star.classList.add('active');
+          } else {
+            star.classList.remove('active');
+          }
+        });
+      }
+
+      setupPhotoInput() {
+        if (!this.photoInput) return;
+
+        this.photoInput.addEventListener('change', (e) => {
+          this.selectedFiles = Array.from(e.target.files);
+          this.updatePhotoPreview();
+        });
+      }
+
+      updatePhotoPreview() {
+        if (!this.previewContainer) return;
+
+        this.previewContainer.innerHTML = '';
+
+        this.selectedFiles.forEach((file, index) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'ai-review-form__preview-item-{{ ai_gen_id }}';
+            
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'ai-review-form__preview-image-{{ ai_gen_id }}';
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'ai-review-form__preview-remove-{{ ai_gen_id }}';
+            removeBtn.innerHTML = '×';
+            removeBtn.addEventListener('click', () => {
+              this.selectedFiles.splice(index, 1);
+              this.updatePhotoPreview();
+            });
+            
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            this.previewContainer.appendChild(wrapper);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      setupFormSubmit() {
+        if (!this.form) return;
+
+        this.form.addEventListener('submit', (e) => {
+          e.preventDefault();
+
+          const name = this.querySelector('[data-review-name]').value;
+          const comment = this.querySelector('[data-review-comment]').value;
+          
+          const reviewCard = this.createReviewCard(name, comment, this.selectedRating, this.selectedFiles);
+          
+          const emptyState = this.reviewsContainer.querySelector('.ai-review-section__empty-{{ ai_gen_id }}');
+          if (emptyState) {
+            emptyState.remove();
+          }
+          
+          this.reviewsContainer.insertBefore(reviewCard, this.reviewsContainer.firstChild);
+          
+          this.form.reset();
+          this.selectedRating = 5;
+          this.selectedFiles = [];
+          this.updateStarDisplay();
+          this.updatePhotoPreview();
+        });
+      }
+
+      createReviewCard(name, comment, rating, files) {
+        const card = document.createElement('div');
+        card.className = 'ai-review-card-{{ ai_gen_id }}';
+        card.dataset.reviewId = Date.now();
+
+        const date = new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+
+        let starsHTML = '';
+        for (let i = 1; i <= 5; i++) {
+          const starClass = i <= rating ? 'ai-review-card__star-{{ ai_gen_id }}' : 'ai-review-card__star-{{ ai_gen_id }} empty';
+          starsHTML += `<svg class="${starClass}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>`;
+        }
+
+        let imagesHTML = '';
+        if (files.length > 0) {
+          imagesHTML = '<div class="ai-review-card__images-{{ ai_gen_id }}">';
+          files.forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const imgWrapper = card.querySelector('.ai-review-card__images-{{ ai_gen_id }}');
+              if (imgWrapper) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'ai-review-card__image-wrapper-{{ ai_gen_id }}';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'ai-review-card__image-{{ ai_gen_id }}';
+                wrapper.appendChild(img);
+                imgWrapper.appendChild(wrapper);
+              }
+            };
+            reader.readAsDataURL(file);
+          });
+          imagesHTML += '</div>';
+        }
+
+        const removeButtonHTML = `{% if block.settings.enable_remove %}
+          <button class="ai-review-card__remove-btn-{{ ai_gen_id }}" aria-label="Remove review" data-remove-review>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        {% endif %}`;
+
+        card.innerHTML = `
+          <div class="ai-review-card__header-{{ ai_gen_id }}">
+            <div class="ai-review-card__user-info-{{ ai_gen_id }}">
+              <h3 class="ai-review-card__name-{{ ai_gen_id }}">${name}</h3>
+              <p class="ai-review-card__date-{{ ai_gen_id }}">${date}</p>
+            </div>
+            <div class="ai-review-card__rating-{{ ai_gen_id }}">
+              ${starsHTML}
+            </div>
+          </div>
+          ${removeButtonHTML}
+          <div class="ai-review-card__comment-{{ ai_gen_id }}">
+            ${comment}
+          </div>
+          ${imagesHTML}
+        `;
+
+        const removeBtn = card.querySelector('[data-remove-review]');
+        if (removeBtn) {
+          removeBtn.addEventListener('click', () => this.removeReview(card));
+        }
+
+        return card;
+      }
+
+      setupRemoveButtons() {
+        const removeButtons = this.querySelectorAll('[data-remove-review]');
+        removeButtons.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const card = btn.closest('.ai-review-card-{{ ai_gen_id }}');
+            this.removeReview(card);
+          });
+        });
+      }
+
+      removeReview(card) {
+        card.classList.add('removing');
+        setTimeout(() => {
+          card.remove();
+          
+          const remainingReviews = this.reviewsContainer.querySelectorAll('.ai-review-card-{{ ai_gen_id }}');
+          if (remainingReviews.length === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'ai-review-section__empty-{{ ai_gen_id }}';
+            emptyState.textContent = 'No reviews yet. Be the first to share your experience!';
+            this.reviewsContainer.appendChild(emptyState);
+          }
+        }, 300);
+      }
+    }
+
+    customElements.define('product-reviews-{{ ai_gen_id }}', ProductReviews{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product reviews",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section header"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_header",
+      "label": "Show header",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Customer Reviews"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 32
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "See what our customers are saying"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Review form"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_form",
+      "label": "Show review form",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "form_title",
+      "label": "Form title",
+      "default": "Write a Review"
+    },
+    {
+      "type": "text",
+      "id": "submit_button_text",
+      "label": "Submit button text",
+      "default": "Submit Review"
+    },
+    {
+      "type": "header",
+      "content": "Sample reviews"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sample_reviews",
+      "label": "Show sample reviews",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Remove option"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_remove",
+      "label": "Enable remove button",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Left padding",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Right padding",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "meta_color",
+      "label": "Meta text",
+      "default": "#999999"
+    },
+    {
+      "type": "header",
+      "content": "Card style"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Card border",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Card border radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Rating stars"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Star filled",
+      "default": "#ffc107"
+    },
+    {
+      "type": "color",
+      "id": "star_empty_color",
+      "label": "Star empty",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "header",
+      "content": "Form colors"
+    },
+    {
+      "type": "color",
+      "id": "form_background",
+      "label": "Form background",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button background",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg",
+      "label": "Button hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Remove button"
+    },
+    {
+      "type": "color",
+      "id": "remove_button_bg",
+      "label": "Background",
+      "default": "#ff4444"
+    },
+    {
+      "type": "color",
+      "id": "remove_button_color",
+      "label": "Icon",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "remove_button_hover_bg",
+      "label": "Hover background",
+      "default": "#cc0000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product reviews"
+    }
+  ]
+}
+{% endschema %}

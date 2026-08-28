@@ -1,0 +1,521 @@
+{{ 'section-banner-two-columns.css' | asset_url | stylesheet_tag }}
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+<noscript>{{ 'component-slider.css' | asset_url | stylesheet_tag }}</noscript>
+
+{%- if section.settings.banner_height == 'adapt_image' and section.blocks.first.settings.image != blank -%}
+  {%- style -%}
+    @media screen and (max-width: 749px) {
+      #Banner-{{ section.id }}::before,
+      #Banner-{{ section.id }} .media::before,
+      #Banner-{{ section.id }}:not(.banner--mobile-bottom) .banner-content::before {
+        padding-bottom: {{ 1 | divided_by: section.blocks.first.settings.image.aspect_ratio | times: 100 }}%;
+        content: '';
+        display: block;
+      }
+    }
+
+    @media screen and (min-width: 750px) {
+      #Banner-{{ section.id }}::before,
+      #Banner-{{ section.id }} .media::before {
+        padding-bottom: {{ 1 | divided_by: section.blocks.first.settings.image.aspect_ratio | times: 100 }}%;
+        content: '';
+        display: block;
+      }
+    }
+  {%- endstyle -%}
+{%- endif -%}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  @media screen and (max-width: 990px) {
+    .margin-spacing-negative.section-{{ section.id }}-margin {
+      margin-top: -{{ section.settings.margin_top }}px;
+    }
+    .margin-spacing-positive.section-{{ section.id }}-margin {
+      margin-top: {{ section.settings.margin_top }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign columns_mobile_int = section.settings.columns_mobile | plus: 0
+  assign show_mobile_slider = false
+  if section.settings.swipe_on_mobile and section.blocks.size > columns_mobile_int
+    assign show_mobile_slider = true
+  endif
+-%}
+<div class="banner-section ignore-{{ section.settings.ignore_spacing }}">
+  <div class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding margin-spacing-{{ section.settings.margin_spacing }} section-{{ section.id }}-margin" data-aos="fade-up">
+    <div class="{% if section.settings.full_width %}banner-section--full-width{% endif %} page-width banner-two-columns {% if section.settings.swipe_on_mobile == false %}swipe-mobile-false{% endif %}">
+      <slider-component class="slider-mobile-gutter">
+        <ul
+          class="contains-content-container {{ section.settings.banner_layout }} grid grid--1-col-tablet-down grid--{{ section.settings.columns_desktop }}-col-desktop{% if show_mobile_slider %} slider slider--mobile grid--peek{% endif %}"
+          id="Slider-{{ section.id }}"
+          role="list"
+        >
+          {%- liquid
+            assign highest_ratio = 0
+            for block in section.blocks
+              if block.settings.image.aspect_ratio > highest_ratio
+                assign highest_ratio = block.settings.image.aspect_ratio
+              endif
+            endfor
+          -%}
+          {%- for block in section.blocks -%}
+            {%- assign empty_column = '' -%}
+            {%- if block.settings.image == blank
+              and block.settings.title == blank
+              and block.settings.text == blank
+              and block.settings.link_label == blank
+            -%}
+              {%- assign empty_column = ' testimonials-list__item--empty' -%}
+            {%- endif -%}
+
+            <li
+              id="Slide-{{ section.id }}-{{ forloop.index }}"
+              class="grid-item{% if section.settings.swipe_on_mobile %} slider-slide{% endif %}{% if section.settings.column_alignment == 'center' %} center{% endif %}{{ empty_column }}" 
+              {{ block.shopify_attributes }} data-aos="fade-up"
+            >
+              <div
+                id="Banner-{{ section.id }}"
+                class="banner banner--medium {% if section.blocks.first.settings.image == blank %} slideshow--placeholder{% endif %}"
+                {{ block.shopify_attributes }}
+              >
+                <style>
+                  #Cover-{{ section.id }}-{{ forloop.index }} .banner-media::after {
+                    opacity: {{ block.settings.image_overlay_opacity | divided_by: 100.0 }};
+                  }
+                </style>
+                <div id="Cover-{{ section.id }}-{{ forloop.index }}">
+                  <div class="banner-media media{% if block.settings.image == blank %} placeholder{% endif %} {% if section.settings.animate_slider == true %} animate--slider{% endif %}">
+                    {%- if block.settings.image -%}
+                      {%- assign height = block.settings.image.width
+                        | divided_by: block.settings.image.aspect_ratio
+                        | round
+                      -%}
+                      {{
+                        block.settings.image
+                        | image_url: width: 3840
+                        | image_tag:
+                          loading: 'lazy',
+                          height: height,
+                          sizes: '100vw',
+                          widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+                      }}
+                    {%- else -%}
+                      {%- assign placeholder_slide = forloop.index | modulo: 2 -%}
+                      {%- if placeholder_slide == 1 -%}
+                        {{ 'collection-2' | placeholder_svg_tag: 'placeholder-svg' }}
+                      {%- else -%}
+                        {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                      {%- endif -%}
+                    {%- endif -%}
+                  </div>
+                </div>
+
+                <div class="banner-content {% if block.settings.show_text_box == false %} banner--desktop-transparent{% endif %}">
+                  <div class="global-media-settings banner-two-columns-box content-container content-container--full-width-mobile color-{{ block.settings.color_scheme_1 }} gradient">
+                    {%- if block.settings.caption != blank -%}
+                      <p
+                        class="image-with-text-text image-with-text-text--caption {{ block.settings.text_style }} {{ block.settings.text_style }}--{{ block.settings.text_size }} {{ block.settings.text_style }}"
+                        {{ block.shopify_attributes }}
+                      >
+                        {{ block.settings.caption | escape }}
+                      </p>
+                    {%- endif -%}
+                    {%- if block.settings.heading != blank -%}
+                      <{{ block.settings.heading_tag }} class="banner-heading heading-bold {{ block.settings.heading_size }}">
+                        {{- block.settings.heading | escape -}}
+                      </{{ block.settings.heading_tag }}>
+                    {%- endif -%}
+                    {%- if block.settings.subheading != blank -%}
+                      <div class="banner-text" {{ block.shopify_attributes }}>
+                        <span>{{ block.settings.subheading | escape }}</span>
+                      </div>
+                    {%- endif -%}
+                    {%- if block.settings.link_label != blank -%}
+                      <div class="banner-buttons">
+                        <a
+                          class="button-arrow button button--primary"
+                          {% if block.settings.link == blank %}
+                            role="link" aria-disabled="true"
+                          {% else %}
+                            href="{{ block.settings.link }}"
+                          {% endif %}
+                        >
+                          {{- block.settings.link_label | escape -}}
+                          {%- if settings.show_button_arrow -%}{% render 'icon-slider-arrows' %}{% endif %}
+                        </a>
+                      </div>
+                    {%- endif -%}
+                  </div>
+                </div>
+                {% comment %} End Banner Content {% endcomment %}
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        {%- if show_mobile_slider -%}
+          <div class="disable-slider-arrows-{{ section.settings.disable_arrow_mobile }} slider-buttons no-js-hidden">
+            <button
+              type="button"
+              class="slider-button slider-button--prev"
+              name="previous"
+              aria-label="{{ 'general.slider.previous_slide' | t }}"
+              aria-controls="Slider-{{ section.id }}"
+            >
+              {% render 'icon-slider-arrows' %}
+            </button>
+            <button
+              type="button"
+              class="slider-button slider-button--next"
+              name="next"
+              aria-label="{{ 'general.slider.next_slide' | t }}"
+              aria-controls="Slider-{{ section.id }}"
+            >
+              {% render 'icon-slider-arrows' %}
+            </button>
+          </div>
+        {%- endif -%}
+      </slider-component>
+      <div class="center{% if show_mobile_slider %} small-hide medium-hide{% endif %}" data-aos="fade-up">
+        {%- if section.settings.button_label != blank -%}
+          <a
+            class="button button--primary"
+            {% if section.settings.button_link == blank %}
+              role="link" aria-disabled="true"
+            {% else %}
+              href="{{ section.settings.button_link }}"
+            {% endif %}
+          >
+            {{ section.settings.button_label | escape }}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.banner-two-columns.name",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "banner_layout",
+      "options": [
+        {
+          "value": "grid_one",
+          "label": "t:sections.banner-two-columns.settings.banner_layout.options__1.label"
+        },
+        {
+          "value": "grid_two",
+          "label": "t:sections.banner-two-columns.settings.banner_layout.options__2.label"
+        },
+        {
+          "value": "grid_three",
+          "label": "t:sections.banner-two-columns.settings.banner_layout.options__3.label"
+        }
+      ],
+      "default": "grid_one",
+      "label": "t:sections.banner-two-columns.settings.banner_layout.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "animate_slider",
+      "default": false,
+      "label": "t:sections.all.animate_slider.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.banner-two-columns.settings.full_width.label",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "option-1"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    },
+    {
+      "type": "checkbox",
+      "id": "ignore_spacing",
+      "default": false,
+      "label": "t:sections.all.ignore_spacing.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.promotion-cards.settings.header_mobile.content"
+    },
+    {
+      "type": "select",
+      "id": "margin_spacing",
+      "options": [
+        {
+          "value": "negative",
+          "label": "t:sections.all.margin_spacing.options__1.label"
+        },
+        {
+          "value": "positive",
+          "label": "t:sections.all.margin_spacing.options__2.label"
+        }
+      ],
+      "default": "negative",
+      "label": "t:sections.all.margin_spacing.label"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.margin_top",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "swipe_on_mobile",
+      "default": false,
+      "label": "t:sections.banner-two-columns.settings.swipe_on_mobile.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_arrow_mobile",
+      "default": true,
+      "label": "t:sections.all.disable_arrow_mobile.label"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "t:sections.banner-two-columns.blocks.slide.name",
+      "limit": 7,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.banner-two-columns.blocks.slide.settings.image.label"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "default": "Image Caption",
+          "label": "t:sections.banner-two-columns.blocks.slide.settings.caption.label"
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "options": [
+            {
+              "value": "subtitle",
+              "label": "t:sections.all.text_style.options__1.label"
+            },
+            {
+              "value": "caption-with-letter-spacing",
+              "label": "t:sections.all.text_style.options__2.label"
+            }
+          ],
+          "default": "caption-with-letter-spacing",
+          "label": "t:sections.all.text_style.label"
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "options": [
+            {
+              "value": "small",
+              "label": "t:sections.all.text_size.options__1.label"
+            },
+            {
+              "value": "medium",
+              "label": "t:sections.all.text_size.options__2.label"
+            },
+            {
+              "value": "large",
+              "label": "t:sections.all.text_size.options__3.label"
+            }
+          ],
+          "default": "medium",
+          "label": "t:sections.all.text_size.label"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Banner",
+          "label": "t:sections.banner-two-columns.blocks.slide.settings.heading.label"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "options": [
+            {
+              "value": "extra-large",
+              "label": "t:sections.all.heading_size.options__1.label"
+            },
+            {
+              "value": "large",
+              "label": "t:sections.all.heading_size.options__2.label"
+            },
+            {
+              "value": "medium",
+              "label": "t:sections.all.heading_size.options__3.label"
+            },
+            {
+              "value": "small",
+              "label": "t:sections.all.heading_size.options__4.label"
+            }
+          ],
+          "default": "medium",
+          "label": "t:sections.all.heading_size.label"
+        },
+        {
+          "type": "select",
+          "id": "heading_tag",
+          "options": [
+            {
+              "value": "h1",
+              "label": "t:sections.all.heading_tag.options__1.label"
+            },
+            {
+              "value": "h2",
+              "label": "t:sections.all.heading_tag.options__2.label"
+            },
+            {
+              "value": "h3",
+              "label": "t:sections.all.heading_tag.options__3.label"
+            },
+            {
+              "value": "h4",
+              "label": "t:sections.all.heading_tag.options__4.label"
+            },
+            {
+              "value": "h5",
+              "label": "t:sections.all.heading_tag.options__5.label"
+            },
+            {
+              "value": "h6",
+              "label": "t:sections.all.heading_tag.options__6.label"
+            }
+          ],
+          "default": "h2",
+          "label": "t:sections.all.heading_tag.label",
+          "info": "t:sections.all.heading_tag.info"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "default": "Tell your brand's story through images",
+          "label": "t:sections.banner-two-columns.blocks.slide.settings.subheading.label"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "t:sections.banner-two-columns.blocks.slide.settings.link_label.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.banner-two-columns.blocks.slide.settings.link.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_text_box",
+          "label": "t:sections.banner-two-columns.blocks.slide.settings.show_text_box.label",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "image_overlay_opacity",
+          "min": 0,
+          "max": 100,
+          "step": 10,
+          "unit": "%",
+          "label": "t:sections.banner-two-columns.blocks.slide.settings.image_overlay_opacity.label",
+          "default": 60
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme_1",
+          "label": "t:sections.all.colors.label",
+          "default": "option-3"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.banner-two-columns.presets.name",
+      "blocks": [
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

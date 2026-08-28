@@ -1,0 +1,666 @@
+{% doc %}
+  @prompt
+    a pop-up video when a user comes to the website, Instead of a video URL, change it to uploading the video, After the pop-up shows up, when the user clicks the video minimizes to the bottom right corner 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-video-popup-overlay-{{ ai_gen_id }} {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, {{ block.settings.overlay_opacity | divided_by: 100.0 }});
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, background-color 0.3s ease;
+    pointer-events: none;
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.minimized {
+    background-color: transparent;
+    pointer-events: none;
+  }
+
+  .ai-video-popup-container-{{ ai_gen_id }} {
+    position: relative;
+    width: 90%;
+    max-width: {{ block.settings.popup_width }}px;
+    background-color: {{ block.settings.popup_background }};
+    border-radius: {{ block.settings.border_radius }}px;
+    padding: {{ block.settings.popup_padding }}px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.active .ai-video-popup-container-{{ ai_gen_id }} {
+    transform: scale(1);
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.minimized .ai-video-popup-container-{{ ai_gen_id }} {
+    position: fixed;
+    bottom: {{ block.settings.minimized_bottom }}px;
+    right: {{ block.settings.minimized_right }}px;
+    width: {{ block.settings.minimized_width }}px;
+    max-width: none;
+    padding: 0;
+    transform: scale(1);
+    pointer-events: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .ai-video-popup-close-{{ ai_gen_id }} {
+    position: absolute;
+    top: {{ block.settings.close_button_position }}px;
+    right: {{ block.settings.close_button_position }}px;
+    width: {{ block.settings.close_button_size }}px;
+    height: {{ block.settings.close_button_size }}px;
+    background-color: {{ block.settings.close_button_background }};
+    color: {{ block.settings.close_button_color }};
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .ai-video-popup-close-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.close_button_hover_background }};
+    transform: scale(1.1);
+  }
+
+  .ai-video-popup-close-{{ ai_gen_id }} svg {
+    width: calc({{ block.settings.close_button_size }}px * 0.5);
+    height: calc({{ block.settings.close_button_size }}px * 0.5);
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.minimized .ai-video-popup-close-{{ ai_gen_id }} {
+    top: 5px;
+    right: 5px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.minimized .ai-video-popup-close-{{ ai_gen_id }} svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .ai-video-popup-maximize-{{ ai_gen_id }} {
+    position: absolute;
+    top: 5px;
+    right: 40px;
+    width: 28px;
+    height: 28px;
+    background-color: {{ block.settings.close_button_background }};
+    color: {{ block.settings.close_button_color }};
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .ai-video-popup-maximize-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.close_button_hover_background }};
+    transform: scale(1.1);
+  }
+
+  .ai-video-popup-maximize-{{ ai_gen_id }} svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.minimized .ai-video-popup-maximize-{{ ai_gen_id }} {
+    display: flex;
+  }
+
+  .ai-video-popup-content-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: {{ block.settings.video_border_radius }}px;
+    background-color: #000000;
+    cursor: pointer;
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.minimized .ai-video-popup-content-{{ ai_gen_id }} {
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-video-popup-video-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: {{ block.settings.video_border_radius }}px;
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.minimized .ai-video-popup-video-{{ ai_gen_id }} {
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-video-popup-heading-{{ ai_gen_id }} {
+    color: {{ block.settings.heading_color }};
+    font-size: {{ block.settings.heading_size }}px;
+    margin: 0 0 {{ block.settings.popup_padding | divided_by: 2 }}px;
+    text-align: center;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.minimized .ai-video-popup-heading-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  .ai-video-popup-description-{{ ai_gen_id }} {
+    color: {{ block.settings.description_color }};
+    font-size: {{ block.settings.description_size }}px;
+    margin: 0 0 {{ block.settings.popup_padding | divided_by: 2 }}px;
+    text-align: center;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-video-popup-overlay-{{ ai_gen_id }}.minimized .ai-video-popup-description-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  .ai-video-popup-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: {{ block.settings.video_border_radius }}px;
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-video-popup-container-{{ ai_gen_id }} {
+      width: 95%;
+      padding: {{ block.settings.popup_padding | times: 0.7 }}px;
+    }
+
+    .ai-video-popup-heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_size | times: 0.8 }}px;
+    }
+
+    .ai-video-popup-description-{{ ai_gen_id }} {
+      font-size: {{ block.settings.description_size | times: 0.9 }}px;
+    }
+
+    .ai-video-popup-overlay-{{ ai_gen_id }}.minimized .ai-video-popup-container-{{ ai_gen_id }} {
+      width: {{ block.settings.minimized_width | times: 0.7 }}px;
+      bottom: {{ block.settings.minimized_bottom | times: 0.5 }}px;
+      right: {{ block.settings.minimized_right | times: 0.5 }}px;
+    }
+  }
+{% endstyle %}
+
+<video-popup-{{ ai_gen_id }}
+  class="ai-video-popup-overlay-{{ ai_gen_id }}"
+  data-delay="{{ block.settings.popup_delay }}"
+  data-show-once="{{ block.settings.show_once }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-video-popup-container-{{ ai_gen_id }}">
+    <button
+      class="ai-video-popup-close-{{ ai_gen_id }}"
+      aria-label="Close video popup"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <button
+      class="ai-video-popup-maximize-{{ ai_gen_id }}"
+      aria-label="Maximize video"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <polyline points="9 21 3 21 3 15"></polyline>
+        <line x1="21" y1="3" x2="14" y2="10"></line>
+        <line x1="3" y1="21" x2="10" y2="14"></line>
+      </svg>
+    </button>
+
+    {% if block.settings.heading != blank %}
+      <h2 class="ai-video-popup-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+    {% endif %}
+
+    {% if block.settings.description != blank %}
+      <div class="ai-video-popup-description-{{ ai_gen_id }}">{{ block.settings.description }}</div>
+    {% endif %}
+
+    <div class="ai-video-popup-content-{{ ai_gen_id }}">
+      {% if block.settings.video != blank %}
+        <video
+          class="ai-video-popup-video-{{ ai_gen_id }}"
+          {% if block.settings.autoplay %}autoplay{% endif %}
+          {% if block.settings.mute %}muted{% endif %}
+          {% if block.settings.loop %}loop{% endif %}
+          {% if block.settings.show_controls %}controls{% endif %}
+          playsinline
+        >
+          {% for source in block.settings.video.sources %}
+            <source src="{{ source.url }}" type="{{ source.mime_type }}">
+          {% endfor %}
+        </video>
+      {% else %}
+        <div class="ai-video-popup-placeholder-{{ ai_gen_id }}">
+          Next, upload a video file
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</video-popup-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class VideoPopup{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.closeButton = this.querySelector('.ai-video-popup-close-{{ ai_gen_id }}');
+        this.maximizeButton = this.querySelector('.ai-video-popup-maximize-{{ ai_gen_id }}');
+        this.videoContent = this.querySelector('.ai-video-popup-content-{{ ai_gen_id }}');
+        this.video = this.querySelector('.ai-video-popup-video-{{ ai_gen_id }}');
+        this.delay = parseInt(this.dataset.delay) * 1000;
+        this.showOnce = this.dataset.showOnce === 'true';
+        this.storageKey = 'videoPopupShown{{ ai_gen_id }}';
+        this.isMinimized = false;
+      }
+
+      connectedCallback() {
+        this.setupEventListeners();
+        this.checkAndShowPopup();
+      }
+
+      setupEventListeners() {
+        this.closeButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.closePopup();
+        });
+
+        this.maximizeButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.maximizePopup();
+        });
+
+        this.videoContent.addEventListener('click', () => {
+          if (!this.isMinimized) {
+            this.minimizePopup();
+          }
+        });
+
+        this.addEventListener('click', (event) => {
+          if (event.target === this && !this.isMinimized) {
+            this.minimizePopup();
+          }
+        });
+
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && this.classList.contains('active')) {
+            if (this.isMinimized) {
+              this.closePopup();
+            } else {
+              this.minimizePopup();
+            }
+          }
+        });
+      }
+
+      checkAndShowPopup() {
+        if (this.showOnce) {
+          const hasShown = localStorage.getItem(this.storageKey);
+          if (hasShown) {
+            return;
+          }
+        }
+
+        setTimeout(() => {
+          this.showPopup();
+        }, this.delay);
+      }
+
+      showPopup() {
+        this.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        if (this.video) {
+          this.video.play();
+        }
+
+        if (this.showOnce) {
+          localStorage.setItem(this.storageKey, 'true');
+        }
+      }
+
+      minimizePopup() {
+        this.classList.add('minimized');
+        this.isMinimized = true;
+        document.body.style.overflow = '';
+
+        if (this.video) {
+          this.video.play();
+        }
+      }
+
+      maximizePopup() {
+        this.classList.remove('minimized');
+        this.isMinimized = false;
+        document.body.style.overflow = 'hidden';
+
+        if (this.video) {
+          this.video.play();
+        }
+      }
+
+      closePopup() {
+        this.classList.remove('active');
+        this.classList.remove('minimized');
+        this.isMinimized = false;
+        document.body.style.overflow = '';
+
+        if (this.video) {
+          this.video.pause();
+          this.video.currentTime = 0;
+        }
+      }
+    }
+
+    customElements.define('video-popup-{{ ai_gen_id }}', VideoPopup{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Video popup",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video file"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay video",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "mute",
+      "label": "Mute video",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop video",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_controls",
+      "label": "Show video controls",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Watch our video"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Discover what makes us special"
+    },
+    {
+      "type": "header",
+      "content": "Popup behavior"
+    },
+    {
+      "type": "range",
+      "id": "popup_delay",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "Delay before showing",
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "show_once",
+      "label": "Show only once per visitor",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Minimized video"
+    },
+    {
+      "type": "range",
+      "id": "minimized_width",
+      "min": 200,
+      "max": 400,
+      "step": 20,
+      "unit": "px",
+      "label": "Minimized width",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "minimized_bottom",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Distance from bottom",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "minimized_right",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Distance from right",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "popup_width",
+      "min": 400,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Popup width",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "popup_padding",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Popup padding",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Popup border radius",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "video_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Video border radius",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 80
+    },
+    {
+      "type": "color",
+      "id": "popup_background",
+      "label": "Popup background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Text style"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 28
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Close button"
+    },
+    {
+      "type": "range",
+      "id": "close_button_size",
+      "min": 24,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Button size",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "close_button_position",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "Button position",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "close_button_background",
+      "label": "Button background",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "close_button_hover_background",
+      "label": "Button hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "close_button_color",
+      "label": "Button icon color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video popup"
+    }
+  ]
+}
+{% endschema %}

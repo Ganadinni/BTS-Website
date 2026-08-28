@@ -1,0 +1,121 @@
+{% comment %}
+  Renders product variant options
+
+  Accepts:
+  - product: {Object} product object.
+  - option: {Object} current product_option object.
+  - block: {Object} block object.
+
+
+  Usage:
+  {% render 'product-variant-options',
+    product: product,
+    option: option,
+    block: block
+  %}
+{% endcomment %}
+{%- liquid
+  assign variants_available_arr = product.variants | map: 'available'
+  assign variants_option1_arr = product.variants | map: 'option1'
+  assign variants_option2_arr = product.variants | map: 'option2'
+  assign variants_option3_arr = product.variants | map: 'option3'
+
+  assign product_form_id = 'product-form-' | append: section.id 
+-%}
+
+{%- for value in option.values -%}
+  {%- liquid
+    assign option_disabled = true
+
+    for option1_name in variants_option1_arr
+      case option.position
+        when 1
+          if variants_option1_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+            assign option_disabled = false
+          endif
+        when 2
+          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+            assign option_disabled = false
+          endif
+        when 3
+          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == product.selected_or_first_available_variant.option2 and variants_option3_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+            assign option_disabled = false
+          endif
+      endcase
+    endfor
+
+    if value.swatch.image
+      assign image_url = value.swatch.image | image_url: width: 50
+      assign swatch_value = 'url(' | append: image_url | append: ')'
+    elsif value.swatch.color
+      assign swatch_value = 'rgb(' | append: value.swatch.color.rgb | append: ')'
+    else
+      assign swatch_value = null
+    endif
+  -%}
+
+  {%- if block.settings.picker_type != 'dropdown' -%}
+    <input
+      type="radio"
+      id="{{ section.id }}-{{ block.id }}-{{ option.position }}-{{ forloop.index0 -}}"
+      name="{{ option.name }}-{{ block.id }}"
+      value="{{ value | escape }}"
+      form="{{ product_form_id }}-{{ block.id }}"
+      {% if option.selected_value == value %}
+        checked
+      {% endif %}
+      {% if option_disabled %}
+        class="disabled"
+      {% endif %}
+    >
+    {% if block.settings.swatch_shape != 'none' and option.name == 'Color' %}
+      <label
+        class="color-swatch swatch-input__label{% if block.settings.swatch_shape == 'square' %} swatch-input__label--square{% endif %}"
+        for="{{ section.id }}-{{ block.id }}-{{ option.position }}-{{ forloop.index0 -}}"
+        data-option="{{ value }}"
+        title="{{ value }}"
+        tabindex="0"
+      >
+        {% render 'swatch', swatch: value.swatch, shape: block.settings.swatch_shape %}
+      </label>
+    {% else %}
+      <label class="variant-buttons" for="{{ section.id }}-{{ block.id }}-{{ option.position }}-{{ forloop.index0 -}}">
+        {{ value }}
+        <span class="visually-hidden">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
+      </label>
+    {% endif %}
+
+  {%- elsif block.settings.picker_type == 'dropdown' -%}
+    <option
+      value="{{ value | escape }}"
+      {% if option.selected_value == value %}
+        selected="selected"
+      {% endif %}
+      {% if swatch_value %}
+        data-option-swatch-value="{{ swatch_value }}"
+      {% endif %}
+      {% if option_disabled -%}
+       class="option-disabled"
+      {%- endif -%}
+    >
+      {% if option_disabled -%}
+        {{- 'products.product.value_unavailable' | t: option_value: value -}}
+      {%- else -%}
+        {{- value -}}
+      {%- endif %}
+    </option>
+  {%- endif -%}
+{%- endfor -%}
+
+<script>
+ document.addEventListener('keydown', function(event) {
+    if (event.key === ' ' || event.key === 'Enter' || event.keyCode === 32 || event.keyCode === 13) { 
+        const focusedElement = document.activeElement;
+        if (focusedElement && focusedElement.classList.contains('color-swatch')) {
+            event.preventDefault(); 
+            focusedElement.click(); 
+        }
+    }
+});
+
+</script>

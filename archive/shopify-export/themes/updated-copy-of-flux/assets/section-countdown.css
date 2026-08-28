@@ -1,0 +1,10 @@
+@media only screen and (min-width: 990px) { 
+  .countdown-section .first-image {
+    margin-left: 100px;
+    margin-top: -100px;
+  }
+  .countdown-section .two-images-text-section--right .first-image {
+    margin-right: 100px;
+    margin-left: 0;
+  }
+}

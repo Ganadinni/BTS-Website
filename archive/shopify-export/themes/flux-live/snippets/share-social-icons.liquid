@@ -1,0 +1,43 @@
+{% assign full_product_url = shop.url | append: product.url %}
+<ul class="social-bar list-unstyled list-social">
+  {%- if settings.social_facebook_link != blank -%}
+    <li class="list-social__item">
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{ full_product_url }}" class="link list-social__link" target="_blank">
+        {%- render 'icon-facebook' -%}
+        <span class="visually-hidden">{{ 'general.social.links.facebook' | t }}</span>
+      </a>
+    </li>
+  {%- endif -%}
+  {%- if settings.social_instagram_link != blank -%}
+    <li class="list-social__item">
+      <a href="https://www.instagram.com/?url={{ full_product_url }}" class="link list-social__link" target="_blank">
+        {%- render 'icon-instagram' -%}
+        <span class="visually-hidden">{{ 'general.social.links.instagram' | t }}</span>
+      </a>
+    </li>
+  {%- endif -%}
+  {%- if settings.social_tiktok_link != blank -%}
+    <li class="list-social__item">
+      <a href="https://www.tiktok.com/share?url={{ full_product_url }}" class="link list-social__link" target="_blank">
+        {%- render 'icon-tiktok' -%}
+        <span class="visually-hidden">{{ 'general.social.links.tiktok' | t }}</span>
+      </a>
+    </li>
+  {%- endif -%}
+  {%- if settings.social_twitter_link != blank -%}
+    <li class="list-social__item">
+      <a href="https://twitter.com/share?url={{ full_product_url }}" class="link list-social__link" target="_blank">
+        {%- render 'icon-twitter' -%}
+        <span class="visually-hidden">{{ 'general.social.links.twitter' | t }}</span>
+      </a>
+    </li>
+  {%- endif -%}
+  {%- if settings.social_pinterest_link != blank -%}
+    <li class="list-social__item">
+      <a href="https://pinterest.com/pin/create/button/?url={{ full_product_url }}" class="link list-social__link" target="_blank">
+        {%- render 'icon-pinterest' -%}
+        <span class="visually-hidden">{{ 'general.social.links.pinterest' | t }}</span>
+      </a>
+    </li>
+  {%- endif -%}
+</ul>

@@ -1,0 +1,85 @@
+/* Deafult Effect */
+.main-navigation-mega .navigation-submenu {
+  transform: translateY(-2.5rem);
+  transition: all .2s ease-in-out;
+  transition-delay: .2s;
+}
+.mega-menu__list,
+.mega-image-menu__list {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY( 1.5rem);
+  transition: all .3s linear;
+  transition-delay: .1s;
+}
+
+.main-navigation-mega li:hover > .navigation-submenu,
+.main-navigation-mega li:focus-within > .navigation-submenu {
+  transform: translateY( 0rem);
+}
+
+.main-navigation-mega li:hover .mega-menu__list,
+.main-navigation-mega li:focus-within .mega-menu__list,
+.main-navigation-mega li:hover .mega-image-menu__list,
+.main-navigation-mega li:focus-within .mega-image-menu__list{
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Bottom Up */
+
+.main-navigation-mega .navigation-submenu.bottom {
+  transform: translateY(3.5rem);
+  transition: all .1s ease-in-out;
+  transition-delay: .1s;
+}
+
+.mega-menu__list.bottom {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-2.5rem);
+  transition: all .1s ease-in-out;
+  transition-delay: .15s;
+}
+
+.main-navigation-mega li:hover > .navigation-submenu.bottom,
+.main-navigation-mega li:focus-within > .navigation-submenu.bottom {
+  transform: translateY(-1.5rem);
+  transition: all .2s ease-in-out;
+  transition-delay: .15s;
+}
+
+.main-navigation-mega li:hover .mega-menu__list.bottom {
+  transform: translateY(0);
+  transition: all .2s ease-in-out;
+  transition-delay: .15s;
+}
+
+/* Left to right */
+.main-navigation-mega .navigation-submenu.left {
+  transform: translateX(-3.5rem);
+  transition: all .1s ease-in-out;
+  transition-delay: .1s;
+}
+
+.mega-menu__list.left {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-2.5rem);
+  transition: all .1s ease-in-out;
+  transition-delay: .15s;
+}
+
+.main-navigation-mega li:hover > .navigation-submenu.left,
+.main-navigation-mega li:focus-within > .navigation-submenu.left {
+  transform: translateY(-1.5rem);
+  transform: translateX(0);
+  transition: all .2s ease-in-out;
+  transition-delay: .15s;
+}
+.main-navigation-mega li:hover .mega-menu__list.left {
+  transform: translateY(0);
+  transition: all .2s ease-in-out;
+  transition-delay: .15s;
+}

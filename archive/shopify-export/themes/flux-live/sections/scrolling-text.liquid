@@ -1,0 +1,333 @@
+{{ 'section-scrolling-text.css' | asset_url | stylesheet_tag }}
+{% style %}
+  .section-{{ section.id }}-scroll-text {
+    height: {{ section.settings.scroll_height }}px;
+    font-size: {{ section.settings.scroll_text_size }}rem;
+  }
+  
+  @media screen and (max-width: 990px) {
+    .margin-spacing-negative.section-{{ section.id }}-margin {
+      margin-top: -{{ section.settings.margin_top }}px;
+    }
+    .margin-spacing-positive.section-{{ section.id }}-margin {
+      margin-top: {{ section.settings.margin_top }}px;
+    }
+  }
+  
+  {% liquid %}
+    {% if section.settings.keep_small_mobile %}
+   @media screen and (max-width: 576px) {
+    .scroll-text {
+      height: 60px;
+      font-size: 2.0rem;
+    }
+  }
+      {% endif %}
+    {% liquid %}
+{% endstyle %}
+
+{% if section.settings.enable_announcement_bar_desktop_sticky %}
+  {%- style -%}
+    @media screen and (min-width: 990px) {
+    .text-scroll-section {
+        position: sticky;
+        width: 100%;
+        top: 0;
+        z-index: 3!important;
+        }
+      }
+  {%- endstyle -%}
+{% endif %}
+{% if section.settings.enable_announcement_bar_mobile_sticky %}
+  {%- style -%}
+    @media screen and (max-width: 990px) {
+    .text-scroll-section {
+        position: sticky;
+        width: 100%;
+        top: 0;
+        z-index: 4!important;
+        }
+      }
+  {%- endstyle -%}
+{% endif %}
+
+<text-scroll
+  class="scroll-text section-{{ section.id }}-scroll-text color-{{ section.settings.color_scheme }} gradient {% if section.settings.border %} scroll-text-border {% endif %} gradient ignore-{{ section.settings.ignore_spacing }} margin-spacing-{{ section.settings.margin_spacing }} section-{{ section.id }}-margin"
+  data-scroll-speed="{{ section.settings.scroll_speed }}"
+  data-scroll-direction="{{ section.settings.scroll_direction }}"
+  data-stop-on-hover="{{ section.settings.hover_stop }}"
+  dir="{{ section.settings.scroll_direction }}"
+  data-aos="fade-up"
+>
+  <div class="scroll-text-block {% if section.settings.enable_stencil_text == true %}stencil-text{% endif %}">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'text' -%}
+          <span {{ block.shopify_attributes }}>
+            {% if block.settings.image %}
+              <a
+                  {% if block.settings.image_link == blank %}
+                    role="link" aria-disabled="true"
+                  {% else %}
+                    href="{{ block.settings.image_link }}"
+                  {% endif %}
+                  class="link"
+                  {{ block.shopify_attributes }}
+              >
+              {%- assign height = section.settings.scroll_height -%}
+              {% if section.settings.keep_small_mobile %}
+                {{
+                  block.settings.image
+                  | image_url: width: 350
+                  | image_tag: height: '70', sizes: '100vw', widths: '50, 100, 200, 350, 550, 750, 1000'
+                }}
+              {% else %}
+                {{
+                  block.settings.image
+                  | image_url: width: 350
+                  | image_tag: height: height, sizes: '100vw', widths: '50, 100, 200, 350, 550, 750, 1000'
+                }}
+              {% endif %}
+              </a>
+            {% else %}
+              {{ block.settings.text }}
+            {% endif %}
+          </span>
+      {%- endcase -%}
+      {%- if section.settings.enable_scroll_decoration == true -%}
+        {%- if section.settings.scroll_decoration == 'circle' -%}
+          <div class="scroll-circle-decoration">
+            <svg class="deco circle-outline" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+        {% endif %}
+                
+        {%- if section.settings.scroll_decoration == 'diamond' -%}
+          <div class="scroll-circle-decoration">
+            <svg class="deco diamond-outline" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+              <path d="M12 2 L20 12 L12 22 L4 12 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+          </div>
+        {% endif %}
+
+        {%- if section.settings.scroll_decoration == 'hexagon' -%}
+          <div class="scroll-circle-decoration">
+            <svg class="deco hexagon-outline" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+              <polygon points="12,2 19,7 19,17 12,22 5,17 5,7" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+          </div>
+        {% endif %}
+
+        {%- if section.settings.scroll_decoration == 'star' -%}
+          <div class="scroll-circle-decoration">
+            <svg class="deco star-outline" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+              <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        {% endif %} 
+      {% endif %}
+    {%- endfor -%}
+  </div>
+</text-scroll>
+
+{% schema %}
+{
+  "name": "t:sections.scrolling-text.name",
+  "tag": "section",
+  "class": "text-scroll-section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "scroll_direction",
+      "options": [
+        {
+          "value": "rtl",
+          "label": "t:sections.scrolling-text.settings.scroll_direction.options__1.label"
+        },
+        {
+          "value": "ltc",
+          "label": "t:sections.scrolling-text.settings.scroll_direction.options__2.label"
+        }
+        ],
+        "default": "ltc",
+        "label": "t:sections.scrolling-text.settings.scroll_direction.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_scroll_decoration",
+      "default": false,
+      "label": "t:sections.scrolling-text.settings.enable_scroll_decoration.label"
+    },
+    {
+      "type": "select",
+      "id": "scroll_decoration",
+      "options": [
+        {
+          "value": "circle",
+          "label": "t:sections.scrolling-text.settings.scroll_decoration.options__1.label"
+        },
+        {
+          "value": "diamond",
+          "label": "t:sections.scrolling-text.settings.scroll_decoration.options__2.label"
+        },
+        {
+          "value": "hexagon",
+          "label": "t:sections.scrolling-text.settings.scroll_decoration.options__3.label"
+        },
+        {
+          "value": "star",
+          "label": "t:sections.scrolling-text.settings.scroll_decoration.options__4.label"
+        }
+        ],
+        "default": "diamond",
+        "label": "t:sections.scrolling-text.settings.scroll_decoration.label"
+      },
+      {
+        "type": "range",
+        "id": "scroll_speed",
+        "min": 50,
+        "max": 250,
+        "step": 5,
+        "label": "t:sections.scrolling-text.settings.scroll_speed.label",
+        "default": 70
+      },
+      {
+        "type": "range",
+        "id": "scroll_height",
+        "min": 30,
+        "max": 250,
+        "step": 5,
+        "label": "t:sections.scrolling-text.settings.scroll_height.label",
+        "default": 35
+      },
+      {
+        "type": "range",
+        "id": "scroll_text_size",
+        "min": 1,
+        "max": 10,
+        "step": 0.1,
+        "label": "t:sections.scrolling-text.settings.scroll_text_size.label",
+        "default": 2
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_stencil_text",
+        "default": false,
+        "label": "t:sections.scrolling-text.settings.enable_stencil_text.label"
+      },
+      {
+        "type": "checkbox",
+        "id": "hover_stop",
+        "default": true,
+        "label": "t:sections.scrolling-text.settings.hover_stop.label"
+     },
+     {
+        "type": "checkbox",
+        "id": "keep_small_mobile",
+        "default": false,
+        "label": "t:sections.scrolling-text.settings.keep_small_mobile.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "border",
+      "default": false,
+      "label": "t:sections.scrolling-text.settings.border.label"
+    },
+   {
+      "type": "checkbox",
+      "id": "enable_announcement_bar_desktop_sticky",
+      "label": "t:sections.scrolling-text.settings.enable_announcement_bar_desktop_sticky.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_bar_mobile_sticky",
+      "label": "t:sections.scrolling-text.settings.enable_announcement_bar_mobile_sticky.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "ignore_spacing",
+      "default": false,
+      "label": "t:sections.all.ignore_spacing.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "option-2"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.promotion-cards.settings.header_mobile.content"
+    },
+    {
+      "type": "select",
+      "id": "margin_spacing",
+      "options": [
+        {
+          "value": "negative",
+          "label": "t:sections.all.margin_spacing.options__1.label"
+        },
+        {
+          "value": "positive",
+          "label": "t:sections.all.margin_spacing.options__2.label"
+        }
+      ],
+      "default": "negative",
+      "label": "t:sections.all.margin_spacing.label"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.margin_top",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "t:sections.scrolling-text.blocks.text.name",
+      "limit": 10,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Write about your brand</p>",
+          "label": "t:sections.scrolling-text.blocks.text.settings.text.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.scrolling-text.blocks.text.settings.image.label",
+          "info": "t:sections.scrolling-text.blocks.text.settings.image.info"
+        },
+        {
+          "type": "url",
+          "id": "image_link",
+          "label": "t:sections.scrolling-text.blocks.text.settings.image_link.label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.scrolling-text.presets.name",
+      "blocks": [
+        {
+          "type": "text"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,533 @@
+{{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  @media screen and (max-width: 990px) {
+    .margin-spacing-negative.section-{{ section.id }}-margin {
+      margin-top: -{{ section.settings.margin_top }}px;
+    }
+    .margin-spacing-positive.section-{{ section.id }}-margin {
+      margin-top: {{ section.settings.margin_top }}px;
+    }
+  }
+
+  .sidebar-border-true {
+    border-top: 1px solid rgba(var(--color-base-border-1));
+    padding-top: 5rem;
+  }
+{%- endstyle -%}
+
+<div class="ignore-{{ section.settings.ignore_spacing }} section-{{ section.id }}-padding">
+  <div class="{% unless section.settings.full_width %} page-width{% endunless %} margin-spacing-{{ section.settings.margin_spacing }} section-{{ section.id }}-margin">
+    <div class="contact-form-{{ section.settings.contact_style }} contact-form-sidebar-section color-{{ section.settings.color_scheme }} gradient">
+      <!-- Banner Image Section (Left Sidebar) -->
+      <div class="banner-section {% if section.settings.hide_image == true %}no-overlay{% endif %}">
+        <div class="banner-media banner-media-height-{{ section.settings.image_height }} banner-media-mobile-height-{{ section.settings.image_height_mobile }}">
+          {% if section.settings.hide_image != true %}
+            {% if section.settings.image %}
+              {% assign height = section.settings.image.width
+                | divided_by: section.settings.image.aspect_ratio
+                | round
+              %}
+              {{
+                section.settings.image
+                | image_url: width: 3840
+                | image_tag: loading: 'lazy', height: height, sizes: '100vw'
+              }}
+            {% else %}
+              {{ 'collection-2' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+          {% endif %}
+          <!-- Overlay Content -->
+          <div class="{% if section.settings.hide_image != true %}banner-overlay{% endif %} banner-content color-{{ section.settings.color_scheme_1 }} gradient">
+            {%- unless section.settings.caption == blank -%}
+              <p
+                class="contact-form-sidebar-caption image-with-text-text image-with-text-text--caption {{ section.settings.text_style }} {{ section.settings.text_style }}--{{ section.settings.text_size }} {{ section.settings.text_style }}"
+                {{ section.shopify_attributes }}
+              >
+                {{ section.settings.caption | escape }}
+              </p>
+            {%- endunless -%}
+            {%- unless section.settings.heading == blank -%}
+              <div class="title-wrapper--no-top-margin">
+                <{{ section.settings.heading_tag }} class="title heading-bold {{ section.settings.heading_size }} heading-{{ section.settings.heading_style }}">
+                  {{- section.settings.heading -}}
+                </{{ section.settings.heading_tag }}>
+              </div>
+            {%- endunless -%}
+            {%- unless section.settings.text == blank -%}
+              <div
+                class="rich-text-text rte"
+                {{ section.shopify_attributes }}
+              >
+                {{ section.settings.text }}
+              </div>
+            {%- endunless -%}
+
+            {%- unless section.settings.button_label_1 == blank -%}
+              <div
+                class="banner-buttons"
+              >
+                <a
+                  {% if section.settings.button_link_1 == blank %}
+                    role="link" aria-disabled="true"
+                  {% else %}
+                    href="{{ section.settings.button_link_1 }}"
+                  {% endif %}
+                  class="button-arrow button{% if section.settings.button_style_secondary_1 %} button--secondary{% else %} button--primary{% endif %}"
+                >
+                  {{- section.settings.button_label_1 | escape -}}
+                  {%- if settings.show_button_arrow -%}{% render 'icon-slider-arrows' %}{% endif %}
+                </a>
+              </div>
+            {%- endunless -%}
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form Section (Right) -->
+      <div class="contact-form-section">
+        <div class="contact__wrapper">
+          {%- form 'contact', id: 'ContactForm', class: 'extract' -%}
+            {%- if form.posted_successfully? -%}
+              <h2 class="form-status form-status-list form-message" tabindex="-1" autofocus>
+                {% render 'icon-success' %}
+                {{ 'templates.contact.form.post_success' | t }}
+              </h2>
+            {%- elsif form.errors -%}
+              <div class="form-message">
+                <h2 class="form-status caption-large text-body" role="alert" tabindex="-1" autofocus>
+                  {% render 'icon-error' %}
+                  {{ 'templates.contact.form.error_heading' | t }}
+                </h2>
+              </div>
+              <ul class="form-status-list caption-large" role="list">
+                <li>
+                  <a href="#ContactForm-email" class="link">
+                    {{ form.errors.translated_fields.email | capitalize }}
+                    {{ form.errors.messages.email }}
+                  </a>
+                </li>
+              </ul>
+            {%- endif -%}
+            <div class="contact__fields">
+              <div class="field">
+                <input
+                  class="field-input"
+                  autocomplete="name"
+                  type="text"
+                  id="ContactForm-name"
+                  name="contact[{{ 'templates.contact.form.name' | t }}]"
+                  value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+                  placeholder="{{ 'templates.contact.form.name' | t }}"
+                >
+                <label class="field-label" for="ContactForm-name">{{ 'templates.contact.form.name' | t }}</label>
+              </div>
+              <div class="field field--with-error">
+                <input
+                  autocomplete="email"
+                  type="email"
+                  id="ContactForm-email"
+                  class="field-input"
+                  name="contact[email]"
+                  spellcheck="false"
+                  autocapitalize="off"
+                  value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+                  aria-required="true"
+                  {% if form.errors contains 'email' %}
+                    aria-invalid="true"
+                    aria-describedby="ContactForm-email-error"
+                  {% endif %}
+                  placeholder="{{ 'templates.contact.form.email' | t }}"
+                >
+                <label class="field-label" for="ContactForm-email">
+                  {{- 'templates.contact.form.email' | t }}
+                  <span aria-hidden="true">*</span></label
+                >
+                {%- if form.errors contains 'email' -%}
+                  <small class="contact__field-error" id="ContactForm-email-error">
+                    <span class="visually-hidden">{{ 'accessibility.error' | t }}</span>
+                    <span class="form-message">
+                      {%- render 'icon-error' -%}
+                      {{- form.errors.translated_fields.email | capitalize }}
+                      {{ form.errors.messages.email -}}
+                    </span>
+                  </small>
+                {%- endif -%}
+              </div>
+            </div>
+
+            {% if section.settings.hide_phone_field == false %}
+            <div class="field">
+              <input
+                type="tel"
+                id="ContactForm-phone"
+                class="field-input"
+                autocomplete="tel"
+                name="contact[{{ 'templates.contact.form.phone' | t }}]"
+                pattern="[0-9\-]*"
+                value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+                placeholder="{{ 'templates.contact.form.phone' | t }}"
+              >
+              <label class="field-label" for="ContactForm-phone">{{ 'templates.contact.form.phone' | t }}</label>
+            </div>
+            {%- endif -%}
+            <div class="field">
+              <textarea
+                rows="10"
+                id="ContactForm-body"
+                class="text-area field-input"
+                name="contact[{{ 'templates.contact.form.comment' | t }}]"
+                placeholder="{{ 'templates.contact.form.comment' | t }}"
+              >
+              {{- form.body -}}
+              </textarea>
+              <label class="form-label field-label" for="ContactForm-body">
+                {{- 'templates.contact.form.comment' | t -}}
+              </label>
+            </div>
+            <div class="contact-button button-arrow">
+              <button type="submit" class="button">
+                {{ 'templates.contact.form.send' | t }}
+                {%- if settings.show_button_arrow -%}{% render 'icon-slider-arrows' %}{% endif %}
+              </button>
+            </div>
+          {%- endform -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.contact-form.name",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "contact_style",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:sections.contact-form.settings.contact_style.options__1.label"
+        },
+        {
+          "value": "row",
+          "label": "t:sections.contact-form.settings.contact_style.options__2.label"
+        }
+      ],
+      "default": "column",
+      "label": "t:sections.contact-form.settings.contact_style.label"
+    },
+    {
+        "type": "image_picker",
+        "id": "image",
+        "label": "t:sections.quick-info-bar.settings.image_1.label"
+    },
+    {
+      "type": "select",
+      "id": "image_height",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.contact-form.settings.image_height.options__1.label"
+        },
+        {
+          "value": "small",
+          "label": "t:sections.contact-form.settings.image_height.options__2.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.contact-form.settings.image_height.options__3.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.contact-form.settings.image_height.options__4.label"
+        }
+      ],
+      "default": "adapt",
+      "label": "t:sections.contact-form.settings.image_height.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_image",
+      "default": false,
+      "label": "t:sections.events-calendar.blocks.event.settings.hide_image.label"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "default": "Caption",
+      "label": "t:sections.contact-form.settings.caption.label"
+    },
+    {
+      "type": "select",
+      "id": "text_style",
+      "options": [
+        {
+          "value": "subtitle",
+          "label": "t:sections.all.text_style.options__1.label"
+        },
+        {
+          "value": "caption-with-letter-spacing",
+          "label": "t:sections.all.text_style.options__2.label"
+        }
+      ],
+      "default": "caption-with-letter-spacing",
+      "label": "t:sections.all.text_style.label"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "options": [
+        {
+          "value": "small",
+          "label": "t:sections.all.text_size.options__1.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.all.text_size.options__2.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.all.text_size.options__3.label"
+        }
+      ],
+      "default": "medium",
+      "label": "t:sections.all.text_size.label"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Contact form",
+      "label": "t:sections.contact-form.settings.heading.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "extra-large",
+          "label": "t:sections.all.heading_size.options__1.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.all.heading_size.options__2.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.all.heading_size.options__3.label"
+        }
+      ],
+      "default": "large",
+      "label": "t:sections.all.heading_size.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_style",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:sections.all.heading_style.options__1.label"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:sections.all.heading_style.options__2.label"
+        }
+      ],
+      "default": "default",
+      "label": "t:sections.all.heading_style.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "options": [
+        {
+          "value": "h1",
+          "label": "t:sections.all.heading_tag.options__1.label"
+        },
+        {
+          "value": "h2",
+          "label": "t:sections.all.heading_tag.options__2.label"
+        },
+        {
+          "value": "h3",
+          "label": "t:sections.all.heading_tag.options__3.label"
+        },
+        {
+          "value": "h4",
+          "label": "t:sections.all.heading_tag.options__4.label"
+        },
+        {
+          "value": "h5",
+          "label": "t:sections.all.heading_tag.options__5.label"
+        },
+        {
+          "value": "h6",
+          "label": "t:sections.all.heading_tag.options__6.label"
+        }
+      ],
+      "default": "h2",
+      "label": "t:sections.all.heading_tag.label",
+      "info": "t:sections.all.heading_tag.info"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "default": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>",
+      "label": "t:sections.contact-form.settings.text.label"
+    },
+    {
+      "type": "text",
+      "id": "button_label_1",
+      "default": "Button label",
+      "label": "t:sections.image-banner.blocks.buttons.settings.button_label_1.label",
+      "info": "t:sections.image-banner.blocks.buttons.settings.button_label_1.info"
+    },
+    {
+      "type": "url",
+      "id": "button_link_1",
+      "label": "t:sections.image-banner.blocks.buttons.settings.button_link_1.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_style_secondary_1",
+      "default": false,
+      "label": "t:sections.image-banner.blocks.buttons.settings.button_style_secondary_1.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.video.settings.full_width.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_phone_field",
+      "label": "t:sections.location-map.settings.hide_phone_field.label",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "option-2"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme_1",
+      "label": "t:sections.all.colors_box.label",
+      "default": "option-3"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    },
+    {
+      "type": "checkbox",
+      "id": "ignore_spacing",
+      "default": false,
+      "label": "t:sections.all.ignore_spacing.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.section_margin_heading"
+    },
+    {
+      "type": "select",
+      "id": "image_height_mobile",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.contact-form.settings.image_height_mobile.options__1.label"
+        },
+        {
+          "value": "small",
+          "label": "t:sections.contact-form.settings.image_height_mobile.options__2.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.contact-form.settings.image_height_mobile.options__3.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.contact-form.settings.image_height_mobile.options__4.label"
+        }
+      ],
+      "default": "small",
+      "label": "t:sections.contact-form.settings.image_height_mobile.label"
+    },
+    {
+      "type": "select",
+      "id": "margin_spacing",
+      "options": [
+        {
+          "value": "negative",
+          "label": "t:sections.all.margin_spacing.options__1.label"
+        },
+        {
+          "value": "positive",
+          "label": "t:sections.all.margin_spacing.options__2.label"
+        }
+      ],
+      "default": "negative",
+      "label": "t:sections.all.margin_spacing.label"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.margin_top",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.contact-form.presets.name"
+    }
+  ]
+}
+{% endschema %}

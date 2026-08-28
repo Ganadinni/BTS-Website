@@ -1,0 +1,251 @@
+{{ 'component-article-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'section-main-blog.css' | asset_url | stylesheet_tag }}
+{{ 'section-featured-blog.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+    }
+
+    @media screen and (min-width: 750px) {
+      .section-{{ section.id }}-padding {
+        padding-top: {{ section.settings.padding_top }}px;
+        padding-bottom: {{ section.settings.padding_bottom }}px;
+      }
+    }
+{%- endstyle -%}
+
+{%- paginate blog.articles by 7 -%}
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="main-blog page-width section-{{ section.id }}-padding {{ section.settings.blog_style }}" data-aos="fade-up" data-aos-delay="150">
+    <h1 class="title--primary title-show-{{ section.settings.show_page_title }} heading-bold">
+      {{ blog.title | escape }}
+    </h1>
+
+    {% if section.settings.tags %}
+      <label for="dropdown" class="blog-tags-title" data-aos="fade-up" data-aos-delay="150">{{ section.settings.tag_label }}</label>
+
+      <div class="tags facet-filters__field">
+        <div class="select" data-aos="fade-up" data-aos-delay="150">
+          <select id="dropdown" class="color-{{ section.settings.color_scheme_1 }} gradient blog-tags-dropdown global-media-settings">
+            <option value="{{ blog.url}}">{{ section.settings.tag_default }}</option>
+            {% for tag in blog.all_tags %}
+              {% assign tag_link = tag | link_to_tag: tag %}
+              {% assign tag_url_parts = tag_link | split: '"' %}
+              {% assign tag_url = tag_url_parts[1] %}
+              <option
+                value="{{ tag_url }}"
+                {% if current_tags contains tag %}
+                  selected
+                {% endif %}
+              >
+                {{ tag }}
+              </option>
+            {% endfor %}
+          </select>
+          {% render 'icon-caret' %}
+        </div>
+      </div>
+      <script>
+        document.getElementById("dropdown").addEventListener("change", function() {
+        var selectedOption = this.options[this.selectedIndex];
+        var tagUrl = selectedOption.value;
+        if (tagUrl !== "#") {
+        window.location.href = tagUrl;
+        }
+        });
+      </script>
+    {% endif %}
+
+    <div class="blog-articles {% if section.settings.layout == 'grid-3' %}blog-articles-grid-3{% endif %} {% if section.settings.layout == 'grid-2' %}blog-articles-grid-2{% endif %} {% if section.settings.make_first_post_featured == true %}make-first-post-featured{% endif %} {% if section.settings.show_image == false %}empty-featured-image{% endif %}">
+      {%- for article in blog.articles -%}
+        <div class="blog-articles__article article" data-aos="fade-up" data-aos-delay="150">
+          {%- render 'article-card',
+            article: article,
+            media_height: section.settings.image_height,
+            media_aspect_ratio: article.image.aspect_ratio,
+            show_image: section.settings.show_image,
+            show_date: section.settings.show_date,
+            show_author: section.settings.show_author,
+            show_excerpt: true
+          -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if paginate.pages > 1 -%}
+      {%- render 'pagination', paginate: paginate -%}
+    {%- endif -%}
+  </div>
+</div>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "t:sections.main-blog.name",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.main-blog.settings.header.content"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "options": [
+        {
+          "value": "grid-2",
+          "label": "t:sections.main-blog.settings.layout.options__2.label"
+        },
+        {
+          "value": "grid-3",
+          "label": "t:sections.main-blog.settings.layout.options__3.label"
+        }
+      ],
+      "default": "grid-2",
+      "label": "t:sections.main-blog.settings.layout.label",
+      "info": "t:sections.main-blog.settings.layout.info"
+    },
+    {
+      "type": "select",
+      "id": "blog_style",
+      "options": [
+        {
+          "value": "blog-style-one",
+          "label": "t:sections.main-blog.settings.blog_style.options__1.label"
+        },
+        {
+          "value": "blog-style-two",
+          "label": "t:sections.main-blog.settings.blog_style.options__2.label"
+        },
+        {
+          "value": "blog-style-three",
+          "label": "t:sections.main-blog.settings.blog_style.options__3.label"
+        }
+      ],
+      "default": "blog-style-two",
+      "label": "t:sections.main-blog.settings.blog_style.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "make_first_post_featured",
+      "default": true,
+      "label": "t:sections.main-blog.settings.make_first_post_featured.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "default": true,
+      "label": "t:sections.main-blog.settings.show_image.label"
+    },
+    {
+      "type": "select",
+      "id": "image_height",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.main-blog.settings.image_height.options__1.label"
+        },
+        {
+          "value": "small",
+          "label": "t:sections.main-blog.settings.image_height.options__2.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.main-blog.settings.image_height.options__3.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.main-blog.settings.image_height.options__4.label"
+        }
+      ],
+      "default": "medium",
+      "label": "t:sections.main-blog.settings.image_height.label",
+      "info": "t:sections.main-blog.settings.image_height.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "tags",
+      "default": true,
+      "label": "t:sections.main-blog.settings.tags.label"
+    },
+    {
+      "type": "text",
+      "id": "tag_label",
+      "default": "Filter by Tag",
+      "label": "t:sections.main-blog.settings.tag_label.label"
+    },
+     {
+      "type": "text",
+      "id": "tag_default",
+      "default": "All Posts",
+      "label": "t:sections.main-blog.settings.tag_default.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_page_title",
+      "default": true,
+      "label": "t:sections.main-blog.settings.show_page_title.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "default": true,
+      "label": "t:sections.main-blog.settings.show_date.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "default": false,
+      "label": "t:sections.main-blog.settings.show_author.label"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:sections.main-blog.settings.paragraph.content"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "option-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme_1",
+      "label": "t:sections.all.colors_box.label",
+      "default": "option-1"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+  ]
+}
+{% endschema %}

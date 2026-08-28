@@ -1,0 +1,600 @@
+{% doc %}
+  @prompt
+    Integrate WhatsApp into the site, connecting with customers. being able to live chat 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-whatsapp-chat-{{ ai_gen_id }} {
+    position: fixed;
+    bottom: {{ block.settings.bottom_position }}px;
+    z-index: 9999;
+  }
+
+  {% if block.settings.position == 'left' %}
+    .ai-whatsapp-chat-{{ ai_gen_id }} {
+      left: {{ block.settings.side_position }}px;
+    }
+  {% else %}
+    .ai-whatsapp-chat-{{ ai_gen_id }} {
+      right: {{ block.settings.side_position }}px;
+    }
+  {% endif %}
+
+  .ai-whatsapp-button-{{ ai_gen_id }} {
+    width: {{ block.settings.button_size }}px;
+    height: {{ block.settings.button_size }}px;
+    background-color: {{ block.settings.button_color }};
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    padding: 0;
+  }
+
+  .ai-whatsapp-button-{{ ai_gen_id }}:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .ai-whatsapp-button-{{ ai_gen_id }} svg {
+    width: calc({{ block.settings.button_size }}px * 0.55);
+    height: calc({{ block.settings.button_size }}px * 0.55);
+    fill: {{ block.settings.icon_color }};
+  }
+
+  .ai-whatsapp-popup-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: calc(100% + 15px);
+    width: 320px;
+    background-color: {{ block.settings.popup_bg_color }};
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  }
+
+  {% if block.settings.position == 'left' %}
+    .ai-whatsapp-popup-{{ ai_gen_id }} {
+      left: 0;
+    }
+  {% else %}
+    .ai-whatsapp-popup-{{ ai_gen_id }} {
+      right: 0;
+    }
+  {% endif %}
+
+  .ai-whatsapp-popup-{{ ai_gen_id }}.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .ai-whatsapp-popup-header-{{ ai_gen_id }} {
+    background-color: {{ block.settings.header_bg_color }};
+    color: {{ block.settings.header_text_color }};
+    padding: 20px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ai-whatsapp-popup-avatar-{{ ai_gen_id }} {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-whatsapp-popup-avatar-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-whatsapp-popup-avatar-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-whatsapp-popup-avatar-placeholder-{{ ai_gen_id }} svg {
+    width: 30px;
+    height: 30px;
+    fill: {{ block.settings.header_text_color }};
+  }
+
+  .ai-whatsapp-popup-info-{{ ai_gen_id }} {
+    flex-grow: 1;
+  }
+
+  .ai-whatsapp-popup-name-{{ ai_gen_id }} {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  .ai-whatsapp-popup-status-{{ ai_gen_id }} {
+    font-size: 13px;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .ai-whatsapp-popup-close-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: {{ block.settings.header_text_color }};
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+
+  .ai-whatsapp-popup-close-{{ ai_gen_id }}:hover {
+    opacity: 1;
+  }
+
+  .ai-whatsapp-popup-close-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
+  .ai-whatsapp-popup-body-{{ ai_gen_id }} {
+    padding: 20px;
+  }
+
+  .ai-whatsapp-message-{{ ai_gen_id }} {
+    background-color: {{ block.settings.message_bg_color }};
+    color: {{ block.settings.message_text_color }};
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .ai-whatsapp-message-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -8px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 8px 8px 0;
+    border-color: transparent {{ block.settings.message_bg_color }} transparent transparent;
+  }
+
+  .ai-whatsapp-chat-button-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px 20px;
+    background-color: {{ block.settings.chat_button_color }};
+    color: {{ block.settings.chat_button_text_color }};
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .ai-whatsapp-chat-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.chat_button_hover_color }};
+  }
+
+  .ai-whatsapp-chat-button-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
+  .ai-whatsapp-badge-{{ ai_gen_id }} {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 20px;
+    height: 20px;
+    background-color: {{ block.settings.badge_color }};
+    color: {{ block.settings.badge_text_color }};
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    border: 2px solid #ffffff;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-whatsapp-popup-{{ ai_gen_id }} {
+      width: 280px;
+    }
+
+    .ai-whatsapp-button-{{ ai_gen_id }} {
+      width: calc({{ block.settings.button_size }}px * 0.85);
+      height: calc({{ block.settings.button_size }}px * 0.85);
+    }
+
+    .ai-whatsapp-chat-{{ ai_gen_id }} {
+      bottom: {{ block.settings.bottom_position | times: 0.8 }}px;
+    }
+
+    {% if block.settings.position == 'left' %}
+      .ai-whatsapp-chat-{{ ai_gen_id }} {
+        left: {{ block.settings.side_position | times: 0.8 }}px;
+      }
+    {% else %}
+      .ai-whatsapp-chat-{{ ai_gen_id }} {
+        right: {{ block.settings.side_position | times: 0.8 }}px;
+      }
+    {% endif %}
+  }
+{% endstyle %}
+
+<whatsapp-chat-{{ ai_gen_id }}
+  class="ai-whatsapp-chat-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <button
+    class="ai-whatsapp-button-{{ ai_gen_id }}"
+    aria-label="Open WhatsApp chat"
+    aria-expanded="false"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+    </svg>
+    {% if block.settings.show_badge %}
+      <span class="ai-whatsapp-badge-{{ ai_gen_id }}">{{ block.settings.badge_number }}</span>
+    {% endif %}
+  </button>
+
+  <div class="ai-whatsapp-popup-{{ ai_gen_id }}">
+    <div class="ai-whatsapp-popup-header-{{ ai_gen_id }}">
+      <div class="ai-whatsapp-popup-avatar-{{ ai_gen_id }}">
+        {% if block.settings.agent_image %}
+          <img
+            src="{{ block.settings.agent_image | image_url: width: 100 }}"
+            alt="{{ block.settings.agent_name | escape }}"
+            width="50"
+            height="50"
+            loading="lazy"
+          >
+        {% else %}
+          <div class="ai-whatsapp-popup-avatar-placeholder-{{ ai_gen_id }}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+        {% endif %}
+      </div>
+      <div class="ai-whatsapp-popup-info-{{ ai_gen_id }}">
+        <h3 class="ai-whatsapp-popup-name-{{ ai_gen_id }}">{{ block.settings.agent_name }}</h3>
+        <p class="ai-whatsapp-popup-status-{{ ai_gen_id }}">{{ block.settings.agent_status }}</p>
+      </div>
+      <button
+        class="ai-whatsapp-popup-close-{{ ai_gen_id }}"
+        aria-label="Close chat"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="ai-whatsapp-popup-body-{{ ai_gen_id }}">
+      {% if block.settings.welcome_message != blank %}
+        <div class="ai-whatsapp-message-{{ ai_gen_id }}">
+          {{ block.settings.welcome_message }}
+        </div>
+      {% endif %}
+      <a
+        href="https://wa.me/{{ block.settings.phone_number | replace: '+', '' | replace: ' ', '' | replace: '-', '' }}?text={{ block.settings.pre_filled_message | url_encode }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="ai-whatsapp-chat-button-{{ ai_gen_id }}"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
+        {{ block.settings.chat_button_text }}
+      </a>
+    </div>
+  </div>
+</whatsapp-chat-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class WhatsAppChat{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.button = this.querySelector('.ai-whatsapp-button-{{ ai_gen_id }}');
+        this.popup = this.querySelector('.ai-whatsapp-popup-{{ ai_gen_id }}');
+        this.closeButton = this.querySelector('.ai-whatsapp-popup-close-{{ ai_gen_id }}');
+        this.chatButton = this.querySelector('.ai-whatsapp-chat-button-{{ ai_gen_id }}');
+
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.button.addEventListener('click', () => {
+          this.togglePopup();
+        });
+
+        this.closeButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.closePopup();
+        });
+
+        this.chatButton.addEventListener('click', () => {
+          this.closePopup();
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!this.contains(e.target)) {
+            this.closePopup();
+          }
+        });
+      }
+
+      togglePopup() {
+        const isActive = this.popup.classList.contains('active');
+        if (isActive) {
+          this.closePopup();
+        } else {
+          this.openPopup();
+        }
+      }
+
+      openPopup() {
+        this.popup.classList.add('active');
+        this.button.setAttribute('aria-expanded', 'true');
+      }
+
+      closePopup() {
+        this.popup.classList.remove('active');
+        this.button.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    customElements.define('whatsapp-chat-{{ ai_gen_id }}', WhatsAppChat{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "WhatsApp live chat",
+  "settings": [
+    {
+      "type": "header",
+      "content": "WhatsApp settings"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone number",
+      "info": "Include country code (e.g., +919876543210)"
+    },
+    {
+      "type": "textarea",
+      "id": "pre_filled_message",
+      "label": "Pre-filled message",
+      "default": "Hi! I have a question about your products."
+    },
+    {
+      "type": "header",
+      "content": "Agent information"
+    },
+    {
+      "type": "text",
+      "id": "agent_name",
+      "label": "Agent name",
+      "default": "Customer Support"
+    },
+    {
+      "type": "text",
+      "id": "agent_status",
+      "label": "Status message",
+      "default": "Typically replies within minutes"
+    },
+    {
+      "type": "image_picker",
+      "id": "agent_image",
+      "label": "Agent photo"
+    },
+    {
+      "type": "header",
+      "content": "Welcome message"
+    },
+    {
+      "type": "textarea",
+      "id": "welcome_message",
+      "label": "Message text",
+      "default": "Hi there! 👋 How can we help you today?"
+    },
+    {
+      "type": "text",
+      "id": "chat_button_text",
+      "label": "Chat button text",
+      "default": "Start chat"
+    },
+    {
+      "type": "header",
+      "content": "Notification badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show notification badge",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "badge_number",
+      "min": 1,
+      "max": 9,
+      "step": 1,
+      "label": "Badge number",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Position"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Screen position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "right",
+          "label": "Bottom right"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "bottom_position",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Distance from bottom",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "side_position",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Distance from side",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "range",
+      "id": "button_size",
+      "min": 50,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Button size",
+      "default": 60
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button color",
+      "default": "#25D366"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "badge_color",
+      "label": "Badge color",
+      "default": "#ff0000"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Popup style"
+    },
+    {
+      "type": "color",
+      "id": "popup_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "header_bg_color",
+      "label": "Header background",
+      "default": "#075E54"
+    },
+    {
+      "type": "color",
+      "id": "header_text_color",
+      "label": "Header text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "message_bg_color",
+      "label": "Message background",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "color",
+      "id": "message_text_color",
+      "label": "Message text color",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "chat_button_color",
+      "label": "Chat button color",
+      "default": "#25D366"
+    },
+    {
+      "type": "color",
+      "id": "chat_button_text_color",
+      "label": "Chat button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "chat_button_hover_color",
+      "label": "Chat button hover color",
+      "default": "#1ebe57"
+    }
+  ],
+  "presets": [
+    {
+      "name": "WhatsApp live chat"
+    }
+  ]
+}
+{% endschema %}

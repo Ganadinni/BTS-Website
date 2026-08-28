@@ -1,0 +1,93 @@
+.blog-articles {
+  display: grid;
+  grid-gap: 1rem;
+  column-gap: var(--grid-mobile-horizontal-spacing);
+  row-gap: var(--grid-mobile-vertical-spacing);
+}
+
+.blog-articles-grid-1 {
+  display: block;
+}
+
+.blog-articles-grid-1 .card-information {
+  max-width: 82rem;
+  margin: 0 auto 2rem;
+}
+
+.blog-articles .card-wrapper {
+  width: 100%;
+}
+
+.title-show-false {
+  display: none;
+}
+
+.main-blog .tags.facet-filters__field {
+  display: inline-block;
+}
+
+.main-blog .tags .select:before {
+  box-shadow: none;
+}
+
+.main-blog .tags .select .icon-caret {
+  top: 13px;
+  right: 15px;
+}
+
+select.blog-tags-dropdown {
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  align-items: center;
+  background: rgb(var(--color-background));
+  border: 1px solid rgba(var(--color-base-border-1));
+  box-shadow: var(--shadow-horizontal-offset) var(--shadow-vertical-offset)
+    var(--shadow-blur-radius) rgba(var(--color-shadow), var(--shadow-opacity));
+  border-radius: var(--media-radius);
+  padding: 5px 45px 5px 15px;
+  margin-bottom: 20px;
+  -moz-appearance: none; /* Firefox */
+  -webkit-appearance: none; /* Safari and Chrome */
+  appearance: none;
+}
+
+select.blog-tags-dropdown:focus-visible {
+  outline-offset: 0;
+}
+
+.blog-tags-title {
+  font-size: 1.6rem;
+}
+
+.main-blog .empty-featured-image .card-content {
+  padding: 0;
+}
+
+.blog-style-three .empty-featured-image .article-card-info {
+  top: -1.5rem;
+  border-radius: calc(var(--media-radius) - var(--media-border-width));
+}
+
+.blog-style-two .empty-featured-image .card-information {
+  border-radius: var(--media-radius);
+}
+
+
+@media screen and (min-width: 750px) {
+  .blog-articles {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--grid-desktop-horizontal-spacing);
+    row-gap: var(--grid-desktop-vertical-spacing);
+  }
+  .blog-articles-grid-1 .h2 {
+    font-size: calc(var(--font-heading-scale) * 3.4rem);
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .blog-articles-grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: var(--grid-desktop-horizontal-spacing);
+    row-gap: var(--grid-desktop-vertical-spacing);
+  }
+}

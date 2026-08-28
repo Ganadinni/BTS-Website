@@ -1,0 +1,124 @@
+<div class="page-loader">
+  <div class="load-spinner">&nbsp;</div>
+  {% if settings.page_loader_text %}
+    <div class="page-loader-text">{{ settings.page_loader_text }}</div>
+  {% endif %}
+</div>
+
+{% style %}
+  .page-loader {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    background: {{ settings.loader_background_color }};
+    z-index: 1000;
+    overflow: hidden;
+    opacity: 1; /* Ensure it's fully opaque initially */
+    visibility: visible;
+  }
+  
+  .page-loader-text {
+    color: {{ settings.loader_text_color }};
+    text-align: center;
+    top: 50%;
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 0.3rem;
+    font-weight: bold;
+    line-height: 1.5;
+    font-family: var(--font-heading-family);
+    opacity: 0; 
+    animation: textFadeSlide 1.5s ease-out 0.2s forwards;
+  }
+
+  /* SPINNER ANIMATION */
+  .load-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+  }
+
+  .load-spinner::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(var(--scroll-indicator-color));
+    animation: fill 2s infinite;
+  }
+
+  /* Spinner Animation Keyframes */
+  @keyframes fill {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* Text Animation Keyframes */
+  @keyframes textFadeSlide {
+    0% {
+      opacity: 0; 
+      transform: scale(0.6); 
+    }
+    100% {
+      opacity: 1; 
+      transform: scale(1.2); 
+    }
+  }
+{% endstyle %}
+
+{% if settings.page_loader_style == 'always' %}
+  {% style %}
+    .page-loader-text{
+      display: block;
+    }
+  {% endstyle %}
+  <script>
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            const pageLoader = document.querySelector('.page-loader');
+            if (pageLoader) {
+                pageLoader.style.transition = 'opacity 0.3s';
+                pageLoader.style.opacity = '0';
+                setTimeout(function() {
+                    pageLoader.style.visibility = 'hidden';
+                }, 500); // Matches the transition duration
+            }
+        }, 10);
+    });
+  </script>
+{% else %}
+  {% style %}
+    .page-loader-text{
+      display: none;
+    }
+  {% endstyle %}
+  <script>
+    window.addEventListener('load', function() {
+        // Check if this is the user's first visit in the current session
+        if (!sessionStorage.getItem('firstVisit')) {
+            // If no flag is found, it's the first visit in this session
+            sessionStorage.setItem('firstVisit', 'true');
+
+            const pageLoaderText = document.querySelector('.page-loader-text');
+            if (pageLoaderText) {
+                pageLoaderText.style.display = 'block'; // Show the text on first visit
+            }
+        }
+
+        // Fade out the page loader after 0.5 seconds
+        setTimeout(function() {
+            const pageLoader = document.querySelector('.page-loader');
+            if (pageLoader) {
+                pageLoader.style.transition = 'opacity 0.3s';
+                pageLoader.style.opacity = '0';
+                setTimeout(function() {
+                    pageLoader.style.visibility = 'hidden';
+                }, 300); // Matches the transition duration
+            }
+        }, 50);
+    });
+  </script>
+{% endif %}

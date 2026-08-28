@@ -1,0 +1,109 @@
+.collection-tabs-section .collection-title .title {
+    margin: 0 0 1rem 0;
+}
+
+.collection-tabs-section .tabs {
+    display: flex;
+    flex-wrap: no-wrap;
+    position: relative;
+    background-color: transparent;
+    border-radius: 12px;
+    width: 100%;
+    text-align: left;
+}
+
+.collection-tabs-section .tabs.center {
+    justify-content: center;
+}
+
+.collection-tabs-section .tabs * {
+    z-index: 2;
+}
+
+.collection-tabs-section input[type="radio"] {
+    display: none;
+}
+
+.collection-tabs-section .tab {
+    display: flex;
+    margin-right: 30px;
+    padding: 0 5px 0 12px;
+    border: 1px solid rgba(var(--color-base-border-1));
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    font-size: calc(var(--font-body-scale)* 1.1rem);
+    text-transform: uppercase;
+    font-weight: 500;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: color 0.15s ease-in;
+    position: relative;
+    line-height: 1rem;
+}
+
+.collection-tabs-section .tab:last-child {
+    margin-right: 0;
+}
+
+.collection-tabs-section .tab-content > div {
+    display: none;
+}
+
+.collection-tabs-section .notification {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin-left: 0.75rem;
+    border-radius: 50%;
+    background-color: #F2F2F2;
+    color: #1D1D1D;
+    transition: 0.15s ease-in;
+}
+
+.collection-tabs-section input[type="radio"]:checked + label {
+    font-weight: 600;
+}
+
+.collection-tabs-section .glider {
+    position: absolute;
+    height: 34px;
+    background-color: rgb(var(--color-base-background-accent-1));
+    z-index: 1;
+    border-radius: 12px;
+    transition: 0.25s ease-out;
+    top: 0;
+    left: 0;
+    width: 0;
+}
+
+.collection-tabs-section input[type="radio"]:checked + label {
+    color: rgb(var(--color-base-accent-1));
+}
+
+.collection-tabs-section .slider-button {
+    position: relative;
+    z-index: 10;
+}
+
+@media (max-width: 990px) {
+    .collection-tabs-section .tabs .grid-item {
+        width: 0;
+    }
+    .collection-tabs-section .tab {
+        margin-right: 5px;
+    }
+    .collection-tabs-section tab-switcher .grid-item.right {
+        margin-top: 1rem;
+    }
+    .collection-tabs-section .collection-three .slider.slider--tablet {
+        margin-top: 1.5rem;
+    }
+}
+@media (min-width: 990px) {
+    .collection-tabs-section tab-switcher .grid-item.right {
+        margin-top: -3.7rem;
+    }
+}

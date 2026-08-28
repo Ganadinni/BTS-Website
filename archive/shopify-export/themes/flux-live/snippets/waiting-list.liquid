@@ -1,0 +1,91 @@
+<style>
+  summary {
+    display: block;
+    cursor: pointer;
+    transition: .3s;
+    user-select: none;
+  }
+  details[open] > div {
+    opacity: 1;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+    animation-fill-mode: forwards;
+  }
+  #wrapper {
+    margin-top: -20px;
+  }
+  .waiting-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+  .waiting-wrapper input#ContactFormEmail {
+    border: 1px solid;
+    padding: 10px;
+    border-radius: 12px;
+  }
+  .waiting-wrapper input#ContactFormEmail:focus-visible {
+    outline: 0.1rem solid rgba(var(--color-foreground),.75);
+    outline-offset: 0;
+    box-shadow: 0 0 0 1rem rgb(var(--color-background)),0 0 0.5rem 0.4rem rgba(var(--color-foreground),.3);
+  }
+  .waiting-wrapper button {
+    font-size: 1.6rem;
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+  .grecaptcha-badge {
+    visibility: hidden;
+  }
+  a.product-popup-modal__button.link {
+    cursor:pointer;
+  }
+  p.waiting-list-notice {
+    font-size: 1.2rem;
+  }
+</style>
+
+{% assign out_of_stock = false %}
+{% for variant in product.variants %}
+  {% if variant.available == false %}
+    {% assign out_of_stock = true %}
+  {% endif %}
+{% endfor %}
+
+{% if out_of_stock == true %}
+  {% form 'contact' %}
+    {% if form.posted_successfully? %}
+      <p>{{ notice }}</p>
+    {% endif %}
+    {% if form.posted_successfully? == false %}
+      <details>
+        <summary class="section-{{ block.id }}-margin product-popup-modal__button link" id="notify-me">{{ title }}</summary>
+        <p class="waiting-list-notice">{{ tagline }}</p>
+        {% unless form.posted_successfully? %}
+          <div id="wrapper">
+            <div class="waiting-wrapper">
+              <input
+                autofocus
+                name="contact[email]"
+                id="ContactFormEmail"
+                value="{{ contact.fields.email }}"
+                type="email"
+                aria-label="Enter email"
+                placeholder=" Please enter a valid email address"
+                required="required"
+              >
+              <input
+                type="hidden"
+                name="contact[body]"
+                value="Please notify me when **{{ product.title | escape }} - {{ product.selected_or_first_available_variant.title }}** becomes available."
+              />
+              
+              <div class="waiting-list-button">
+                <button class="button" type="submit">{{ button }}</button>
+              </div>
+            </div>
+          </div>
+        {% endunless %}
+      </details>
+    {% endif %}
+  {% endform %}
+{% endif %}

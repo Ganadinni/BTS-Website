@@ -1,0 +1,233 @@
+.infocards {
+  display: flex;
+  gap: 0;
+  padding: 0;
+  justify-content: center; 
+}
+
+.infocard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.infocard--expanded {
+  cursor: default;
+}
+
+.infocard__content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2.5rem;
+  overflow: hidden;
+}
+
+.infocards .infocard__header .button-arrow {
+  display: none;
+}
+
+.infocard--expanded .infocard__header .button-arrow {
+  display: flex;
+  margin-top: .5rem;
+}
+
+.infocard--expanded .infocard__content {
+  border-radius: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  justify-content: flex-start;
+  align-items: flex-start;
+  overflow: auto;
+}
+
+.infocard__user-image,
+.infocards svg.placeholder-svg {
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  will-change: transform;
+  transform-origin: 0 0;
+}
+
+.infocard--expanded .infocard__user-image,
+.infocard--expanded svg.placeholder-svg {
+  width: 150px;
+  height: 150px;
+}
+
+.infocard__images {
+  display: grid;
+  gap: 10px;
+  margin: 50px auto 0;
+  transform-origin: 0 0;
+  position: absolute;
+  top: 100%;
+}
+
+.infocard--expanded .infocard__images {
+  position: static;
+}
+
+.infocard__image {
+  border-radius: 5px;
+  aspect-ratio: 1;
+}
+
+.infocard__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  transform-origin: 0 0;
+  line-height: 1;
+}
+
+.infocard--expanded .infocard__title {
+  font-size: 30px;
+}
+
+.infocard__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px 14px;
+  margin: 0 auto;
+}
+
+.infocard--expanded .infocard__header {
+  flex-direction: row;
+}
+
+.infocard__user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+}
+
+.infocard--expanded .infocard__user-info {
+  align-items: flex-start;
+  gap: 2px 0;
+  text-align: left;
+}
+
+.infocard__bio {
+  opacity: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+
+.infocard--expanded .infocard__bio {
+  max-width: 800px;
+  margin: 20px auto 0;
+  opacity: 1;
+  height: auto;
+}
+
+.infocard__close {
+  position: absolute;
+  right: -40px;
+  top: 10px;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  color: white;
+  padding: 10px;
+}
+
+.infocard--expanded .infocard__close {
+  transition: 0.3s all ease;
+  transition-delay: 0.3s;
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(-100%) translateX(-5px);
+}
+
+.infocard--animatable .infocard__user-image,
+.infocard--animatable .infocard__title,
+.infocard--animatable .infocard__subtitle,
+.infocard--animatable .infocard__bio,
+.infocard--animatable .infocard__images,
+.infocard--animatable .infocard__content {
+  transition: all 0.5s cubic-bezier(0, 0, 0.21, 1);
+}
+
+p.infocard__subtitle.image-with-text-text--caption {
+  margin-bottom: .5rem;
+}
+
+@media screen and (min-width: 990px) {
+  .page-width .infocard:first-child .infocard__content {
+    border-bottom-left-radius: var(--media-radius);
+    border-top-left-radius: var(--media-radius);
+  }
+  
+  .page-width .infocard:last-child .infocard__content {
+    border-bottom-right-radius: var(--media-radius);
+    border-top-right-radius: var(--media-radius);
+  }
+}
+  
+@media screen and (max-width: 990px) {
+  .info-cards-section.page-width {
+    padding: 0;
+  }
+  .infocards {
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+    padding: 0;
+    row-gap: 0;
+    width: 100%;
+  }
+  infocard-element.infocard {
+    width: 25%;
+    max-width: 25%;
+  }
+  .style-1 .infocards {
+    flex-direction: column;
+  }
+  .style-2 infocard-element.infocard {
+    width: 50%; 
+    max-width: 50%;
+  }
+  .style-3 infocard-element.infocard {
+    width: 33.33%; 
+    max-width: 33.33%;
+  }
+  .style-1 infocard-element.infocard {
+    width: 100%;
+    max-width: 100%;
+  }
+  .infocard__user-image, 
+  .infocards svg.placeholder-svg {
+    width: 80px;
+    height: 80px;
+  }
+  .infocard__user-info,
+  .infocard__title{
+    font-size: 1.2rem;
+  }
+  .infocard__content {
+    padding: 1rem;
+  }
+}

@@ -1,0 +1,1217 @@
+{% doc %}
+  @prompt
+    Create a chatbot that is 24/7 active for help, which can also be connected to WhatsApp or a live agent, Make the chat In-Site Pop-up, make the chat give solutions 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-chatbot-widget-{{ ai_gen_id }} {
+    position: fixed;
+    bottom: {{ block.settings.bottom_position }}px;
+    right: {{ block.settings.right_position }}px;
+    z-index: 9999;
+    font-family: {{ block.settings.font.family }}, sans-serif;
+  }
+
+  .ai-chatbot-button-{{ ai_gen_id }} {
+    width: {{ block.settings.button_size }}px;
+    height: {{ block.settings.button_size }}px;
+    border-radius: 50%;
+    background-color: {{ block.settings.button_color }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+  }
+
+  .ai-chatbot-button-{{ ai_gen_id }}:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .ai-chatbot-button-{{ ai_gen_id }} svg {
+    width: calc({{ block.settings.button_size }}px * 0.5);
+    height: calc({{ block.settings.button_size }}px * 0.5);
+    fill: {{ block.settings.button_icon_color }};
+  }
+
+  .ai-chatbot-badge-{{ ai_gen_id }} {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background-color: {{ block.settings.notification_color }};
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #ffffff;
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .ai-chatbot-badge-{{ ai_gen_id }}.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .ai-chatbot-overlay-{{ ai_gen_id }} {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .ai-chatbot-overlay-{{ ai_gen_id }}.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .ai-chatbot-popup-{{ ai_gen_id }} {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: {{ block.settings.popup_width }}px;
+    max-width: calc(100vw - 40px);
+    height: {{ block.settings.popup_height }}px;
+    max-height: calc(100vh - 40px);
+    background-color: {{ block.settings.chat_background }};
+    border-radius: {{ block.settings.chat_border_radius }}px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
+  }
+
+  .ai-chatbot-popup-{{ ai_gen_id }}.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .ai-chatbot-header-{{ ai_gen_id }} {
+    background-color: {{ block.settings.header_background }};
+    color: {{ block.settings.header_text_color }};
+    padding: 20px 24px;
+    border-radius: {{ block.settings.chat_border_radius }}px {{ block.settings.chat_border_radius }}px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ai-chatbot-header-info-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ai-chatbot-avatar-{{ ai_gen_id }} {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: {{ block.settings.avatar_background }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 18px;
+    color: {{ block.settings.avatar_text_color }};
+  }
+
+  .ai-chatbot-title-{{ ai_gen_id }} {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+  }
+
+  .ai-chatbot-status-{{ ai_gen_id }} {
+    font-size: 13px;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ai-chatbot-status-dot-{{ ai_gen_id }} {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: {{ block.settings.online_indicator_color }};
+  }
+
+  .ai-chatbot-close-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: {{ block.settings.header_text_color }};
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    border-radius: 50%;
+  }
+
+  .ai-chatbot-close-{{ ai_gen_id }}:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .ai-chatbot-close-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+  }
+
+  .ai-chatbot-messages-{{ ai_gen_id }} {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ai-chatbot-message-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    max-width: 75%;
+  }
+
+  .ai-chatbot-message-{{ ai_gen_id }}.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  .ai-chatbot-message-avatar-{{ ai_gen_id }} {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: {{ block.settings.avatar_background }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: {{ block.settings.avatar_text_color }};
+    flex-shrink: 0;
+  }
+
+  .ai-chatbot-message-{{ ai_gen_id }}.user .ai-chatbot-message-avatar-{{ ai_gen_id }} {
+    background-color: {{ block.settings.user_avatar_background }};
+    color: {{ block.settings.user_avatar_text_color }};
+  }
+
+  .ai-chatbot-message-bubble-{{ ai_gen_id }} {
+    padding: 14px 18px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    background-color: {{ block.settings.bot_message_background }};
+    color: {{ block.settings.bot_message_text }};
+  }
+
+  .ai-chatbot-message-{{ ai_gen_id }}.user .ai-chatbot-message-bubble-{{ ai_gen_id }} {
+    background-color: {{ block.settings.user_message_background }};
+    color: {{ block.settings.user_message_text }};
+  }
+
+  .ai-chatbot-solution-card-{{ ai_gen_id }} {
+    background-color: {{ block.settings.solution_card_background }};
+    border: 1px solid {{ block.settings.solution_card_border }};
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 8px;
+  }
+
+  .ai-chatbot-solution-title-{{ ai_gen_id }} {
+    font-weight: 600;
+    font-size: 14px;
+    margin: 0 0 8px 0;
+    color: {{ block.settings.solution_title_color }};
+  }
+
+  .ai-chatbot-solution-text-{{ ai_gen_id }} {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 12px 0;
+    color: {{ block.settings.bot_message_text }};
+  }
+
+  .ai-chatbot-solution-link-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: {{ block.settings.solution_link_background }};
+    color: {{ block.settings.solution_link_text }};
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .ai-chatbot-solution-link-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.solution_link_hover_background }};
+  }
+
+  .ai-chatbot-solution-link-{{ ai_gen_id }} svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .ai-chatbot-typing-{{ ai_gen_id }} {
+    display: flex;
+    gap: 4px;
+    padding: 14px 18px;
+    background-color: {{ block.settings.bot_message_background }};
+    border-radius: 18px;
+    width: fit-content;
+  }
+
+  .ai-chatbot-typing-dot-{{ ai_gen_id }} {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: {{ block.settings.bot_message_text }};
+    opacity: 0.6;
+  }
+
+  .ai-chatbot-quick-replies-{{ ai_gen_id }} {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 24px 16px;
+  }
+
+  .ai-chatbot-quick-reply-{{ ai_gen_id }} {
+    padding: 10px 20px;
+    background-color: {{ block.settings.quick_reply_background }};
+    color: {{ block.settings.quick_reply_text }};
+    border: 1px solid {{ block.settings.quick_reply_border }};
+    border-radius: 24px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ai-chatbot-quick-reply-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.quick_reply_hover_background }};
+    border-color: {{ block.settings.quick_reply_hover_border }};
+  }
+
+  .ai-chatbot-input-area-{{ ai_gen_id }} {
+    padding: 20px 24px;
+    border-top: 1px solid {{ block.settings.input_border_color }};
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .ai-chatbot-input-{{ ai_gen_id }} {
+    flex: 1;
+    padding: 14px 20px;
+    border: 1px solid {{ block.settings.input_border_color }};
+    border-radius: 28px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .ai-chatbot-input-{{ ai_gen_id }}:focus {
+    border-color: {{ block.settings.button_color }};
+  }
+
+  .ai-chatbot-send-{{ ai_gen_id }} {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: {{ block.settings.button_color }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+  }
+
+  .ai-chatbot-send-{{ ai_gen_id }}:hover {
+    opacity: 0.9;
+  }
+
+  .ai-chatbot-send-{{ ai_gen_id }} svg {
+    width: 22px;
+    height: 22px;
+    fill: {{ block.settings.button_icon_color }};
+  }
+
+  .ai-chatbot-options-{{ ai_gen_id }} {
+    padding: 16px 24px;
+    border-top: 1px solid {{ block.settings.input_border_color }};
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .ai-chatbot-option-btn-{{ ai_gen_id }} {
+    padding: 10px 20px;
+    background-color: transparent;
+    color: {{ block.settings.header_background }};
+    border: 1px solid {{ block.settings.header_background }};
+    border-radius: 24px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ai-chatbot-option-btn-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.header_background }};
+    color: {{ block.settings.header_text_color }};
+  }
+
+  .ai-chatbot-option-btn-{{ ai_gen_id }} svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-chatbot-popup-{{ ai_gen_id }} {
+      width: calc(100vw - 32px);
+      height: calc(100vh - 100px);
+    }
+
+    .ai-chatbot-widget-{{ ai_gen_id }} {
+      right: 20px;
+      bottom: 20px;
+    }
+
+    .ai-chatbot-message-{{ ai_gen_id }} {
+      max-width: 85%;
+    }
+  }
+{% endstyle %}
+
+<chatbot-widget-{{ ai_gen_id }}
+  class="ai-chatbot-widget-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+  data-solutions='[
+    {
+      "keywords": ["track", "order", "tracking", "where", "shipment", "delivery"],
+      "title": "Track Your Order",
+      "message": "You can track your order status easily!",
+      "link": "/pages/track-order",
+      "linkText": "Track Order"
+    },
+    {
+      "keywords": ["shipping", "ship", "delivery time", "how long", "when arrive"],
+      "title": "Shipping Information",
+      "message": "{{ block.settings.shipping_info }}",
+      "link": "/pages/shipping-policy",
+      "linkText": "View Shipping Policy"
+    },
+    {
+      "keywords": ["return", "refund", "exchange", "send back"],
+      "title": "Returns & Refunds",
+      "message": "{{ block.settings.return_info }}",
+      "link": "/pages/refund-policy",
+      "linkText": "View Return Policy"
+    },
+    {
+      "keywords": ["payment", "pay", "credit card", "checkout", "purchase"],
+      "title": "Payment Methods",
+      "message": "{{ block.settings.payment_info }}",
+      "link": "/pages/payment-methods",
+      "linkText": "Payment Options"
+    },
+    {
+      "keywords": ["size", "sizing", "fit", "measurements"],
+      "title": "Size Guide",
+      "message": "{{ block.settings.size_info }}",
+      "link": "/pages/size-guide",
+      "linkText": "View Size Guide"
+    },
+    {
+      "keywords": ["contact", "email", "phone", "support", "help"],
+      "title": "Contact Support",
+      "message": "{{ block.settings.contact_info }}",
+      "link": "/pages/contact",
+      "linkText": "Contact Us"
+    },
+    {
+      "keywords": ["discount", "coupon", "promo", "code", "sale"],
+      "title": "Discounts & Promotions",
+      "message": "{{ block.settings.discount_info }}",
+      "link": "/collections/sale",
+      "linkText": "View Sales"
+    },
+    {
+      "keywords": ["account", "login", "password", "register", "sign"],
+      "title": "Account Help",
+      "message": "{{ block.settings.account_info }}",
+      "link": "/account",
+      "linkText": "My Account"
+    }
+  ]'
+>
+  <button
+    class="ai-chatbot-button-{{ ai_gen_id }}"
+    aria-label="Open chat"
+    aria-expanded="false"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+      <path d="M7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
+    </svg>
+    <span class="ai-chatbot-badge-{{ ai_gen_id }}">1</span>
+  </button>
+
+  <div class="ai-chatbot-overlay-{{ ai_gen_id }}"></div>
+
+  <div class="ai-chatbot-popup-{{ ai_gen_id }}">
+    <div class="ai-chatbot-header-{{ ai_gen_id }}">
+      <div class="ai-chatbot-header-info-{{ ai_gen_id }}">
+        <div class="ai-chatbot-avatar-{{ ai_gen_id }}">
+          {{ block.settings.bot_name | slice: 0 }}
+        </div>
+        <div>
+          <div class="ai-chatbot-title-{{ ai_gen_id }}">{{ block.settings.bot_name }}</div>
+          <div class="ai-chatbot-status-{{ ai_gen_id }}">
+            <span class="ai-chatbot-status-dot-{{ ai_gen_id }}"></span>
+            {{ block.settings.status_text }}
+          </div>
+        </div>
+      </div>
+      <button
+        class="ai-chatbot-close-{{ ai_gen_id }}"
+        aria-label="Close chat"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="ai-chatbot-messages-{{ ai_gen_id }}">
+      <div class="ai-chatbot-message-{{ ai_gen_id }} bot">
+        <div class="ai-chatbot-message-avatar-{{ ai_gen_id }}">
+          {{ block.settings.bot_name | slice: 0 }}
+        </div>
+        <div class="ai-chatbot-message-bubble-{{ ai_gen_id }}">
+          {{ block.settings.welcome_message }}
+        </div>
+      </div>
+    </div>
+
+    {% if block.settings.show_quick_replies %}
+      <div class="ai-chatbot-quick-replies-{{ ai_gen_id }}">
+        {% if block.settings.quick_reply_1 != blank %}
+          <button class="ai-chatbot-quick-reply-{{ ai_gen_id }}" data-reply="{{ block.settings.quick_reply_1 }}">
+            {{ block.settings.quick_reply_1 }}
+          </button>
+        {% endif %}
+        {% if block.settings.quick_reply_2 != blank %}
+          <button class="ai-chatbot-quick-reply-{{ ai_gen_id }}" data-reply="{{ block.settings.quick_reply_2 }}">
+            {{ block.settings.quick_reply_2 }}
+          </button>
+        {% endif %}
+        {% if block.settings.quick_reply_3 != blank %}
+          <button class="ai-chatbot-quick-reply-{{ ai_gen_id }}" data-reply="{{ block.settings.quick_reply_3 }}">
+            {{ block.settings.quick_reply_3 }}
+          </button>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="ai-chatbot-input-area-{{ ai_gen_id }}">
+      <input
+        type="text"
+        class="ai-chatbot-input-{{ ai_gen_id }}"
+        placeholder="{{ block.settings.input_placeholder }}"
+        aria-label="Type your message"
+      >
+      <button
+        class="ai-chatbot-send-{{ ai_gen_id }}"
+        aria-label="Send message"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </div>
+
+    {% if block.settings.show_connection_options %}
+      <div class="ai-chatbot-options-{{ ai_gen_id }}">
+        {% if block.settings.enable_whatsapp %}
+          <button class="ai-chatbot-option-btn-{{ ai_gen_id }}" data-action="whatsapp">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+            WhatsApp
+          </button>
+        {% endif %}
+        {% if block.settings.enable_live_agent %}
+          <button class="ai-chatbot-option-btn-{{ ai_gen_id }}" data-action="agent">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            Live Agent
+          </button>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</chatbot-widget-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ChatbotWidget{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.isOpen = false;
+        this.solutions = [];
+      }
+
+      connectedCallback() {
+        this.button = this.querySelector('.ai-chatbot-button-{{ ai_gen_id }}');
+        this.popup = this.querySelector('.ai-chatbot-popup-{{ ai_gen_id }}');
+        this.overlay = this.querySelector('.ai-chatbot-overlay-{{ ai_gen_id }}');
+        this.closeBtn = this.querySelector('.ai-chatbot-close-{{ ai_gen_id }}');
+        this.messagesContainer = this.querySelector('.ai-chatbot-messages-{{ ai_gen_id }}');
+        this.input = this.querySelector('.ai-chatbot-input-{{ ai_gen_id }}');
+        this.sendBtn = this.querySelector('.ai-chatbot-send-{{ ai_gen_id }}');
+        this.quickReplies = this.querySelectorAll('.ai-chatbot-quick-reply-{{ ai_gen_id }}');
+        this.badge = this.querySelector('.ai-chatbot-badge-{{ ai_gen_id }}');
+        this.optionBtns = this.querySelectorAll('.ai-chatbot-option-btn-{{ ai_gen_id }}');
+
+        try {
+          this.solutions = JSON.parse(this.dataset.solutions || '[]');
+        } catch (e) {
+          this.solutions = [];
+        }
+
+        this.setupEventListeners();
+        this.showBadgeAfterDelay();
+      }
+
+      setupEventListeners() {
+        this.button.addEventListener('click', () => this.toggleChat());
+        this.closeBtn.addEventListener('click', () => this.toggleChat());
+        this.overlay.addEventListener('click', () => this.toggleChat());
+        this.sendBtn.addEventListener('click', () => this.sendMessage());
+        
+        this.input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            this.sendMessage();
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && this.isOpen) {
+            this.toggleChat();
+          }
+        });
+
+        this.quickReplies.forEach(reply => {
+          reply.addEventListener('click', (e) => {
+            const message = e.target.dataset.reply;
+            this.addUserMessage(message);
+            this.findAndShowSolution(message);
+          });
+        });
+
+        this.optionBtns.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const action = e.currentTarget.dataset.action;
+            this.handleAction(action);
+          });
+        });
+      }
+
+      toggleChat() {
+        this.isOpen = !this.isOpen;
+        this.popup.classList.toggle('active');
+        this.overlay.classList.toggle('active');
+        this.button.setAttribute('aria-expanded', this.isOpen);
+        
+        if (this.isOpen) {
+          this.badge.classList.remove('active');
+          this.input.focus();
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+
+      sendMessage() {
+        const message = this.input.value.trim();
+        if (message) {
+          this.addUserMessage(message);
+          this.input.value = '';
+          this.findAndShowSolution(message);
+        }
+      }
+
+      addUserMessage(message) {
+        const messageEl = document.createElement('div');
+        messageEl.className = 'ai-chatbot-message-{{ ai_gen_id }} user';
+        messageEl.innerHTML = `
+          <div class="ai-chatbot-message-avatar-{{ ai_gen_id }}">U</div>
+          <div class="ai-chatbot-message-bubble-{{ ai_gen_id }}">${this.escapeHtml(message)}</div>
+        `;
+        this.messagesContainer.appendChild(messageEl);
+        this.scrollToBottom();
+      }
+
+      addBotMessage(message, solution = null) {
+        const messageEl = document.createElement('div');
+        messageEl.className = 'ai-chatbot-message-{{ ai_gen_id }} bot';
+        
+        let solutionHTML = '';
+        if (solution) {
+          solutionHTML = `
+            <div class="ai-chatbot-solution-card-{{ ai_gen_id }}">
+              <h4 class="ai-chatbot-solution-title-{{ ai_gen_id }}">${this.escapeHtml(solution.title)}</h4>
+              <p class="ai-chatbot-solution-text-{{ ai_gen_id }}">${this.escapeHtml(solution.message)}</p>
+              <a href="${solution.link}" class="ai-chatbot-solution-link-{{ ai_gen_id }}">
+                ${this.escapeHtml(solution.linkText)}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          `;
+        }
+        
+        messageEl.innerHTML = `
+          <div class="ai-chatbot-message-avatar-{{ ai_gen_id }}">{{ block.settings.bot_name | slice: 0 }}</div>
+          <div>
+            <div class="ai-chatbot-message-bubble-{{ ai_gen_id }}">${this.escapeHtml(message)}</div>
+            ${solutionHTML}
+          </div>
+        `;
+        this.messagesContainer.appendChild(messageEl);
+        this.scrollToBottom();
+      }
+
+      showTypingIndicator() {
+        const typingEl = document.createElement('div');
+        typingEl.className = 'ai-chatbot-message-{{ ai_gen_id }} bot typing-indicator';
+        typingEl.innerHTML = `
+          <div class="ai-chatbot-message-avatar-{{ ai_gen_id }}">{{ block.settings.bot_name | slice: 0 }}</div>
+          <div class="ai-chatbot-typing-{{ ai_gen_id }}">
+            <div class="ai-chatbot-typing-dot-{{ ai_gen_id }}"></div>
+            <div class="ai-chatbot-typing-dot-{{ ai_gen_id }}"></div>
+            <div class="ai-chatbot-typing-dot-{{ ai_gen_id }}"></div>
+          </div>
+        `;
+        this.messagesContainer.appendChild(typingEl);
+        this.scrollToBottom();
+        return typingEl;
+      }
+
+      findAndShowSolution(userMessage) {
+        const typingIndicator = this.showTypingIndicator();
+        
+        setTimeout(() => {
+          typingIndicator.remove();
+          
+          const messageLower = userMessage.toLowerCase();
+          let foundSolution = null;
+          
+          for (const solution of this.solutions) {
+            if (solution.keywords.some(keyword => messageLower.includes(keyword.toLowerCase()))) {
+              foundSolution = solution;
+              break;
+            }
+          }
+          
+          if (foundSolution) {
+            this.addBotMessage("I found a solution for you!", foundSolution);
+          } else {
+            const fallbackMessages = [
+              "I understand you need help. Let me connect you with more resources.",
+              "I'm here to help! Could you provide more details about your question?",
+              "I want to make sure I give you the right information. Can you rephrase your question?",
+              "Let me help you find what you're looking for. Try asking about orders, shipping, returns, or payments."
+            ];
+            const randomMessage = fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)];
+            this.addBotMessage(randomMessage);
+          }
+        }, 1200);
+      }
+
+      handleAction(action) {
+        if (action === 'whatsapp') {
+          const whatsappNumber = '{{ block.settings.whatsapp_number }}';
+          const message = encodeURIComponent('{{ block.settings.whatsapp_message }}');
+          window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+        } else if (action === 'agent') {
+          this.addBotMessage('{{ block.settings.agent_message }}');
+        }
+      }
+
+      scrollToBottom() {
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      }
+
+      showBadgeAfterDelay() {
+        setTimeout(() => {
+          if (!this.isOpen) {
+            this.badge.classList.add('active');
+          }
+        }, 3000);
+      }
+
+      escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+    }
+
+    customElements.define('chatbot-widget-{{ ai_gen_id }}', ChatbotWidget{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Smart chatbot",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Bot settings"
+    },
+    {
+      "type": "text",
+      "id": "bot_name",
+      "label": "Bot name",
+      "default": "Support Bot"
+    },
+    {
+      "type": "text",
+      "id": "status_text",
+      "label": "Status text",
+      "default": "Online 24/7"
+    },
+    {
+      "type": "textarea",
+      "id": "welcome_message",
+      "label": "Welcome message",
+      "default": "Hi! How can I help you today? Ask me about orders, shipping, returns, or anything else!"
+    },
+    {
+      "type": "text",
+      "id": "input_placeholder",
+      "label": "Input placeholder",
+      "default": "Type your question..."
+    },
+    {
+      "type": "header",
+      "content": "Solution responses"
+    },
+    {
+      "type": "textarea",
+      "id": "shipping_info",
+      "label": "Shipping information",
+      "default": "We offer free shipping on orders over $50. Standard delivery takes 3-5 business days."
+    },
+    {
+      "type": "textarea",
+      "id": "return_info",
+      "label": "Return information",
+      "default": "We accept returns within 30 days of purchase. Items must be unused and in original packaging."
+    },
+    {
+      "type": "textarea",
+      "id": "payment_info",
+      "label": "Payment information",
+      "default": "We accept all major credit cards, PayPal, and Shop Pay for secure checkout."
+    },
+    {
+      "type": "textarea",
+      "id": "size_info",
+      "label": "Size guide information",
+      "default": "Check our detailed size guide to find your perfect fit. Measurements are provided for all products."
+    },
+    {
+      "type": "textarea",
+      "id": "contact_info",
+      "label": "Contact information",
+      "default": "Our support team is available Monday-Friday, 9am-5pm. We typically respond within 24 hours."
+    },
+    {
+      "type": "textarea",
+      "id": "discount_info",
+      "label": "Discount information",
+      "default": "Sign up for our newsletter to get 10% off your first order and exclusive deals!"
+    },
+    {
+      "type": "textarea",
+      "id": "account_info",
+      "label": "Account information",
+      "default": "Create an account to track orders, save favorites, and checkout faster."
+    },
+    {
+      "type": "header",
+      "content": "Quick replies"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_replies",
+      "label": "Show quick replies",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "quick_reply_1",
+      "label": "Quick reply 1",
+      "default": "Track my order"
+    },
+    {
+      "type": "text",
+      "id": "quick_reply_2",
+      "label": "Quick reply 2",
+      "default": "Shipping info"
+    },
+    {
+      "type": "text",
+      "id": "quick_reply_3",
+      "label": "Quick reply 3",
+      "default": "Return policy"
+    },
+    {
+      "type": "header",
+      "content": "Connection options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_connection_options",
+      "label": "Show connection options",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_whatsapp",
+      "label": "Enable WhatsApp",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_number",
+      "label": "WhatsApp number",
+      "info": "Include country code without + (e.g., 919876543210)"
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_message",
+      "label": "WhatsApp default message",
+      "default": "Hi, I need help with my order"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_live_agent",
+      "label": "Enable live agent",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "agent_message",
+      "label": "Live agent message",
+      "default": "Connecting you to a live agent. Please wait a moment..."
+    },
+    {
+      "type": "header",
+      "content": "Button position"
+    },
+    {
+      "type": "range",
+      "id": "bottom_position",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Bottom position",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "right_position",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Right position",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "range",
+      "id": "button_size",
+      "min": 50,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Button size",
+      "default": 60
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button color",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "button_icon_color",
+      "label": "Icon color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "notification_color",
+      "label": "Notification badge color",
+      "default": "#ff4444"
+    },
+    {
+      "type": "header",
+      "content": "Popup window"
+    },
+    {
+      "type": "range",
+      "id": "popup_width",
+      "min": 400,
+      "max": 700,
+      "step": 20,
+      "unit": "px",
+      "label": "Width",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "popup_height",
+      "min": 500,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "label": "Height",
+      "default": 640
+    },
+    {
+      "type": "range",
+      "id": "chat_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "chat_background",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Header colors"
+    },
+    {
+      "type": "color",
+      "id": "header_background",
+      "label": "Background",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "header_text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "online_indicator_color",
+      "label": "Online indicator",
+      "default": "#4caf50"
+    },
+    {
+      "type": "header",
+      "content": "Avatar colors"
+    },
+    {
+      "type": "color",
+      "id": "avatar_background",
+      "label": "Bot avatar background",
+      "default": "#f2f2f2"
+    },
+    {
+      "type": "color",
+      "id": "avatar_text_color",
+      "label": "Bot avatar text",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "user_avatar_background",
+      "label": "User avatar background",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "user_avatar_text_color",
+      "label": "User avatar text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Message colors"
+    },
+    {
+      "type": "color",
+      "id": "bot_message_background",
+      "label": "Bot message background",
+      "default": "#f2f2f2"
+    },
+    {
+      "type": "color",
+      "id": "bot_message_text",
+      "label": "Bot message text",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "user_message_background",
+      "label": "User message background",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "user_message_text",
+      "label": "User message text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Solution card colors"
+    },
+    {
+      "type": "color",
+      "id": "solution_card_background",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "solution_card_border",
+      "label": "Card border",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "color",
+      "id": "solution_title_color",
+      "label": "Title color",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "solution_link_background",
+      "label": "Link background",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "solution_link_text",
+      "label": "Link text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "solution_link_hover_background",
+      "label": "Link hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Quick reply colors"
+    },
+    {
+      "type": "color",
+      "id": "quick_reply_background",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "quick_reply_text",
+      "label": "Text",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "quick_reply_border",
+      "label": "Border",
+      "default": "#d1d1d1"
+    },
+    {
+      "type": "color",
+      "id": "quick_reply_hover_background",
+      "label": "Hover background",
+      "default": "#f2f2f2"
+    },
+    {
+      "type": "color",
+      "id": "quick_reply_hover_border",
+      "label": "Hover border",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "header",
+      "content": "Input colors"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Border",
+      "default": "#d1d1d1"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "default": "assistant_n4"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Smart chatbot"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,127 @@
+<div class="loader-container" data-aos="fade-up">
+  <button id="load-more" class="load-more-button button">
+    <span class="button-text">{{ button }}</span>
+    <div class="loading-line-container" style="display: none;">
+      <div class="loading-line">&nbsp;</div>
+    </div>
+  </button>
+</div>
+
+{% style %}
+  .loader-container {
+    margin-top: 35px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .load-more-button {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .button-text {
+    display: inline-block;
+    position: relative;
+    z-index: 2;
+  }
+
+  .loading-line-container {
+    position: absolute;
+    left: 15%;
+    right: 0;
+    top: 75%;
+    background-color: transparent;
+    z-index: 1;
+  }
+
+  .loading-line {
+    height: 3px;
+    background-color: rgb(var(--scroll-indicator-color));
+    width: 50px;
+    animation: bounce-left-right 1.2s ease-in-out infinite;
+  }
+
+  @keyframes bounce-left-right {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(100%);
+    }
+  }
+{% endstyle %}
+<script>
+// Function to handle loading more products
+let currentPage = 1;
+function loadMoreProducts() {
+  const maxPages = {{ paginate.pages | default: 1 }}; 
+  const loadMoreButton = document.getElementById('load-more');
+  const buttonText = loadMoreButton.querySelector('.button-text');
+  const loadingLineContainer = loadMoreButton.querySelector('.loading-line-container');
+  const productGrid = document.getElementById('product-grid');
+  let isLoading = false;
+
+  if (isLoading || currentPage >= maxPages) return;
+
+  // Start loading state
+  isLoading = true;
+  loadingLineContainer.style.display = 'block'; 
+
+  currentPage++;
+  let nextPageUrl = `${window.location.pathname}?page=${currentPage}`;
+
+  fetch(nextPageUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text();
+    })
+    .then((data) => {
+      let parser = new DOMParser();
+      let newDocument = parser.parseFromString(data, 'text/html');
+      let newProducts = newDocument.querySelectorAll('#product-grid .grid-item');
+      newProducts.forEach(product => {
+        productGrid.appendChild(product);
+
+        product.setAttribute('tabindex', '0');
+      });
+
+      if (newProducts.length > 0) {
+        newProducts[0].focus();
+      }
+
+      loadingLineContainer.style.display = 'none';
+      
+      if (currentPage >= maxPages) {
+        loadMoreButton.style.display = 'none';
+      } else {
+        buttonText.style.display = 'inline';
+        loadMoreButton.style.display = 'inline-block';
+      }
+
+      isLoading = false;
+    })
+    .catch((error) => {
+      console.error('Error loading more products:', error);
+      loadingLineContainer.style.display = 'none'; 
+      buttonText.style.display = 'inline'; 
+      isLoading = false;
+    });
+}
+
+// Function to initialize event listeners
+function initializeLoadMoreButton() {
+  const loadMoreButton = document.getElementById('load-more');
+  if (loadMoreButton) {
+    loadMoreButton.addEventListener('click', function() {
+      loadMoreProducts();
+    });
+  }
+}
+
+// Event listener for DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+  initializeLoadMoreButton();
+});
+</script>

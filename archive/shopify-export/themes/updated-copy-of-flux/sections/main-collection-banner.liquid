@@ -1,0 +1,372 @@
+{{ 'component-collection-hero.css' | asset_url | stylesheet_tag }}
+{{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
+
+{%- if section.settings.image != blank -%}
+  {%- style -%}
+    @media screen and (max-width: 749px) {
+      #Banner-{{ section.id }}::before,
+      #Banner-{{ section.id }} .banner-media::before,
+      #Banner-{{ section.id }}:not(.banner--mobile-bottom) .banner-content::before {
+        padding-bottom: {{ 1 | divided_by: section.settings.image.aspect_ratio | times: 100 }}%;
+        content: '';
+        display: block;
+      }
+    }
+
+    @media screen and (min-width: 750px) {
+      #Banner-{{ section.id }}::before,
+      #Banner-{{ section.id }} .banner-media::before {
+        padding-bottom: {{ 1 | divided_by: section.settings.image.aspect_ratio | times: 100 }}%;
+        content: '';
+        display: block;
+      }
+    }
+  {%- endstyle -%}
+{%- endif -%}
+
+{%- style -%}
+    #Banner-{{ section.id }}::after {
+    opacity: {{ section.settings.image_overlay_opacity | divided_by: 100.0 }};
+  }
+
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}rem;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}rem;
+      padding-bottom: {{ section.settings.padding_bottom }}rem;
+    }
+  }
+{%- endstyle -%}
+
+
+{% if section.settings.collection_style == 'style-three' %}
+{% comment %} Start Image Banner {% endcomment %}
+<div
+  id="Banner-{{ section.id }}"
+  class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding collection-{{ section.settings.collection_style }} section-main-collection-banner image-banner banner banner--{{ section.settings.image_height }} {% if section.settings.image_height == 'adapt' and section.settings.image != blank %} banner--adapt{% endif %} {% if section.settings.show_collection_description == true %}show-collection-description{% endif %} ignore-{{ section.settings.ignore_spacing }}" data-aos="fade-up"
+>
+  {% comment %} Start Image {% endcomment %}
+  {% if section.settings.image_for_all != true %}
+      {%- if collection.image -%}
+        <div class="section-{{ section.id }}-padding banner-media media placeholder" data-aos="fade-up" data-aos-delay="350">
+          {%- liquid
+            assign image_height = section.settings.image.width | divided_by: section.settings.image.aspect_ratio
+            assign sizes = '50vw'
+          -%}
+          {{
+            collection.image
+            | image_url: width: 3840
+            | image_tag:
+              width: section.settings.image.width,
+              height: image_height,
+              sizes: sizes,
+              widths: '750, 1100, 1500, 1780, 2000, 3000, 3840'
+          }}
+        </div>
+      {%- elsif collection.image == blank and section.settings.image != blank -%}
+         <div class="banner-media media" data-aos="fade-up" data-aos-delay="350">
+          {{
+            section.settings.image
+            | image_url: width: 3840
+            | image_tag:
+              width: section.settings.image.width,
+              height: image_height,
+              sizes: sizes,
+              widths: '750, 1100, 1500, 1780, 2000, 3000, 3840'
+          }}
+         </div>
+    
+      {% else %}
+        <div class="banner-media media placeholder" data-aos="fade-up" data-aos-delay="350">
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+      {%- endif -%}
+  {%- elsif section.settings.image != blank -%}
+     <div class="banner-media media" data-aos="fade-up" data-aos-delay="350">
+      {{
+        section.settings.image
+            | image_url: width: 3840
+            | image_tag:
+              width: section.settings.image.width,
+              height: image_height,
+              sizes: sizes,
+              widths: '750, 1100, 1500, 1780, 2000, 3000, 3840'
+      }}
+     </div>
+
+  {% else %}
+    <div class="banner-media media placeholder" data-aos="fade-up" data-aos-delay="350">
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    </div>
+  {%- endif -%}
+  
+  {% comment %} End Image {% endcomment %}
+
+  {% comment %} Start Content {% endcomment %}
+  <div
+    class="banner-content banner-content--bottom-left banner--content-align-{{ section.settings.desktop_content_alignment }} page-width"
+    data-aos="fade-up"
+  >
+    <div class="banner-box content-container content-container--full-width-mobile">      
+      <div class="collection-content-description{% if section.settings.collection_style == 'style-one' %} grid-item {%- endif -%}">
+        {%- if section.settings.show_breadcrumbs -%}
+          <div class="collection-breadcrumbs" data-aos="fade-up" data-aos-delay="400">
+            {%- render 'breadcrumbs' -%}
+          </div>
+        {% endif %}
+        <h1 class="collection-hero__title" data-aos="fade-up" data-aos-delay="450">
+          <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span>
+        {%- if section.settings.fallback_heading != blank and collection.title == blank -%}
+              {{- section.settings.fallback_heading | escape -}}
+        {% else %}
+              {{- collection.title | escape -}}
+          {% endif %}
+        </h1>
+        {%- if section.settings.show_collection_description -%}
+          <div class="banner-text rte" data-aos="fade-up" data-aos-delay="500">{{ collection.description }}</div>
+        {%- endif -%}
+      </div>      
+    </div>
+  </div>
+  {% comment %} End Content {% endcomment %}
+</div>
+{% comment %} End Image Banner {% endcomment %}
+  
+{%- else -%}
+{% comment %} Start Collection Banner {% endcomment %}
+<div class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding collection-hero-cover collection-{{ section.settings.collection_style }} image-with-text-content--desktop-{{ section.settings.desktop_content_alignment }} collection-full-width {% if section.settings.show_collection_description_mobile == false %}hide-collection-description-mobile{% endif %} {% if section.settings.show_breadcrumbs_mobile == false %}hide-breadcrumbs-mobile{% endif %} {% if section.settings.show_image_mobile == false %}hide-collection-image-mobile{% endif %} {% if section.settings.collection_style == 'style-two' %} image-banner banner banner--{{ section.settings.image_height }} {%- endif -%}">
+  {% comment %} Start Content {% endcomment %}
+  <div class="collection-content page-width" data-aos="fade-up">
+    <div class="collection-content-inner {% if section.settings.collection_style == 'style-one' %} grid {%- endif -%} {% if section.settings.collection_style == 'style-two' %} page-width {%- endif -%}" data-aos="fade-up" data-aos-delay="350">
+      <div class="collection-content-description{% if section.settings.collection_style == 'style-one' %} grid-item {%- endif -%}">
+        {%- if section.settings.show_breadcrumbs -%}
+          <div class="collection-breadcrumbs" data-aos="fade-up" data-aos-delay="350">
+            {%- render 'breadcrumbs' -%}
+          </div>
+        {% endif %}
+        <h1 class="collection-hero__title" data-aos="fade-up" data-aos-delay="400">
+          <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span>
+          {%- if section.settings.fallback_heading != blank and collection.title == blank -%}
+              {{- section.settings.fallback_heading | escape -}}
+        {% else %}
+              {{- collection.title | escape -}}
+          {% endif %}
+        </h1>
+        {%- if section.settings.show_collection_description -%}
+          <div class="collection-hero__description rte" data-aos="fade-up" data-aos-delay="500">{{ collection.description }}</div>
+        {%- endif -%}
+      </div>
+
+      {% if section.settings.collection_style == 'style-one' %}
+        <div class="collection-content-media {% if section.settings.collection_style == 'style-one' %}grid-item right{% endif %}" data-aos="fade-up" data-aos-delay="350">
+          {% if section.settings.image_for_all != true %}
+              {%- if collection.image -%}
+                <div class="image-with-text-media global-media-settings" data-aos="fade-up" data-aos-delay="400">
+                  {%- capture sizes -%}
+                  (min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 | divided_by: 2 }}px,
+                  (min-width: 750px) calc((100vw - 130px) / 2), calc((100vw - 50px) / 2)
+                {%- endcapture -%}
+                  {{
+                    collection.image
+                    | image_url: width: 1500
+                    | image_tag: sizes: sizes, widths: '165, 360, 535, 750, 1070, 1500'
+                  }}
+                </div>
+            {%- elsif collection.image == blank and section.settings.image != blank -%}
+               <div class="image-with-text-media global-media-settings" data-aos="fade-up" data-aos-delay="400">
+                {{
+                    section.settings.image
+                    | image_url: width: 1500
+                    | image_tag: widths: '535, 750, 1070, 1500'
+                }}
+               </div>
+            {% else %}
+                <div class="image-with-text-media global-media-settings">
+                  {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+                </div>
+            {%- endif -%}
+     {%- elsif section.settings.image != blank -%}
+         <div class="banner-media media" data-aos="fade-up" data-aos-delay="350">
+          {{
+            section.settings.image
+            | image_url: width: 1500
+            | image_tag: widths: '535, 750, 1070, 1500'
+          }}
+         </div>
+    {% else %}
+          <div class="banner-media media placeholder" data-aos="fade-up" data-aos-delay="350">
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          </div>
+    {%- endif -%}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% comment %} End Collection Banner {% endcomment %}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:sections.main-collection-banner.name",
+  "class": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:sections.main-collection-banner.settings.paragraph.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "default": true,
+      "label": "t:sections.main-collection-banner.settings.show_collection_description.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "default": true,
+      "label": "t:sections.main-collection-banner.settings.show_breadcrumbs.label"
+    },
+    {
+      "type": "select",
+      "id": "collection_style",
+      "options": [
+        {
+          "value": "style-one",
+          "label": "t:sections.main-collection-banner.settings.collection_style.options__1.label"
+        },
+        {
+          "value": "style-two",
+          "label": "t:sections.main-collection-banner.settings.collection_style.options__2.label"
+        },
+        {
+          "value": "style-three",
+          "label": "t:sections.main-collection-banner.settings.collection_style.options__3.label"
+        }
+      ],
+      "default": "style-one",
+      "label": "t:sections.main-collection-banner.settings.collection_style.label"
+    },
+    {
+      "type": "select",
+      "id": "desktop_content_alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.main-collection-banner.settings.desktop_content_alignment.options__1.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.main-collection-banner.settings.desktop_content_alignment.options__2.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.main-collection-banner.settings.desktop_content_alignment.options__3.label"
+        }
+      ],
+      "default": "left",
+      "label": "t:sections.main-collection-banner.settings.desktop_content_alignment.label"
+    },
+    {
+      "type": "select",
+      "id": "image_height",
+      "options": [
+        {
+          "value": "small",
+          "label": "t:sections.main-collection-banner.settings.image_height.options__1.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.main-collection-banner.settings.image_height.options__2.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.main-collection-banner.settings.image_height.options__3.label"
+        },
+        {
+          "value": "adapt-to-image",
+          "label": "t:sections.main-collection-banner.settings.image_height.options__4.label"
+        }
+      ],
+      "default": "medium",
+      "label": "t:sections.main-collection-banner.settings.image_height.label",
+      "info": "t:sections.main-collection-banner.settings.image_height.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-collection-banner.settings.header_style_three.content"
+    },
+    {
+      "type": "range",
+      "id": "image_overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "label": "t:sections.image-banner.settings.image_overlay_opacity.label",
+      "info": "t:sections.image-banner.settings.image_overlay_opacity.info",
+      "default": 40
+    },
+    {
+    "type": "header",
+    "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "option-3"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-collection-banner.settings.all_products_collection_header.content",
+      "info": "t:sections.main-collection-banner.settings.all_products_collection_header.info"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.main-collection-banner.settings.image.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_for_all",
+      "default": false,
+      "label": "t:sections.main-collection-banner.settings.image_for_all.label"
+    },
+    {
+      "type": "text",
+      "id": "fallback_heading",
+      "label": "t:sections.main-collection-banner.settings.fallback_heading.label",
+      "default": "All Products"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-collection-banner.settings.padding_heading.content"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "rem",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "rem",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

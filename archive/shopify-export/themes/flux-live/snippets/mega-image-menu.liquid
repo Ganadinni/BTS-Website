@@ -1,0 +1,314 @@
+{% assign settings = block_settings %}
+
+{%- if settings.mega_image_menu_image_1 != blank -%}
+  <li>
+    <div class="mega-menu-collection-image">
+      <a class="title-link"
+        {% if settings.mega_image_menu_link_1 == blank %}
+            role="link" aria-disabled="true"
+          {% else %}
+            href="{{ settings.mega_image_menu_link_1 }}"
+          {% endif %}
+        >
+        {{ settings.mega_image_menu_image_1 | image_url: width: 500 | image_tag: loading: 'lazy' }}
+      </a>
+    </div>
+    {%- if settings.mega_image_menu_caption_1 != blank -%}
+      <div class="mega-menu-collection-text">
+        <p class="caption-with-letter-spacing ">
+          {{ settings.mega_image_menu_caption_1 | escape }}
+        </p>
+      </div>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_title_1 != blank -%}
+      <p class="title heading-bold">{{ settings.mega_image_menu_title_1 }}</p>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_link_label_1 != blank -%}
+      <div class="mega-menu-link link">
+        <a
+          class="link animate-arrow"
+          {% if settings.mega_image_menu_link_1 == blank %}
+            role="link" aria-disabled="true"
+          {% else %}
+            href="{{ settings.mega_image_menu_link_1 }}"
+          {% endif %}
+        >
+          {{- settings.mega_image_menu_link_label_1 | escape }}
+        </a>
+      </div>
+    {%- endif -%}
+  </li>
+{%- endif -%}
+{%- if settings.mega_image_menu_image_2 != blank -%}
+  <li>
+    <div class="mega-menu-collection-image">
+      <a class="title-link"
+        {% if settings.mega_image_menu_link_2 == blank %}
+            role="link" aria-disabled="true"
+          {% else %}
+            href="{{ settings.mega_image_menu_link_2 }}"
+          {% endif %}
+        >
+        {{ settings.mega_image_menu_image_2 | image_url: width: 500 | image_tag: loading: 'lazy' }}
+      </a>
+    </div>
+    {%- if settings.mega_image_menu_caption_2 != blank -%}
+      <div class="mega-menu-collection-text">
+        <p class="caption-with-letter-spacing ">
+          {{ settings.mega_image_menu_caption_2 | escape }}
+        </p>
+      </div>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_title_2 != blank -%}
+      <p class="title heading-bold">{{ settings.mega_image_menu_title_2 }}</p>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_link_label_2 != blank -%}
+      <div class="mega-menu-link link">
+        <a
+          class="link animate-arrow"
+          {% if settings.mega_image_menu_link_2 == blank %}
+            role="link" aria-disabled="true"
+          {% else %}
+            href="{{ settings.mega_image_menu_link_2 }}"
+          {% endif %}
+        >
+          {{- settings.mega_image_menu_link_label_2 | escape }}
+        </a>
+      </div>
+    {%- endif -%}
+  </li>
+{%- endif -%}
+{%- if settings.mega_image_menu_image_3 != blank -%}
+  <li>
+    <div class="mega-menu-collection-image">
+      <a class="title-link"
+        {% if settings.mega_image_menu_link_3 == blank %}
+            role="link" aria-disabled="true"
+        {% else %}
+            href="{{ settings.mega_image_menu_link_3 }}"
+        {% endif %}
+        >
+        {{ settings.mega_image_menu_image_3 | image_url: width: 500 | image_tag: loading: 'lazy' }}
+      </a>
+    </div>
+    {%- if settings.mega_image_menu_caption_3 != blank -%}
+      <div class="mega-menu-collection-text">
+        <p class="caption-with-letter-spacing ">
+          {{ settings.mega_image_menu_caption_3 | escape }}
+        </p>
+      </div>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_title_3 != blank -%}
+      <p class="title heading-bold">{{ settings.mega_image_menu_title_3 }}</p>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_link_label_3 != blank -%}
+      <div class="mega-menu-link link">
+        <a
+          class="link animate-arrow"
+          {% if settings.mega_image_menu_link_3 == blank %}
+            role="link" aria-disabled="true"
+          {% else %}
+            href="{{ settings.mega_image_menu_link_3 }}"
+          {% endif %}
+        >
+          {{- settings.mega_image_menu_link_label_3 | escape }}
+        </a>
+      </div>
+    {%- endif -%}
+  </li>
+{%- endif -%}
+{%- if settings.mega_image_menu_image_4 != blank -%}
+  <li>
+    <div class="mega-menu-collection-image">
+      <a class="title-link"
+        {% if settings.mega_image_menu_link_4 == blank %}
+            role="link" aria-disabled="true"
+        {% else %}
+            href="{{ settings.mega_image_menu_link_4 }}"
+        {% endif %}
+        >
+        {{ settings.mega_image_menu_image_4 | image_url: width: 500 | image_tag: loading: 'lazy' }}
+      </a>
+    </div>
+    {%- if settings.mega_image_menu_caption_4 != blank -%}
+      <div class="mega-menu-collection-text">
+        <p class="caption-with-letter-spacing ">
+          {{ settings.mega_image_menu_caption_4 | escape }}
+        </p>
+      </div>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_title_4 != blank -%}
+      <p class="title heading-bold">{{ settings.mega_image_menu_title_4 }}</p>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_link_label_4 != blank -%}
+      <div class="mega-menu-link link">
+        <a
+          class="link animate-arrow"
+          {% if settings.mega_image_menu_link_4 == blank %}
+            role="link" aria-disabled="true"
+          {% else %}
+            href="{{ settings.mega_image_menu_link_4 }}"
+          {% endif %}
+        >
+          {{- settings.mega_image_menu_link_label_4 | escape }}
+        </a>
+      </div>
+    {%- endif -%}
+  </li>
+{%- endif -%}
+{%- if settings.mega_image_menu_image_5 != blank -%}
+  <li>
+    <div class="mega-menu-collection-image">
+      <a class="title-link"
+        {% if settings.mega_image_menu_link_5 == blank %}
+            role="link" aria-disabled="true"
+        {% else %}
+            href="{{ settings.mega_image_menu_link_5 }}"
+        {% endif %}
+        >
+        {{ settings.mega_image_menu_image_5 | image_url: width: 500 | image_tag: loading: 'lazy' }}
+      </a>
+    </div>
+    {%- if settings.mega_image_menu_caption_5 != blank -%}
+      <div class="mega-menu-collection-text">
+        <p class="caption-with-letter-spacing ">
+          {{ settings.mega_image_menu_caption_5 | escape }}
+        </p>
+      </div>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_title_5 != blank -%}
+      <p class="title heading-bold">{{ settings.mega_image_menu_title_5 }}</p>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_link_label_5 != blank -%}
+      <div class="mega-menu-link link">
+        <a
+          class="link animate-arrow"
+          {% if settings.mega_image_menu_link_5 == blank %}
+            role="link" aria-disabled="true"
+          {% else %}
+            href="{{ settings.mega_image_menu_link_5 }}"
+          {% endif %}
+        >
+          {{- settings.mega_image_menu_link_label_5 | escape }}
+        </a>
+      </div>
+    {%- endif -%}
+  </li>
+{%- endif -%}
+{%- if settings.mega_image_menu_image_6 != blank -%}
+  <li>
+    <div class="mega-menu-collection-image">
+      <a class="title-link"
+        {% if settings.mega_image_menu_link_6 == blank %}
+            role="link" aria-disabled="true"
+        {% else %}
+            href="{{ settings.mega_image_menu_link_6 }}"
+        {% endif %}
+        >
+        {{ settings.mega_image_menu_image_6 | image_url: width: 500 | image_tag: loading: 'lazy' }}
+      </a>
+    </div>
+    {%- if settings.mega_image_menu_caption_6 != blank -%}
+      <div class="mega-menu-collection-text">
+        <p class="caption-with-letter-spacing ">
+          {{ settings.mega_image_menu_caption_6 | escape }}
+        </p>
+      </div>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_title_6 != blank -%}
+      <p class="title heading-bold">{{ settings.mega_image_menu_title_6 }}</p>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_link_label_6 != blank -%}
+      <div class="mega-menu-link link">
+        <a
+          class="link animate-arrow"
+          {% if settings.mega_image_menu_link_6 == blank %}
+            role="link" aria-disabled="true"
+          {% else %}
+            href="{{ settings.mega_image_menu_link_6 }}"
+          {% endif %}
+        >
+          {{- settings.mega_image_menu_link_label_6 | escape }}
+        </a>
+      </div>
+    {%- endif -%}
+  </li>
+{% endif %}
+{%- if settings.mega_image_menu_image_7 != blank -%}
+  <li>
+    <div class="mega-menu-collection-image">
+      <a class="title-link"
+        {% if settings.mega_image_menu_link_7 == blank %}
+            role="link" aria-disabled="true"
+        {% else %}
+            href="{{ settings.mega_image_menu_link_7 }}"
+        {% endif %}
+        >
+        {{ settings.mega_image_menu_image_7 | image_url: width: 500 | image_tag: loading: 'lazy' }}
+      </a>
+    </div>
+    {%- if settings.mega_image_menu_caption_7 != blank -%}
+      <div class="mega-menu-collection-text">
+        <p class="caption-with-letter-spacing ">
+          {{ settings.mega_image_menu_caption_7 | escape }}
+        </p>
+      </div>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_title_7 != blank -%}
+      <p class="title heading-bold">{{ settings.mega_image_menu_title_7 }}</p>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_link_label_7 != blank -%}
+      <div class="mega-menu-link link">
+        <a
+          class="link animate-arrow"
+          {% if settings.mega_image_menu_link_7 == blank %}
+            role="link" aria-disabled="true"
+          {% else %}
+            href="{{ settings.mega_image_menu_link_7 }}"
+          {% endif %}
+        >
+          {{- settings.mega_image_menu_link_label_7 | escape }}
+        </a>
+      </div>
+    {%- endif -%}
+  </li>
+{% endif %}
+{%- if settings.mega_image_menu_image_8 != blank -%}
+  <li>
+    <div class="mega-menu-collection-image">
+      <a class="title-link"
+        {% if settings.mega_image_menu_link_8 == blank %}
+            role="link" aria-disabled="true"
+        {% else %}
+            href="{{ settings.mega_image_menu_link_8 }}"
+        {% endif %}
+        >
+        {{ settings.mega_image_menu_image_8 | image_url: width: 500 | image_tag: loading: 'lazy' }}
+      </a>
+    </div>
+    {%- if settings.mega_image_menu_caption_8 != blank -%}
+      <div class="mega-menu-collection-text">
+        <p class="caption-with-letter-spacing ">
+          {{ settings.mega_image_menu_caption_8 | escape }}
+        </p>
+      </div>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_title_8 != blank -%}
+      <p class="title heading-bold">{{ settings.mega_image_menu_title_8 }}</p>
+    {%- endif -%}
+    {%- if settings.mega_image_menu_link_label_8 != blank -%}
+      <div class="mega-menu-link link">
+        <a
+          class="link animate-arrow"
+          {% if settings.mega_image_menu_link_8 == blank %}
+            role="link" aria-disabled="true"
+          {% else %}
+            href="{{ settings.mega_image_menu_link_8 }}"
+          {% endif %}
+        >
+          {{- settings.mega_image_menu_link_label_8 | escape }}
+        </a>
+      </div>
+    {%- endif -%}
+  </li>
+{% endif %}

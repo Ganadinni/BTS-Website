@@ -1,0 +1,1388 @@
+{% doc %}
+  @prompt
+    Please create the Bulk Order Request Form based on the Quick-Reference Summary. Ensure the form has conditional logic for the 'Occasion' and 'Product Selection' fields, strictly enforces a minimum quantity of 10, and is configured to send immediate notifications via both email (with full data) and a concise WhatsApp message upon every submission.", Add left and right padding, remove the grey box at the top and bottom, remove form border, Add top and bottom padding.
+    
+    
+    , Product selection should be the kits or the products that are available in the collections, Make all the labels and sections editable in the parameter so it can be tweaked later if required 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-bulk-order-form-{{ ai_gen_id }} {
+    padding: {{ block.settings.vertical_padding }}px {{ block.settings.horizontal_padding }}px;
+    max-width: {{ block.settings.form_max_width }}px;
+    margin: 0 auto;
+  }
+
+  .ai-bulk-order-form__container-{{ ai_gen_id }} {
+    background-color: {{ block.settings.form_background }};
+    padding: {{ block.settings.form_inner_padding }}px;
+    border-radius: {{ block.settings.form_border_radius }}px;
+  }
+
+  .ai-bulk-order-form__heading-{{ ai_gen_id }} {
+    color: {{ block.settings.heading_color }};
+    font-size: {{ block.settings.heading_size }}px;
+    margin: 0 0 {{ block.settings.heading_spacing }}px;
+    text-align: {{ block.settings.text_alignment }};
+  }
+
+  .ai-bulk-order-form__description-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.description_size }}px;
+    margin: 0 0 {{ block.settings.section_spacing }}px;
+    text-align: {{ block.settings.text_alignment }};
+  }
+
+  .ai-bulk-order-form__field-group-{{ ai_gen_id }} {
+    margin-bottom: {{ block.settings.field_spacing }}px;
+  }
+
+  .ai-bulk-order-form__label-{{ ai_gen_id }} {
+    display: block;
+    color: {{ block.settings.label_color }};
+    font-size: {{ block.settings.label_size }}px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .ai-bulk-order-form__required-{{ ai_gen_id }} {
+    color: {{ block.settings.required_color }};
+    margin-left: 4px;
+  }
+
+  .ai-bulk-order-form__input-{{ ai_gen_id }},
+  .ai-bulk-order-form__select-{{ ai_gen_id }},
+  .ai-bulk-order-form__textarea-{{ ai_gen_id }} {
+    width: 100%;
+    padding: 12px 16px;
+    border: {{ block.settings.input_border_width }}px solid {{ block.settings.input_border_color }};
+    border-radius: {{ block.settings.input_border_radius }}px;
+    background-color: {{ block.settings.input_background }};
+    color: {{ block.settings.input_text_color }};
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+  }
+
+  .ai-bulk-order-form__input-{{ ai_gen_id }}:focus,
+  .ai-bulk-order-form__select-{{ ai_gen_id }}:focus,
+  .ai-bulk-order-form__textarea-{{ ai_gen_id }}:focus {
+    outline: none;
+    border-color: {{ block.settings.input_focus_border }};
+  }
+
+  .ai-bulk-order-form__textarea-{{ ai_gen_id }} {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  .ai-bulk-order-form__product-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 12px;
+  }
+
+  .ai-bulk-order-form__product-card-{{ ai_gen_id }} {
+    border: 2px solid {{ block.settings.input_border_color }};
+    border-radius: {{ block.settings.input_border_radius }}px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: {{ block.settings.input_background }};
+  }
+
+  .ai-bulk-order-form__product-card-{{ ai_gen_id }}:hover {
+    border-color: {{ block.settings.input_focus_border }};
+  }
+
+  .ai-bulk-order-form__product-card-{{ ai_gen_id }}.selected {
+    border-color: {{ block.settings.button_background }};
+    background-color: {{ block.settings.success_background }};
+  }
+
+  .ai-bulk-order-form__product-image-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+
+  .ai-bulk-order-form__product-title-{{ ai_gen_id }} {
+    font-size: 14px;
+    font-weight: 600;
+    color: {{ block.settings.text_color }};
+    margin-bottom: 4px;
+  }
+
+  .ai-bulk-order-form__product-price-{{ ai_gen_id }} {
+    font-size: 13px;
+    color: {{ block.settings.label_color }};
+  }
+
+  .ai-bulk-order-form__checkbox-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  .ai-bulk-order-form__helper-text-{{ ai_gen_id }} {
+    font-size: 13px;
+    color: {{ block.settings.label_color }};
+    margin-bottom: 12px;
+  }
+
+  .ai-bulk-order-form__error-{{ ai_gen_id }} {
+    color: {{ block.settings.error_color }};
+    font-size: 13px;
+    margin-top: 6px;
+    display: none;
+  }
+
+  .ai-bulk-order-form__error-{{ ai_gen_id }}.active {
+    display: block;
+  }
+
+  .ai-bulk-order-form__submit-{{ ai_gen_id }} {
+    width: 100%;
+    padding: 16px 32px;
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    border: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: {{ block.settings.button_text_size }}px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-bulk-order-form__submit-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+  }
+
+  .ai-bulk-order-form__submit-{{ ai_gen_id }}:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .ai-bulk-order-form__success-{{ ai_gen_id }} {
+    background-color: {{ block.settings.success_background }};
+    color: {{ block.settings.success_text_color }};
+    padding: 20px;
+    border-radius: {{ block.settings.input_border_radius }}px;
+    text-align: center;
+    display: none;
+  }
+
+  .ai-bulk-order-form__success-{{ ai_gen_id }}.active {
+    display: block;
+  }
+
+  .ai-bulk-order-form__row-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: {{ block.settings.field_spacing }}px;
+  }
+
+  .ai-bulk-order-form__selected-products-{{ ai_gen_id }} {
+    margin-top: 12px;
+    padding: 12px;
+    background-color: {{ block.settings.success_background }};
+    border-radius: {{ block.settings.input_border_radius }}px;
+    display: none;
+  }
+
+  .ai-bulk-order-form__selected-products-{{ ai_gen_id }}.active {
+    display: block;
+  }
+
+  .ai-bulk-order-form__selected-item-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid {{ block.settings.input_border_color }};
+  }
+
+  .ai-bulk-order-form__selected-item-{{ ai_gen_id }}:last-child {
+    border-bottom: none;
+  }
+
+  .ai-bulk-order-form__remove-btn-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    color: {{ block.settings.error_color }};
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: underline;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-bulk-order-form__row-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+    }
+
+    .ai-bulk-order-form__product-grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .ai-bulk-order-form-{{ ai_gen_id }} {
+      padding: {{ block.settings.vertical_padding | times: 0.6 }}px {{ block.settings.horizontal_padding | times: 0.6 }}px;
+    }
+  }
+{% endstyle %}
+
+<bulk-order-form-{{ ai_gen_id }}
+  class="ai-bulk-order-form-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+  data-min-quantity="{{ block.settings.minimum_quantity }}"
+  data-email-recipient="{{ block.settings.notification_email }}"
+  data-whatsapp-number="{{ block.settings.whatsapp_number }}"
+>
+  <div class="ai-bulk-order-form__container-{{ ai_gen_id }}">
+    {% if block.settings.heading != blank %}
+      <h2 class="ai-bulk-order-form__heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+    {% endif %}
+
+    {% if block.settings.description != blank %}
+      <div class="ai-bulk-order-form__description-{{ ai_gen_id }}">{{ block.settings.description }}</div>
+    {% endif %}
+
+    <div class="ai-bulk-order-form__success-{{ ai_gen_id }}" id="success-message-{{ ai_gen_id }}">
+      <p>{{ block.settings.success_message }}</p>
+    </div>
+
+    <form id="bulk-order-form-{{ ai_gen_id }}" class="ai-bulk-order-form__form-{{ ai_gen_id }}">
+      <div class="ai-bulk-order-form__row-{{ ai_gen_id }}">
+        <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+          <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="name-{{ ai_gen_id }}">
+            {{ block.settings.label_name }}<span class="ai-bulk-order-form__required-{{ ai_gen_id }}">*</span>
+          </label>
+          <input
+            type="text"
+            id="name-{{ ai_gen_id }}"
+            name="name"
+            class="ai-bulk-order-form__input-{{ ai_gen_id }}"
+            placeholder="{{ block.settings.placeholder_name }}"
+            required
+          >
+          <div class="ai-bulk-order-form__error-{{ ai_gen_id }}" id="name-error-{{ ai_gen_id }}">
+            {{ block.settings.error_name }}
+          </div>
+        </div>
+
+        <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+          <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="email-{{ ai_gen_id }}">
+            {{ block.settings.label_email }}<span class="ai-bulk-order-form__required-{{ ai_gen_id }}">*</span>
+          </label>
+          <input
+            type="email"
+            id="email-{{ ai_gen_id }}"
+            name="email"
+            class="ai-bulk-order-form__input-{{ ai_gen_id }}"
+            placeholder="{{ block.settings.placeholder_email }}"
+            required
+          >
+          <div class="ai-bulk-order-form__error-{{ ai_gen_id }}" id="email-error-{{ ai_gen_id }}">
+            {{ block.settings.error_email }}
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-bulk-order-form__row-{{ ai_gen_id }}">
+        <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+          <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="phone-{{ ai_gen_id }}">
+            {{ block.settings.label_phone }}<span class="ai-bulk-order-form__required-{{ ai_gen_id }}">*</span>
+          </label>
+          <input
+            type="tel"
+            id="phone-{{ ai_gen_id }}"
+            name="phone"
+            class="ai-bulk-order-form__input-{{ ai_gen_id }}"
+            placeholder="{{ block.settings.placeholder_phone }}"
+            required
+          >
+          <div class="ai-bulk-order-form__error-{{ ai_gen_id }}" id="phone-error-{{ ai_gen_id }}">
+            {{ block.settings.error_phone }}
+          </div>
+        </div>
+
+        <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+          <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="company-{{ ai_gen_id }}">
+            {{ block.settings.label_company }}
+          </label>
+          <input
+            type="text"
+            id="company-{{ ai_gen_id }}"
+            name="company"
+            class="ai-bulk-order-form__input-{{ ai_gen_id }}"
+            placeholder="{{ block.settings.placeholder_company }}"
+          >
+        </div>
+      </div>
+
+      <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+        <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="occasion-{{ ai_gen_id }}">
+          {{ block.settings.label_occasion }}<span class="ai-bulk-order-form__required-{{ ai_gen_id }}">*</span>
+        </label>
+        <select
+          id="occasion-{{ ai_gen_id }}"
+          name="occasion"
+          class="ai-bulk-order-form__select-{{ ai_gen_id }}"
+          required
+        >
+          <option value="">{{ block.settings.occasion_placeholder }}</option>
+          <option value="corporate-event">{{ block.settings.occasion_option_1 }}</option>
+          <option value="wedding">{{ block.settings.occasion_option_2 }}</option>
+          <option value="birthday">{{ block.settings.occasion_option_3 }}</option>
+          <option value="festival">{{ block.settings.occasion_option_4 }}</option>
+          <option value="other">{{ block.settings.occasion_option_5 }}</option>
+        </select>
+        <div class="ai-bulk-order-form__error-{{ ai_gen_id }}" id="occasion-error-{{ ai_gen_id }}">
+          {{ block.settings.error_occasion }}
+        </div>
+      </div>
+
+      <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}" id="occasion-details-{{ ai_gen_id }}" style="display: none;">
+        <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="occasion-other-{{ ai_gen_id }}">
+          {{ block.settings.label_occasion_other }}<span class="ai-bulk-order-form__required-{{ ai_gen_id }}">*</span>
+        </label>
+        <input
+          type="text"
+          id="occasion-other-{{ ai_gen_id }}"
+          name="occasion_other"
+          class="ai-bulk-order-form__input-{{ ai_gen_id }}"
+          placeholder="{{ block.settings.placeholder_occasion_other }}"
+        >
+        <div class="ai-bulk-order-form__error-{{ ai_gen_id }}" id="occasion-other-error-{{ ai_gen_id }}">
+          {{ block.settings.error_occasion_other }}
+        </div>
+      </div>
+
+      <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+        <label class="ai-bulk-order-form__label-{{ ai_gen_id }}">
+          {{ block.settings.label_products }}<span class="ai-bulk-order-form__required-{{ ai_gen_id }}">*</span>
+        </label>
+        {% if block.settings.helper_text_products != blank %}
+          <p class="ai-bulk-order-form__helper-text-{{ ai_gen_id }}">
+            {{ block.settings.helper_text_products }}
+          </p>
+        {% endif %}
+        
+        <div class="ai-bulk-order-form__product-grid-{{ ai_gen_id }}" id="product-grid-{{ ai_gen_id }}">
+          {% if block.settings.product_collection != blank %}
+            {% for product in block.settings.product_collection.products limit: 20 %}
+              <div class="ai-bulk-order-form__product-card-{{ ai_gen_id }}" data-product-id="{{ product.id }}" data-product-title="{{ product.title | escape }}" data-product-price="{{ product.price | money }}">
+                {% if product.featured_image %}
+                  <img
+                    src="{{ product.featured_image | image_url: width: 300 }}"
+                    alt="{{ product.featured_image.alt | escape }}"
+                    class="ai-bulk-order-form__product-image-{{ ai_gen_id }}"
+                    loading="lazy"
+                  >
+                {% else %}
+                  <div class="ai-bulk-order-form__product-image-{{ ai_gen_id }}" style="background-color: #f4f4f4; display: flex; align-items: center; justify-content: center;">
+                    {{ 'product-1' | placeholder_svg_tag }}
+                  </div>
+                {% endif %}
+                <div class="ai-bulk-order-form__product-title-{{ ai_gen_id }}">{{ product.title }}</div>
+                <div class="ai-bulk-order-form__product-price-{{ ai_gen_id }}">{{ product.price | money }}</div>
+                <input type="checkbox" class="ai-bulk-order-form__checkbox-{{ ai_gen_id }}" name="products[]" value="{{ product.id }}">
+              </div>
+            {% endfor %}
+          {% else %}
+            <p style="grid-column: 1 / -1; text-align: center; color: {{ block.settings.label_color }}; padding: 20px;">
+              {{ block.settings.empty_collection_message }}
+            </p>
+          {% endif %}
+        </div>
+
+        <div class="ai-bulk-order-form__selected-products-{{ ai_gen_id }}" id="selected-products-{{ ai_gen_id }}">
+          <strong style="display: block; margin-bottom: 8px; color: {{ block.settings.text_color }};">{{ block.settings.selected_products_label }}</strong>
+          <div id="selected-list-{{ ai_gen_id }}"></div>
+        </div>
+
+        <div class="ai-bulk-order-form__error-{{ ai_gen_id }}" id="products-error-{{ ai_gen_id }}">
+          {{ block.settings.error_products }}
+        </div>
+      </div>
+
+      <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+        <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="product-notes-{{ ai_gen_id }}">
+          {{ block.settings.label_product_notes }}
+        </label>
+        <textarea
+          id="product-notes-{{ ai_gen_id }}"
+          name="product_notes"
+          class="ai-bulk-order-form__textarea-{{ ai_gen_id }}"
+          placeholder="{{ block.settings.placeholder_product_notes }}"
+        ></textarea>
+      </div>
+
+      <div class="ai-bulk-order-form__row-{{ ai_gen_id }}">
+        <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+          <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="quantity-{{ ai_gen_id }}">
+            {{ block.settings.label_quantity }} ({{ block.settings.minimum_label }} {{ block.settings.minimum_quantity }})<span class="ai-bulk-order-form__required-{{ ai_gen_id }}">*</span>
+          </label>
+          <input
+            type="number"
+            id="quantity-{{ ai_gen_id }}"
+            name="quantity"
+            class="ai-bulk-order-form__input-{{ ai_gen_id }}"
+            min="{{ block.settings.minimum_quantity }}"
+            placeholder="{{ block.settings.placeholder_quantity }}"
+            required
+          >
+          <div class="ai-bulk-order-form__error-{{ ai_gen_id }}" id="quantity-error-{{ ai_gen_id }}">
+            {{ block.settings.error_quantity }}
+          </div>
+        </div>
+
+        <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+          <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="delivery-date-{{ ai_gen_id }}">
+            {{ block.settings.label_delivery_date }}<span class="ai-bulk-order-form__required-{{ ai_gen_id }}">*</span>
+          </label>
+          <input
+            type="text"
+            id="delivery-date-{{ ai_gen_id }}"
+            name="delivery_date"
+            class="ai-bulk-order-form__input-{{ ai_gen_id }}"
+            placeholder="{{ block.settings.placeholder_delivery_date }}"
+            required
+          >
+          <div class="ai-bulk-order-form__error-{{ ai_gen_id }}" id="delivery-date-error-{{ ai_gen_id }}">
+            {{ block.settings.error_delivery_date }}
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+        <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="delivery-address-{{ ai_gen_id }}">
+          {{ block.settings.label_delivery_address }}<span class="ai-bulk-order-form__required-{{ ai_gen_id }}">*</span>
+        </label>
+        <textarea
+          id="delivery-address-{{ ai_gen_id }}"
+          name="delivery_address"
+          class="ai-bulk-order-form__textarea-{{ ai_gen_id }}"
+          placeholder="{{ block.settings.placeholder_delivery_address }}"
+          required
+        ></textarea>
+        <div class="ai-bulk-order-form__error-{{ ai_gen_id }}" id="delivery-address-error-{{ ai_gen_id }}">
+          {{ block.settings.error_delivery_address }}
+        </div>
+      </div>
+
+      <div class="ai-bulk-order-form__field-group-{{ ai_gen_id }}">
+        <label class="ai-bulk-order-form__label-{{ ai_gen_id }}" for="additional-notes-{{ ai_gen_id }}">
+          {{ block.settings.label_additional_notes }}
+        </label>
+        <textarea
+          id="additional-notes-{{ ai_gen_id }}"
+          name="additional_notes"
+          class="ai-bulk-order-form__textarea-{{ ai_gen_id }}"
+          placeholder="{{ block.settings.placeholder_additional_notes }}"
+        ></textarea>
+      </div>
+
+      <button
+        type="submit"
+        class="ai-bulk-order-form__submit-{{ ai_gen_id }}"
+        id="submit-button-{{ ai_gen_id }}"
+      >
+        {{ block.settings.button_text }}
+      </button>
+    </form>
+  </div>
+</bulk-order-form-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class BulkOrderForm{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.form = this.querySelector('#bulk-order-form-{{ ai_gen_id }}');
+        this.occasionSelect = this.querySelector('#occasion-{{ ai_gen_id }}');
+        this.occasionDetails = this.querySelector('#occasion-details-{{ ai_gen_id }}');
+        this.occasionOtherInput = this.querySelector('#occasion-other-{{ ai_gen_id }}');
+        this.productCards = this.querySelectorAll('.ai-bulk-order-form__product-card-{{ ai_gen_id }}');
+        this.selectedProductsContainer = this.querySelector('#selected-products-{{ ai_gen_id }}');
+        this.selectedList = this.querySelector('#selected-list-{{ ai_gen_id }}');
+        this.quantityInput = this.querySelector('#quantity-{{ ai_gen_id }}');
+        this.submitButton = this.querySelector('#submit-button-{{ ai_gen_id }}');
+        this.successMessage = this.querySelector('#success-message-{{ ai_gen_id }}');
+        this.minQuantity = parseInt(this.dataset.minQuantity);
+        this.emailRecipient = this.dataset.emailRecipient;
+        this.whatsappNumber = this.dataset.whatsappNumber;
+        this.selectedProducts = [];
+      }
+
+      connectedCallback() {
+        this.setupConditionalLogic();
+        this.setupProductSelection();
+        this.setupFormValidation();
+        this.setupFormSubmission();
+      }
+
+      setupConditionalLogic() {
+        this.occasionSelect.addEventListener('change', () => {
+          if (this.occasionSelect.value === 'other') {
+            this.occasionDetails.style.display = 'block';
+            this.occasionOtherInput.setAttribute('required', 'required');
+          } else {
+            this.occasionDetails.style.display = 'none';
+            this.occasionOtherInput.removeAttribute('required');
+            this.occasionOtherInput.value = '';
+          }
+        });
+      }
+
+      setupProductSelection() {
+        this.productCards.forEach(card => {
+          card.addEventListener('click', () => {
+            const checkbox = card.querySelector('.ai-bulk-order-form__checkbox-{{ ai_gen_id }}');
+            const productId = card.dataset.productId;
+            const productTitle = card.dataset.productTitle;
+            const productPrice = card.dataset.productPrice;
+
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+              card.classList.add('selected');
+              this.selectedProducts.push({
+                id: productId,
+                title: productTitle,
+                price: productPrice
+              });
+            } else {
+              card.classList.remove('selected');
+              this.selectedProducts = this.selectedProducts.filter(p => p.id !== productId);
+            }
+
+            this.updateSelectedProductsList();
+          });
+        });
+      }
+
+      updateSelectedProductsList() {
+        if (this.selectedProducts.length > 0) {
+          this.selectedProductsContainer.classList.add('active');
+          this.selectedList.innerHTML = this.selectedProducts.map(product => `
+            <div class="ai-bulk-order-form__selected-item-{{ ai_gen_id }}">
+              <span>${product.title} - ${product.price}</span>
+              <button type="button" class="ai-bulk-order-form__remove-btn-{{ ai_gen_id }}" data-product-id="${product.id}">{{ block.settings.remove_button_text }}</button>
+            </div>
+          `).join('');
+
+          this.selectedList.querySelectorAll('.ai-bulk-order-form__remove-btn-{{ ai_gen_id }}').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const productId = btn.dataset.productId;
+              const card = this.querySelector(`[data-product-id="${productId}"]`);
+              const checkbox = card.querySelector('.ai-bulk-order-form__checkbox-{{ ai_gen_id }}');
+              
+              checkbox.checked = false;
+              card.classList.remove('selected');
+              this.selectedProducts = this.selectedProducts.filter(p => p.id !== productId);
+              this.updateSelectedProductsList();
+            });
+          });
+        } else {
+          this.selectedProductsContainer.classList.remove('active');
+          this.selectedList.innerHTML = '';
+        }
+      }
+
+      setupFormValidation() {
+        this.quantityInput.addEventListener('input', () => {
+          const quantity = parseInt(this.quantityInput.value);
+          const errorElement = this.querySelector('#quantity-error-{{ ai_gen_id }}');
+          
+          if (quantity < this.minQuantity) {
+            errorElement.classList.add('active');
+            this.quantityInput.setCustomValidity('Minimum quantity not met');
+          } else {
+            errorElement.classList.remove('active');
+            this.quantityInput.setCustomValidity('');
+          }
+        });
+      }
+
+      setupFormSubmission() {
+        this.form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          
+          if (!this.validateForm()) {
+            return;
+          }
+
+          const formData = this.collectFormData();
+          this.sendNotifications(formData);
+          this.showSuccessMessage();
+          this.resetForm();
+        });
+      }
+
+      validateForm() {
+        let isValid = true;
+        const requiredFields = this.form.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+          const errorElement = this.querySelector(`#${field.id}-error-{{ ai_gen_id }}`);
+          
+          if (!field.value.trim()) {
+            if (errorElement) {
+              errorElement.classList.add('active');
+            }
+            isValid = false;
+          } else {
+            if (errorElement) {
+              errorElement.classList.remove('active');
+            }
+          }
+        });
+
+        const quantity = parseInt(this.quantityInput.value);
+        if (quantity < this.minQuantity) {
+          const errorElement = this.querySelector('#quantity-error-{{ ai_gen_id }}');
+          errorElement.classList.add('active');
+          isValid = false;
+        }
+
+        const productsError = this.querySelector('#products-error-{{ ai_gen_id }}');
+        if (this.selectedProducts.length === 0) {
+          productsError.classList.add('active');
+          isValid = false;
+        } else {
+          productsError.classList.remove('active');
+        }
+
+        return isValid;
+      }
+
+      collectFormData() {
+        const formData = new FormData(this.form);
+        const data = {};
+        
+        for (let [key, value] of formData.entries()) {
+          if (key !== 'products[]') {
+            data[key] = value;
+          }
+        }
+        
+        data.selected_products = this.selectedProducts;
+        
+        return data;
+      }
+
+      sendNotifications(data) {
+        this.sendEmailNotification(data);
+        this.sendWhatsAppNotification(data);
+      }
+
+      sendEmailNotification(data) {
+        const productsList = data.selected_products.map(p => `- ${p.title} (${p.price})`).join('\n          ');
+        
+        const emailBody = `
+BULK ORDER REQUEST
+
+Customer Information:
+Name: ${data.name}
+Email: ${data.email}
+Phone: ${data.phone}
+Company: ${data.company || 'N/A'}
+
+Order Details:
+Occasion: ${data.occasion}${data.occasion_other ? ' - ' + data.occasion_other : ''}
+
+Selected Products:
+          ${productsList}
+
+Product Notes: ${data.product_notes || 'None'}
+Total Quantity: ${data.quantity}
+
+Delivery Information:
+Preferred Date: ${data.delivery_date}
+Address: ${data.delivery_address}
+
+Additional Notes: ${data.additional_notes || 'None'}
+
+Submitted: ${new Date().toLocaleString()}
+        `;
+
+        const mailtoLink = `mailto:${this.emailRecipient}?subject=New Bulk Order Request - ${data.name}&body=${encodeURIComponent(emailBody)}`;
+        window.location.href = mailtoLink;
+      }
+
+      sendWhatsAppNotification(data) {
+        if (!this.whatsappNumber) return;
+
+        const productNames = data.selected_products.map(p => p.title).join(', ');
+        const whatsappMessage = `*New Bulk Order*\n\nName: ${data.name}\nProducts: ${productNames}\nQuantity: ${data.quantity}\nOccasion: ${data.occasion}\nDelivery: ${data.delivery_date}\nPhone: ${data.phone}`;
+        
+        const whatsappLink = `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+        window.open(whatsappLink, '_blank');
+      }
+
+      showSuccessMessage() {
+        this.successMessage.classList.add('active');
+        this.form.style.display = 'none';
+        
+        setTimeout(() => {
+          this.successMessage.classList.remove('active');
+          this.form.style.display = 'block';
+        }, 5000);
+      }
+
+      resetForm() {
+        this.form.reset();
+        this.occasionDetails.style.display = 'none';
+        this.selectedProducts = [];
+        this.productCards.forEach(card => {
+          card.classList.remove('selected');
+          const checkbox = card.querySelector('.ai-bulk-order-form__checkbox-{{ ai_gen_id }}');
+          checkbox.checked = false;
+        });
+        this.updateSelectedProductsList();
+      }
+    }
+
+    customElements.define('bulk-order-form-{{ ai_gen_id }}', BulkOrderForm{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Bulk order request form",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Form content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Bulk Order Request"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Fill out the form below to request a bulk order. Our team will get back to you within 24 hours."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Submit button text",
+      "default": "Submit Request"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thank you! Your bulk order request has been submitted successfully. We'll contact you soon."
+    },
+    {
+      "type": "header",
+      "content": "Name field"
+    },
+    {
+      "type": "text",
+      "id": "label_name",
+      "label": "Label",
+      "default": "Name"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_name",
+      "label": "Placeholder"
+    },
+    {
+      "type": "text",
+      "id": "error_name",
+      "label": "Error message",
+      "default": "Please enter your name"
+    },
+    {
+      "type": "header",
+      "content": "Email field"
+    },
+    {
+      "type": "text",
+      "id": "label_email",
+      "label": "Label",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_email",
+      "label": "Placeholder"
+    },
+    {
+      "type": "text",
+      "id": "error_email",
+      "label": "Error message",
+      "default": "Please enter a valid email address"
+    },
+    {
+      "type": "header",
+      "content": "Phone field"
+    },
+    {
+      "type": "text",
+      "id": "label_phone",
+      "label": "Label",
+      "default": "Phone Number"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_phone",
+      "label": "Placeholder"
+    },
+    {
+      "type": "text",
+      "id": "error_phone",
+      "label": "Error message",
+      "default": "Please enter your phone number"
+    },
+    {
+      "type": "header",
+      "content": "Company field"
+    },
+    {
+      "type": "text",
+      "id": "label_company",
+      "label": "Label",
+      "default": "Company Name"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_company",
+      "label": "Placeholder"
+    },
+    {
+      "type": "header",
+      "content": "Occasion field"
+    },
+    {
+      "type": "text",
+      "id": "label_occasion",
+      "label": "Label",
+      "default": "Occasion"
+    },
+    {
+      "type": "text",
+      "id": "occasion_placeholder",
+      "label": "Placeholder",
+      "default": "Select an occasion"
+    },
+    {
+      "type": "text",
+      "id": "occasion_option_1",
+      "label": "Option 1",
+      "default": "Corporate Event"
+    },
+    {
+      "type": "text",
+      "id": "occasion_option_2",
+      "label": "Option 2",
+      "default": "Wedding"
+    },
+    {
+      "type": "text",
+      "id": "occasion_option_3",
+      "label": "Option 3",
+      "default": "Birthday Party"
+    },
+    {
+      "type": "text",
+      "id": "occasion_option_4",
+      "label": "Option 4",
+      "default": "Festival"
+    },
+    {
+      "type": "text",
+      "id": "occasion_option_5",
+      "label": "Option 5 (Other)",
+      "default": "Other"
+    },
+    {
+      "type": "text",
+      "id": "error_occasion",
+      "label": "Error message",
+      "default": "Please select an occasion"
+    },
+    {
+      "type": "header",
+      "content": "Occasion other field"
+    },
+    {
+      "type": "text",
+      "id": "label_occasion_other",
+      "label": "Label",
+      "default": "Please specify the occasion"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_occasion_other",
+      "label": "Placeholder"
+    },
+    {
+      "type": "text",
+      "id": "error_occasion_other",
+      "label": "Error message",
+      "default": "Please specify the occasion"
+    },
+    {
+      "type": "header",
+      "content": "Product selection"
+    },
+    {
+      "type": "collection",
+      "id": "product_collection",
+      "label": "Product collection"
+    },
+    {
+      "type": "text",
+      "id": "label_products",
+      "label": "Label",
+      "default": "Product Selection"
+    },
+    {
+      "type": "text",
+      "id": "helper_text_products",
+      "label": "Helper text",
+      "default": "Select one or more products from the collection below"
+    },
+    {
+      "type": "text",
+      "id": "selected_products_label",
+      "label": "Selected products label",
+      "default": "Selected Products:"
+    },
+    {
+      "type": "text",
+      "id": "remove_button_text",
+      "label": "Remove button text",
+      "default": "Remove"
+    },
+    {
+      "type": "text",
+      "id": "empty_collection_message",
+      "label": "Empty collection message",
+      "default": "Please select a collection in the block settings to display products."
+    },
+    {
+      "type": "text",
+      "id": "error_products",
+      "label": "Error message",
+      "default": "Please select at least one product"
+    },
+    {
+      "type": "header",
+      "content": "Product notes field"
+    },
+    {
+      "type": "text",
+      "id": "label_product_notes",
+      "label": "Label",
+      "default": "Product Notes"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_product_notes",
+      "label": "Placeholder",
+      "default": "Specify flavors, sizes, customizations, or any special requirements for the selected products"
+    },
+    {
+      "type": "header",
+      "content": "Quantity field"
+    },
+    {
+      "type": "text",
+      "id": "label_quantity",
+      "label": "Label",
+      "default": "Total Quantity"
+    },
+    {
+      "type": "text",
+      "id": "minimum_label",
+      "label": "Minimum label",
+      "default": "Minimum"
+    },
+    {
+      "type": "range",
+      "id": "minimum_quantity",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "label": "Minimum quantity",
+      "default": 10
+    },
+    {
+      "type": "text",
+      "id": "placeholder_quantity",
+      "label": "Placeholder"
+    },
+    {
+      "type": "text",
+      "id": "error_quantity",
+      "label": "Error message",
+      "default": "Minimum quantity is 10"
+    },
+    {
+      "type": "header",
+      "content": "Delivery date field"
+    },
+    {
+      "type": "text",
+      "id": "label_delivery_date",
+      "label": "Label",
+      "default": "Preferred Delivery Date"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_delivery_date",
+      "label": "Placeholder",
+      "default": "DD/MM/YYYY"
+    },
+    {
+      "type": "text",
+      "id": "error_delivery_date",
+      "label": "Error message",
+      "default": "Please enter a delivery date"
+    },
+    {
+      "type": "header",
+      "content": "Delivery address field"
+    },
+    {
+      "type": "text",
+      "id": "label_delivery_address",
+      "label": "Label",
+      "default": "Delivery Address"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_delivery_address",
+      "label": "Placeholder"
+    },
+    {
+      "type": "text",
+      "id": "error_delivery_address",
+      "label": "Error message",
+      "default": "Please enter a delivery address"
+    },
+    {
+      "type": "header",
+      "content": "Additional notes field"
+    },
+    {
+      "type": "text",
+      "id": "label_additional_notes",
+      "label": "Label",
+      "default": "Additional Notes"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_additional_notes",
+      "label": "Placeholder",
+      "default": "Any other special requests or requirements"
+    },
+    {
+      "type": "header",
+      "content": "Notifications"
+    },
+    {
+      "type": "text",
+      "id": "notification_email",
+      "label": "Notification email"
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_number",
+      "label": "WhatsApp number",
+      "info": "Include country code (e.g., 919876543210)"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "form_max_width",
+      "min": 400,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Maximum width",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "horizontal_padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Horizontal padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "vertical_padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Vertical padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "form_inner_padding",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Form inner padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "field_spacing",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Field spacing",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "section_spacing",
+      "min": 10,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Section spacing",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 20,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading spacing",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Label size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_text_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Button text size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "form_background",
+      "label": "Form background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "required_color",
+      "label": "Required asterisk color",
+      "default": "#d82c0d"
+    },
+    {
+      "type": "color",
+      "id": "input_background",
+      "label": "Input background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_text_color",
+      "label": "Input text color",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border color",
+      "default": "#d1d1d1"
+    },
+    {
+      "type": "color",
+      "id": "input_focus_border",
+      "label": "Input focus border",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Button hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "error_color",
+      "label": "Error color",
+      "default": "#d82c0d"
+    },
+    {
+      "type": "color",
+      "id": "success_background",
+      "label": "Success background",
+      "default": "#d4c4d9"
+    },
+    {
+      "type": "color",
+      "id": "success_text_color",
+      "label": "Success text color",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "form_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Form border radius",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "input_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Input border radius",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "input_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Input border width",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Button border radius",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bulk order request form"
+    }
+  ]
+}
+{% endschema %}

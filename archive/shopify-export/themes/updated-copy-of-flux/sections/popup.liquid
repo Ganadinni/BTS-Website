@@ -1,0 +1,652 @@
+{{ 'section-popup.css' | asset_url | stylesheet_tag }}
+{{ 'component-list-social.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .subscribe-modal h2 {
+    font-size:{{ section.settings.header_font_size }}px;
+  }
+  .subscribe-modal p {
+    font-size:{{ section.settings.message_font_size }}px
+  }
+  .submit-btn[disabled] {
+    cursor: not-allowed;
+  }
+  .subscribe-modal .terms-cart {
+    margin-top: 1rem;
+  }
+  .subscribe-modal .terms-cart p {
+    margin: 0;
+  }
+  .popup-style-2.subscribe-modal > img,
+  .popup-style-3.subscribe-modal > img{
+    width: {{ section.settings.image_width }}%;
+  }
+  .popup-style-1.subscribe-modal > img {
+    width: 100%;
+  }
+  .popup-ignore {
+    margin-top: 0!important;
+  }
+{%- endstyle -%}
+
+{% if section.settings.popup_test and request.design_mode %}
+  <div class="subscribe-overlay setStorage" id="overlay-id" style="display: block; pointerEvents: all;"></div>
+  <div
+    class="color-{{ section.settings.color_scheme }} gradient {% if section.settings.layout == 'style_2' %} popup-style-2{% endif %} {% if section.settings.layout == 'style_3' %} popup-style-3{% endif %} subscribe-modal test-popup global-media-settings"
+    id="modal"
+  >
+    <button
+      type="button"
+      id="close"
+      class="closeBtn setStorage quick-add-modal__toggle"
+      data-dismiss="subscribe-modal"
+      aria-label="Close"
+    >
+      {% render 'icon-close' %}
+    </button>
+    {%- if section.settings.popup_image -%}
+      <img
+        src="{{section.settings.popup_image | image_url: width: 1200 }}"
+        width="{{ section.settings.image_width }}"
+        height="auto"
+        alt="{{ section.settings.image_alt | escape }}"
+        loading="lazy"
+      >
+    {%- endif -%}
+
+    {% form 'customer', class: 'newsletter-form' %}
+      {%- if form.errors -%}
+        <div class="subscribe-message">
+          {{ form.errors | default_errors }}
+        </div>
+      {%- endif -%}
+      {% if form.posted_successfully? %}
+        <script>
+          sessionStorage.setItem("popupdisplayed", false);
+        </script>
+        <p class="subscribe-message">{{ section.settings.success_message }}</p>
+      {% else %}
+        <h2>{{ section.settings.popup_title }}</h2>
+        <p>{{ section.settings.popup_message }}</p>
+        {%- unless section.settings.button_label == blank -%}
+          <div class="banner-buttons">
+            <a
+              {% if section.settings.link %}
+                href="{{ section.settings.link }}"
+              {% else %}
+                role="link" aria-disabled="true"
+              {% endif %}
+              class="button-arrow button button--primary"
+            >
+              {{- section.settings.button_label | escape -}}
+              {%- if settings.show_button_arrow -%}{% render 'icon-slider-arrows' %}{% endif %}
+            </a>
+          </div>
+        {%- endunless -%}
+        {% if section.settings.subs_form != true %}
+        <div class="form-inputs">
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <input
+            type="email"
+            name="contact[email]"
+            id="Email"
+            class="email email-input"
+            value="{% if customer %}{{ customer.email }}{% endif %}"
+            placeholder="Email"
+            aria-label="Email"
+            autocorrect="off"
+            autocapitalize="off"
+            required
+            autofocus
+          >
+
+          {% if section.settings.enable_terms == true and section.settings.terms_position == 'position_above' %}               
+            <div class="terms-cart">
+              <input type="checkbox" id="signup-checkbox" name="termsCheckbox" value="1">
+              <label for="signup-checkbox">{{ section.settings.terms_label }}</label>
+            </div>
+          {% endif %}
+          
+          <button type="submit" class="button-arrow submit-btn button" id="Subscribe" {% if section.settings.enable_terms%} disabled {% endif %}>
+            {{ section.settings.submit_button_text }}
+            {%- if settings.show_button_arrow -%}{% render 'icon-slider-arrows' %}{% endif %}
+          </button>
+
+
+          {% if section.settings.enable_terms == true and section.settings.terms_position == 'position_under'  %}               
+            <div class="terms-cart">
+              <input type="checkbox" id="signup-checkbox" name="termsCheckbox" value="1">
+              <label for="signup-checkbox">{{ section.settings.terms_label }}</label>
+            </div>
+          {% endif %}
+          
+          </div>
+          {% endif %}
+          {% comment %} Start Social Icons {% endcomment %}
+          {%- liquid
+            assign has_social_icons = true
+            if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
+              assign has_social_icons = false
+            endif
+          -%}
+          <div class="socials">
+            {%- if section.settings.show_social and has_social_icons -%}
+              {%- render 'social-icons' -%}
+            {%- endif -%}
+          </div>
+          {% comment %} End Social Icons {% endcomment %}
+        
+      {% endif %}
+    {% endform %}
+  </div>
+  <script>
+  var checkbox = document.getElementById('signup-checkbox');
+  var submitButton = document.getElementById('Subscribe');
+
+  if (checkbox) { 
+    checkbox.addEventListener('change', function() {
+      submitButton.disabled = !this.checked;
+    });
+  }
+  </script>
+{% elsif section.settings.enable_popup %}
+  {% if section.settings.trigger_link != true %}
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+ 
+  const templateId = "{{ section.id }}"; 
+  const popupDisplayedKey = `popupdisplayed_${templateId}`;
+  const popupCountKey = `popupCount_${templateId}`;
+  
+  const modal = document.querySelector("#modal-id");
+  const overlay = document.querySelector("#overlay-id");
+  const body = document.querySelector("body");
+  const store = document.querySelectorAll(".setStorage");
+  const initialFocus = document.querySelector("#close");
+  const fadeIn = {{ section.settings.fadein }} * 1000;
+  
+  let popupDisplayed = sessionStorage.getItem(popupDisplayedKey);
+  let popupCount = sessionStorage.getItem(popupCountKey);
+
+  if (!popupCount) {
+    popupCount = 0;
+  }
+
+  function hideModal() {
+    modal.classList.add("fade-out");
+
+    modal.addEventListener(
+      "animationend",
+      function onAnimationEnd() {
+        modal.classList.remove("visible", "fade-out");
+        body.style.overflow = "scroll";
+        body.style.padding = "0";
+        overlay.style.display = "none";
+        body.style.overflowX = "hidden";
+
+        modal.removeEventListener("animationend", onAnimationEnd);
+      }
+    );
+  }
+
+  function showModal() {
+    modal.classList.add("visible");
+    body.style.overflow = "hidden";
+    body.style.padding = "0 4px 0 0";
+    overlay.style.display = "block";
+    overlay.style.pointerEvents = "all";
+    initialFocus.focus();
+  }
+let allowSuccessPopup = sessionStorage.getItem("allowSuccessPopup");
+  if ((popupDisplayed === "true" && !allowSuccessPopup) || popupCount >= {{ section.settings.popup_count }}) {
+    hideModal();
+  } else if (allowSuccessPopup) {
+    showModal(); 
+    setTimeout(() => {
+        sessionStorage.removeItem("allowSuccessPopup"); 
+    }, 5000); 
+}
+  else {
+    setTimeout(function () {
+      showModal();
+      popupCount++;
+      sessionStorage.setItem(popupCountKey, popupCount);
+    }, fadeIn);
+  }
+
+  store.forEach((stored) => {
+    stored.addEventListener("click", () => {
+      hideModal();
+    });
+  });
+
+  document.querySelector("#Subscribe").addEventListener("click", () => {
+    sessionStorage.setItem(popupDisplayedKey, true);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.keyCode === 27) {
+      hideModal();
+    }
+  });
+
+  var checkbox = document.getElementById('signup-checkbox');
+  var submitButton = document.getElementById('Subscribe');
+
+  if (checkbox) { 
+    checkbox.addEventListener('change', function() {
+      submitButton.disabled = !this.checked;
+    });
+  }
+});  
+  </script>
+    
+  {% else %}
+
+<script>
+function initializeModal() {
+  const modal = document.querySelector("#modal-id");  
+  const overlay = document.querySelector("#overlay-id");  
+  const closeButton = document.querySelector("#close");  
+  const popupTrigger = document.querySelector("a[href='#popup']");  
+  const body = document.querySelector("body");
+
+  function showModal() {
+    modal.classList.add("visible");
+    body.style.overflow = "hidden";
+    body.style.padding = "0 4px 0 0";
+    overlay.style.display = "block";
+    overlay.style.pointerEvents = "all";
+    const initialFocus = document.querySelector("#close");
+    if (initialFocus) {
+      initialFocus.focus();
+    }
+  }
+
+  function hideModal() {
+    modal.classList.add("fade-out");
+
+    modal.addEventListener(
+      "animationend",
+      function onAnimationEnd() {
+        modal.classList.remove("visible", "fade-out");
+        body.style.overflow = "scroll";
+        body.style.padding = "0";
+        overlay.style.display = "none";
+        body.style.overflowX = "hidden";
+
+        modal.removeEventListener("animationend", onAnimationEnd);
+      }
+    );
+  }
+
+  if (popupTrigger) {
+    popupTrigger.addEventListener("click", function (event) {
+      event.preventDefault();  
+      showModal();  
+    });
+  }
+
+  if (closeButton) {
+    closeButton.addEventListener("click", function () {
+      hideModal();
+    });
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", hideModal);
+  }
+
+  const checkbox = document.getElementById('signup-checkbox');
+  const submitButton = document.getElementById('Subscribe');
+
+  if (checkbox) {
+    checkbox.addEventListener('change', function() {
+      submitButton.disabled = !this.checked;
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initializeModal);
+document.addEventListener("shopify:section:select", initializeModal);
+
+</script>
+    {% endif %}
+
+  <div class="subscribe-overlay setStorage" id="overlay-id"></div>
+  <div
+    class="color-{{ section.settings.color_scheme }} gradient {% if section.settings.layout == 'style_2' %} popup-style-2{% endif %} {% if section.settings.layout == 'style_3' %} popup-style-3{% endif %} subscribe-modal global-media-settings"
+    id="modal-id"
+  >
+    <button
+      type="button"
+      id="close"
+      class="closeBtn setStorage quick-add-modal__toggle"
+      data-dismiss="subscribe-modal"
+      aria-label="Close"
+    >
+      {% render 'icon-close' %}
+    </button>
+    {%- if section.settings.popup_image -%}
+      <img
+        src="{{section.settings.popup_image | image_url: width: 1200 }}"
+        width="{{ section.settings.image_width }}"
+        height="auto"
+        alt="{{ section.settings.image_alt | escape }}"
+        loading="lazy"
+      >
+    {%- endif -%}
+
+    {% form 'customer', class: 'newsletter-form' %}
+      {%- if form.errors -%}
+        <div class="subscribe-message">
+          {{ form.errors | default_errors }}
+        </div>
+      {%- endif -%}
+      {% if form.posted_successfully? %}
+        <script>
+           sessionStorage.setItem("allowSuccessPopup", "true");
+          setTimeout(function () {
+          const modal = document.querySelector("#modal-id");
+          const overlay = document.querySelector("#overlay-id");
+          const body = document.querySelector("body");
+          modal.classList.add("visible");
+          overlay.style.display = "block";
+          overlay.style.pointerEvents = "all";
+          }, 1*1000);
+        </script>
+        <p class="subscribe-message">{{ section.settings.success_message }}</p>
+      {% else %}
+        <h2>{{ section.settings.popup_title }}</h2>
+        <p>{{ section.settings.popup_message }}</p>
+        {%- unless section.settings.button_label == blank -%}
+          <div class="banner-buttons">
+            <a
+              {% if section.settings.link %}
+                href="{{ section.settings.link }}"
+              {% else %}
+                role="link" aria-disabled="true"
+              {% endif %}
+              class="button-arrow button button--primary"
+            >
+              {{- section.settings.button_label | escape -}}
+              {%- if settings.show_button_arrow -%}{% render 'icon-slider-arrows' %}{% endif %}
+            </a>
+          </div>
+        {%- endunless -%}
+        {% if section.settings.subs_form != true %}
+        <div class="form-inputs">
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <input
+            type="email"
+            name="contact[email]"
+            id="Email"
+            class="email email-input"
+            value="{% if customer %}{{ customer.email }}{% endif %}"
+            placeholder="Email"
+            aria-label="Email"
+            {%- if form.errors -%}
+              aria-invalid="true"
+            {%- endif -%}
+            autocorrect="off"
+            autocapitalize="off"
+            required
+            autofocus
+          >
+
+          {% if section.settings.enable_terms == true and section.settings.terms_position == 'position_above' %}               
+            <div class="terms-cart">
+              <input type="checkbox" id="signup-checkbox" name="termsCheckbox" value="1">
+              <label for="signup-checkbox">{{ section.settings.terms_label }}</label>
+            </div>
+          {% endif %}
+          
+          <button type="submit" class="submit-btn button-arrow button" id="Subscribe" {% if section.settings.enable_terms%} disabled {% endif %}>
+            {{ section.settings.submit_button_text }}
+            {%- if settings.show_button_arrow -%}{% render 'icon-slider-arrows' %}{% endif %}
+          </button>
+
+          {% if section.settings.enable_terms == true and section.settings.terms_position == 'position_under'  %}               
+            <div class="terms-cart">
+              <input type="checkbox" id="signup-checkbox" name="termsCheckbox" value="1">
+              <label for="signup-checkbox">{{ section.settings.terms_label }}</label>
+            </div>
+          {% endif %}
+          </div>
+          {% endif %}
+          {% comment %} Start Social Icons {% endcomment %}
+          {%- liquid
+            assign has_social_icons = true
+            if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
+              assign has_social_icons = false
+            endif
+          -%}
+          <div class="socials">
+            {%- if section.settings.show_social and has_social_icons -%}
+              {%- render 'social-icons' -%}
+            {%- endif -%}
+          </div>
+          {% comment %} End Social Icons {% endcomment %}
+        
+      {% endif %}
+    {% endform %}
+  </div>
+{% endif %}
+
+
+{% schema %}
+{
+  "name": "t:sections.promo-popup.name",
+  "tag": "section",
+  "class": "section popup-ignore",
+  "disabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_popup",
+      "default": false,
+      "label": "t:sections.promo-popup.settings.enable_popup.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "popup_test",
+      "default": false,
+      "label": "t:sections.promo-popup.settings.popup_test.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.promo-popup.settings.header_popup_trigger.content"
+    },
+    {
+      "type": "range",
+      "id": "fadein",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "sec",
+      "label": "t:sections.promo-popup.settings.fadein.label",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "popup_count",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "t:sections.promo-popup.settings.popup_count.label",
+      "default": 1
+    },
+    {
+      "type": "checkbox",
+      "id": "trigger_link",
+      "default": false,
+      "label": "t:sections.promo-popup.settings.trigger_link.label",
+      "info" : "t:sections.promo-popup.settings.trigger_link.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.promo-popup.settings.header_popup_content.content"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "options": [
+        {
+          "value": "style_1",
+          "label": "t:sections.promo-popup.settings.layout.options__1.label"
+        },
+        {
+          "value": "style_2",
+          "label": "t:sections.promo-popup.settings.layout.options__2.label"
+        },
+        {
+          "value": "style_3",
+          "label": "t:sections.promo-popup.settings.layout.options__3.label"
+        }
+      ],
+      "default": "style_3",
+      "label": "t:sections.promo-popup.settings.layout.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "popup_image",
+      "label": "t:sections.promo-popup.settings.popup_image.label"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "min": 40,
+      "max": 70,
+      "step": 5,
+      "unit": "%",
+      "label": "t:sections.promo-popup.settings.image_width.label",
+      "default": 50
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "default": "Alt text",
+      "label": "t:sections.promo-popup.settings.image_alt.label"
+    },
+    {
+      "type": "text",
+      "id": "popup_title",
+      "default": "Sign-up",
+      "label": "t:sections.promo-popup.settings.popup_title.label"
+    },
+    {
+      "type": "range",
+      "id": "header_font_size",
+      "min": 12,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "label": "t:sections.promo-popup.settings.header_font_size.label",
+      "default": 38
+    },
+    {
+      "type": "textarea",
+      "id": "popup_message",
+      "default": "Subscribe to our newsletter",
+      "label": "t:sections.promo-popup.settings.popup_message.label"
+    },
+    {
+      "type": "range",
+      "id": "message_font_size",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "t:sections.promo-popup.settings.message_font_size.label",
+      "default": 16
+    },
+    {
+      "type": "text",
+      "id": "submit_button_text",
+      "default": "Sign-up",
+      "label": "t:sections.promo-popup.settings.submit_button_text.label"
+    },
+    {
+      "type": "textarea",
+      "id": "success_message",
+      "default": "Thank you for subscribing!",
+      "label": "t:sections.promo-popup.settings.success_message.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "default": true,
+      "label": "t:sections.announcement-bar.settings.show_social.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.promo-popup.settings.header_popup_newsletter_consent.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_terms",
+      "label": "t:sections.promo-popup.settings.enable_terms.label",
+      "default": false
+    },
+    {
+      "type": "richtext",
+      "id": "terms_label",
+      "label": "t:sections.promo-popup.settings.terms_label.label",
+      "default": "<p>I agree to receive marketing emails</p>"
+    },
+    {
+      "type": "select",
+      "id": "terms_position",
+      "options": [
+        {
+          "value": "position_under",
+          "label": "t:sections.promo-popup.settings.terms_position.options__1.label"
+        },
+        {
+          "value": "position_above",
+          "label": "t:sections.promo-popup.settings.terms_position.options__2.label"
+        }
+      ],
+      "default": "position_above",
+      "label": "t:sections.promo-popup.settings.terms_position.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.promo-popup.settings.header_popup_additional_settings.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "subs_form",
+      "default": false,
+      "label": "t:sections.promo-popup.settings.subs_form.label"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:sections.video-background.settings.button_label.label"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:sections.video-background.settings.link.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "option-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.promo-popup.presets.name"
+    }
+  ]
+}
+{% endschema %}

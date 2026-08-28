@@ -1,0 +1,381 @@
+{{ 'section-quick-info-bar.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  @media screen and (max-width: 990px) {
+    .margin-spacing-negative.section-{{ section.id }}-margin {
+      margin-top: -{{ section.settings.margin_top }}px;
+    }
+    .margin-spacing-positive.section-{{ section.id }}-margin {
+      margin-top: {{ section.settings.margin_top }}px;
+    }
+  }
+{%- endstyle -%}
+
+{% comment %} Start Quick Info Bar {% endcomment %}
+<div class="ignore-{{ section.settings.ignore_spacing }}">
+<div class="color-{{ section.settings.color_scheme }} gradient quick-info-bar position-center-no-overlap border-{{ section.settings.add_border }} section-{{ section.id }}-padding margin-spacing-{{ section.settings.margin_spacing }} section-{{ section.id }}-margin image-size-{{ section.settings.image_size }}" data-aos="fade-up">
+  <div class="{% if section.settings.full_width_background == false %} page-width{% endif %} grid">
+    {% comment %} Start Column 1 {% endcomment %}
+      <div class="grid-item color-{{ section.settings.color_scheme_1 }} gradient">
+        <div class="is-layout-flex columns">
+        {% comment %} Start Image 1 {% endcomment %}
+          <div class="column info-image">
+            {%- if section.settings.image-1 != blank -%}
+            {{
+            section.settings.image-1
+            | image_url: width: 100
+            | image_tag: loading: 'lazy'
+            }}
+            {%- else -%}
+            {{ 'collection-6' | placeholder_svg_tag: 'placeholder-svg' }}
+            {%- endif -%}
+          </div>
+        {% comment %} End Image 1 {% endcomment %}
+        {% comment %} Start Caption 1 {% endcomment %}
+          <div class="column info-caption">
+              {%- if section.settings.heading-1 != blank -%}
+                  <h3 class="quick-info-bar__heading heading-bold">
+              {{ section.settings.heading-1 | escape }}
+                  </h3>
+              {%- endif -%}
+              {%- if section.settings.caption-1 != blank -%}
+                   <p class="quick-info-bar-caption">
+                  {{ section.settings.caption-1 | escape }}
+                  </p>
+              {%- endif -%}
+          </div>
+        {% comment %} End Caption 1 {% endcomment %}
+        </div>
+      </div>
+    {% comment %} End Column 1 {% endcomment %}
+    
+    {% comment %} Start Column 2 {% endcomment %}
+    <div class="grid-item color-{{ section.settings.color_scheme_1 }} gradient">
+        <div class="is-layout-flex columns">
+        {% comment %} Start Image 2 {% endcomment %}
+          <div class="column info-image">
+            {%- if section.settings.image-2 != blank -%}
+            {{
+            section.settings.image-2
+            | image_url: width: 100
+            | image_tag: loading: 'lazy'
+            }}
+            {%- else -%}
+            {{ 'collection-5' | placeholder_svg_tag: 'placeholder-svg' }}
+            {%- endif -%}
+          </div>
+        {% comment %} End Image 2 {% endcomment %}
+        {% comment %} Start Caption 2 {% endcomment %}
+          <div class="column info-caption">
+              {%- if section.settings.heading-2 != blank -%}
+                  <h3 class="quick-info-bar__heading heading-bold">
+              {{ section.settings.heading-2 | escape }}
+                  </h3>
+              {%- endif -%}
+              {%- if section.settings.caption-2 != blank -%}
+                   <p class="quick-info-bar-caption">
+                  {{ section.settings.caption-2 | escape }}
+                  </p>
+              {%- endif -%}
+          </div>
+        {% comment %} End Caption 2 {% endcomment %}
+        </div>
+      </div>
+    {% comment %} End Column 2 {% endcomment %}
+
+    {% comment %} Start Column 3 {% endcomment %}
+    <div class="grid-item color-{{ section.settings.color_scheme_1 }} gradient">
+        <div class="is-layout-flex columns">
+        {% comment %} Start Image 3 {% endcomment %}
+          <div class="column info-image">
+            {%- if section.settings.image-3 != blank -%}
+            {{
+            section.settings.image-3
+            | image_url: width: 100
+            | image_tag: loading: 'lazy'
+            }}
+            {%- else -%}
+            {{ 'collection-3' | placeholder_svg_tag: 'placeholder-svg' }}
+            {%- endif -%}
+          </div>
+        {% comment %} End Image 3 {% endcomment %}
+        {% comment %} Start Caption 3 {% endcomment %}
+          <div class="column info-caption">
+              {%- if section.settings.heading-3 != blank -%}
+                  <h3 class="quick-info-bar__heading heading-bold">
+              {{ section.settings.heading-3 | escape }}
+                  </h3>
+              {%- endif -%}
+              {%- if section.settings.caption-3 != blank -%}
+                   <p class="quick-info-bar-caption">
+                  {{ section.settings.caption-3 | escape }}
+                  </p>
+              {%- endif -%}
+          </div>
+        {% comment %} End Caption 3 {% endcomment %}
+        </div>
+      </div>
+    {% comment %} End Column 3 {% endcomment %}
+
+    {% comment %} Start Column 4 {% endcomment %}
+    <div class="grid-item color-{{ section.settings.color_scheme_1 }} gradient">
+        <div class="is-layout-flex columns">
+        {% comment %} Start Image 4 {% endcomment %}
+          <div class="column info-image">
+            {%- if section.settings.image-4 != blank -%}
+            {{
+            section.settings.image-4
+            | image_url: width: 100
+            | image_tag: loading: 'lazy'
+            }}
+            {%- else -%}
+            {{ 'collection-4' | placeholder_svg_tag: 'placeholder-svg' }}
+            {%- endif -%}
+          </div>
+        {% comment %} End Image 4 {% endcomment %}
+        {% comment %} Start Caption 4 {% endcomment %}
+          <div class="column info-caption">
+              {%- if section.settings.heading-4 != blank -%}
+                  <h3 class="quick-info-bar__heading heading-bold">
+              {{ section.settings.heading-4 | escape }}
+                  </h3>
+              {%- endif -%}
+              {%- if section.settings.caption-4 != blank -%}
+                   <p class="quick-info-bar-caption">
+                  {{ section.settings.caption-4 | escape }}
+                  </p>
+              {%- endif -%}
+          </div>
+        {% comment %} End Caption 4 {% endcomment %}
+        </div>
+      </div>
+    {% comment %} End Column 4 {% endcomment %}
+  </div>
+</div>
+</div>
+{% comment %} End Quick Info Bar {% endcomment %}
+
+{% schema %}
+{
+  "name": "t:sections.quick-info-bar.name",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+        "type": "header",
+        "content": "t:sections.quick-info-bar.settings.first_column_content.content"
+    },
+    {
+        "type": "image_picker",
+        "id": "image-1",
+        "label": "t:sections.quick-info-bar.settings.image_1.label"
+    },
+    {
+        "type": "text",
+        "id": "heading-1",
+        "default": "Cruelty Free",
+        "label": "t:sections.quick-info-bar.settings.heading_1.label"
+    },
+    {
+        "type": "text",
+        "id": "caption-1",
+        "default": "Cosmetics for a kinder World",
+        "label": "t:sections.quick-info-bar.settings.caption_1.label"
+    },
+    {
+        "type": "header",
+        "content": "t:sections.quick-info-bar.settings.second_column_content.content"
+    },
+    {
+        "type": "image_picker",
+        "id": "image-2",
+        "label": "t:sections.quick-info-bar.settings.image_2.label"
+    },
+    {
+        "type": "text",
+        "id": "heading-2",
+        "default": "Organic Cosmetics",
+        "label": "t:sections.quick-info-bar.settings.heading_2.label"
+    },
+    {
+        "type": "text",
+        "id": "caption-2",
+        "default": "Nourish Your Skin with Nature",
+        "label": "t:sections.quick-info-bar.settings.caption_2.label"
+    },
+    {
+        "type": "header",
+        "content": "t:sections.quick-info-bar.settings.third_column_content.content"
+    },
+    {
+        "type": "image_picker",
+        "id": "image-3",
+        "label": "t:sections.quick-info-bar.settings.image_3.label"
+    },
+    {
+        "type": "text",
+        "id": "heading-3",
+        "default": "Made with Love",
+        "label": "t:sections.quick-info-bar.settings.heading_3.label"
+    },
+    {
+        "type": "text",
+        "id": "caption-3",
+        "default": "Beautifully Crafted with Love",
+        "label": "t:sections.quick-info-bar.settings.caption_3.label"
+    },
+    {
+        "type": "header",
+        "content": "t:sections.quick-info-bar.settings.fourth_column_content.content"
+    },
+    {
+        "type": "image_picker",
+        "id": "image-4",
+        "label": "t:sections.quick-info-bar.settings.image_4.label"
+    },
+    {
+        "type": "text",
+        "id": "heading-4",
+        "default": "Strong Formula",
+        "label": "t:sections.quick-info-bar.settings.heading_4.label"
+    },
+    {
+        "type": "text",
+        "id": "caption-4",
+        "default": "A Formula For Flawless Skin",
+        "label": "t:sections.quick-info-bar.settings.caption_4.label"
+    },
+    {
+        "type": "header",
+        "content": "t:sections.quick-info-bar.settings.info_bar_options.content"
+    },
+    {
+        "type": "select",
+        "id": "image_size",
+        "options": [
+          {
+            "value": "small",
+            "label": "t:sections.quick-info-bar.settings.image_size.options_1.label"
+          },
+          {
+            "value": "medium",
+            "label": "t:sections.quick-info-bar.settings.image_size.options_2.label"
+          },
+          {
+            "value": "large",
+            "label": "t:sections.quick-info-bar.settings.image_size.options_3.label"
+          }
+        ],
+        "default": "small",
+        "label": "t:sections.quick-info-bar.settings.image_size.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "add_border",
+      "default": false,
+      "label": "t:sections.quick-info-bar.settings.add_border.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width_background",
+      "default": true,
+      "label": "t:sections.quick-info-bar.settings.full_width_background.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "option-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme_1",
+      "label": "t:sections.all.colors_box.label",
+      "default": "option-2"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "ignore_spacing",
+      "default": false,
+      "label": "t:sections.all.ignore_spacing.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.featured-collection.settings.header_mobile.content"
+    },
+    {
+      "type": "select",
+      "id": "margin_spacing",
+      "options": [
+        {
+          "value": "negative",
+          "label": "t:sections.all.margin_spacing.options__1.label"
+        },
+        {
+          "value": "positive",
+          "label": "t:sections.all.margin_spacing.options__2.label"
+        }
+      ],
+      "default": "negative",
+      "label": "t:sections.all.margin_spacing.label"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.margin_top",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.quick-info-bar.presets.name"
+    }
+  ]
+}
+{% endschema %}

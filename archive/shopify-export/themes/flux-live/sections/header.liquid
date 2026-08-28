@@ -1,0 +1,2256 @@
+{{ 'component-cart-items.css' | asset_url | stylesheet_tag }}
+{{ 'component-mega-menu.css' | asset_url | stylesheet_tag }}
+{{ 'component-menu-drawer.css' | asset_url | stylesheet_tag }}
+{{ 'component-desktop-menu-drawer.css' | asset_url | stylesheet_tag }}
+{{ 'component-search.css' | asset_url | stylesheet_tag }}
+{{ 'localization.css' | asset_url | stylesheet_tag }}
+{{ 'disclosure.css' | asset_url | stylesheet_tag }}
+{{ 'section-featured-collections.css' | asset_url | stylesheet_tag }}
+{%- if settings.predictive_search_enabled -%}
+  {{ 'component-loading-overlay.css' | asset_url | stylesheet_tag }}
+  {{ 'component-price.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+{%- if section.settings.menu_type_desktop == 'mega' -%}
+  {{ 'component-mega-menu-animations.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+
+{%- if settings.cart_type == "drawer" -%}
+  {{ 'component-cart.css' | asset_url | stylesheet_tag }}
+  {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
+  {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+  {{ 'component-loading-overlay.css' | asset_url | stylesheet_tag }}
+  {{ 'component-price.css' | asset_url | stylesheet_tag }}
+  {{ 'component-totals.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+
+<noscript>{{ 'component-cart-items.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-cart-notification.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-mega-menu.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-list-menu.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-menu-drawer.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-search.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'disclosure.css' | asset_url | stylesheet_tag }}</noscript>
+
+{% style %}
+  header-drawer {
+    justify-self: start;
+    margin-left: -1.2rem;
+  }
+
+  .header {
+    padding-top: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px;
+  }
+
+  .section-header {
+    position: sticky; /* This is for fixing a Safari z-index issue. PR #2147 */
+    margin-bottom: {{ section.settings.margin_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  .enable-item-highlight--true .navigation-menu > li:{{ section.settings.item_highlight_position }} span:before {
+    content: '{{ section.settings.item_highlight_text }}';
+    background: {{ section.settings.item_highlight_background_color }};
+    color: {{ section.settings.item_highlight_color }};
+    right: -{{ section.settings.adjust_item_highlight_position }}px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    position: absolute;
+    top: -15px;
+    line-height: 1.4;
+    font-size: calc(var(--font-navigation-scale)*1rem);
+    width: max-content;
+  }
+
+  .navigation-menu > li:last-child .navigation-submenu span:after,
+  .enable-item-highlight--true .navigation-menu > li:{{ section.settings.item_highlight_position }} .navigation-submenu span:before  {
+    display: none;
+  } 
+
+  span.flag-image {
+    height: 14px;
+  }
+
+  .flag-image img {
+    margin-right: 5px;
+  }
+
+  .header__heading-logo {
+    max-width: {{ settings.logo_width }}px;
+  }
+  
+
+  @media screen and (max-width: 990px) {
+    .header__heading-logo {
+      max-width: {{ settings.logo_width_mobile }}px;
+    }
+  }
+  
+  {%- if section.settings.sticky_header_type == 'reduce-logo-size' -%}
+    .scrolled-past-header .header__heading-logo {
+      width: 75%;
+    }
+  {%- endif -%}
+
+  .menu-drawer-container {
+    display: flex;
+  }
+
+  .navigation-menu {
+    display: inline-flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0 -1rem;
+  }
+
+  .navigation-submenu,
+  .menu-drawer__menu {
+    list-style: none;
+  }
+
+  .list-menu__item {
+    display: flex;
+    align-items: center;
+    line-height: calc(1 + 0.3 / var(--font-body-scale));
+  }
+
+  .list-menu__item--link {
+    text-decoration: none;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+    line-height: calc(1 + 0.8 / var(--font-body-scale));
+  }
+
+  .field:after,
+  .select:after {
+    box-shadow: none;
+  }
+ 
+  .field-input {
+    background: rgb(var(--color-background));
+    height: 5.5rem;
+  }
+
+  .field__button {
+    height: 5.4rem;
+  }
+
+  .field-label {
+    top: calc(1.5rem + var(--inputs-border-width));
+  }
+
+  /* Rotation on hover */
+  .icon-caret {
+    transition: transform 0.4s ease-in-out; 
+    transform: rotate(0deg); 
+  }
+
+  .main-navigation-mega li:hover .icon-caret,
+  .main-navigation > ul > li:hover > .nav-menu-item .icon-caret {
+    transform: rotate(360deg);
+  }
+
+  .navigation-submenu li:hover .icon-caret{
+    transform: rotate(270deg);
+  }
+
+  @media screen and (min-width: 990px) {
+    header-drawer {
+      display: none;
+    }
+    .enable-fixed-header-part--true.enable-header-full-width--false,
+    .enable-fixed-header-part--true.enable-header-full-width--true,
+    .enable-fixed-header-part--true.enable-header-full-width--false.transparent-fixed-header,
+    .enable-fixed-header-part--true.enable-header-full-width--true.transparent-fixed-header{
+      margin: {{ section.settings.fixed_header_type_margin }}% auto;
+    }
+    .header.header--centered-two-row.header-two-row-alternative>.header__search {
+      justify-self: flex-start;
+    }
+    .header.header--centered-two-row.header-two-row-alternative .header__search .header--icons-line,
+    .header.header--centered-two-row.header-two-row-alternative .header__search .header__icon:after {
+      display: none;
+    }
+    .header--centered-two-row.header-two-row-alternative .header__heading,
+    .header--centered-two-row.header-two-row-alternative .header__heading-link {
+      justify-self: center;
+    }
+    .header--centered-two-row.header-two-row-alternative {
+      grid-template-areas: "left-icon heading icons" "navigation-buttons navigation-buttons navigation-buttons";
+    }
+    .header--centered-two-row.header-two-row-alternative .navigation-buttons {
+      border-top: none;
+    }
+    .header-wrapper.enable-fixed-header-part--true.transparent-fixed-header.in-view .header.page-width {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .scrolled-past-header.shopify-section-header-sticky .header-wrapper.enable-fixed-header-part--true.transparent-fixed-header.in-view .header.page-width {
+      padding-left: 3.4rem;
+      padding-right: 2rem;
+    }
+  }
+
+  @media screen and (max-width: 990px) {
+    .enable-fixed-header-part--true.enable-header-full-width--false {
+      margin: {{ section.settings.fixed_header_type_margin_mobile }}% auto;
+    }
+    .newsletter .field-label,
+    .contact__wrapper .field-label {
+      top: calc(1.5rem + var(--inputs-border-width));
+    }
+    .field-label {
+      top: calc(2.5rem + var(--inputs-border-width));
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .list-menu__item--link {
+      padding-bottom: 0.5rem;
+      padding-top: 0.5rem;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .header {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .hide-title {
+    display: block;
+    width: 1px;
+    visibility: hidden;
+  }
+    
+{% endstyle %}
+
+<script src="{{ 'details-modal.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'search-form.js' | asset_url }}" defer="defer"></script>
+{%- if settings.cart_type == "drawer" -%}
+  <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{% comment %} Start Search Icons {% endcomment %}
+<svg xmlns="http://www.w3.org/2000/svg" class="hidden">
+  <symbol id="icon-search" viewbox="0 0 16 16" fill="none">
+    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" fill="currentColor"/>
+
+  </symbol>
+
+  <symbol id="icon-reset" class="icon icon-close"  fill="none" viewBox="0 0 16 16">
+    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" fill="currentColor"/>
+      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-close" class="icon icon-close" fill="none" viewBox="0 0 16 16">
+    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" fill="currentColor"/>
+  </symbol>
+</svg>
+{% comment %} End Search Icons {% endcomment %}
+
+{% comment %} Start Header {% endcomment %}
+<{% if section.settings.sticky_header_type != 'none' %}sticky-header data-sticky-type="{{ section.settings.sticky_header_type }}" data-margin-desktop="{{ section.settings.fixed_header_type_margin }}"data-margin-mobile="{{ section.settings.fixed_header_type_margin_mobile }}"{% else %}div{% endif %} class="header-wrapper color-{{ section.settings.color_scheme }} gradient {% if template.name == 'index' %}enable-fixed-header-part--{{ section.settings.enable_fixed_header_type }}{% endif %}  {% if template.name == 'index' and section.settings.enable_fixed_header_type == true and section.settings.enable_fixed_header_transparent == true %}transparent-fixed-header{% endif %} {% if template.name == 'collection' %}enable-fixed-header-part--{{ section.settings.enable_fixed_header_type_collection }}{% endif %} {% if template.name == 'collection' and section.settings.enable_fixed_header_type_collection == true and section.settings.enable_fixed_header_transparent == true %}collection-fixed-header transparent-fixed-header{% endif %} enable-header-full-width--{{ section.settings.enable_header_full_width }} navigation-{{ settings.navigation_font }} 
+  {% if section.settings.transparent_menu != blank %}
+  {% assign menu = linklists[section.settings.transparent_menu] %}
+  {% assign current_page_handle = request.path | split: '/' %}
+  {% assign current_page_handle = current_page_handle.last %}
+  {% assign is_in_menu = false %}
+  {% for link in menu.links %}
+    {% assign link_handle = link.url | split: '/' %}
+    {% assign link_handle = link_handle.last %}
+    {% if current_page_handle == link_handle %}
+      {% assign is_in_menu = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  {% if is_in_menu %}
+    enable-fixed-header-part--true {% if section.settings.enable_fixed_header_transparent == true %}transparent-fixed-header{% endif %}
+  {% endif %}
+{% endif %} {%- if section.settings.enable_fixed_header_type_all == true -%}enable-fixed-header-part--true {% if section.settings.enable_fixed_header_transparent == true %} transparent-fixed-header{% endif %}{% endif %}" data-aos="fade-up" data-aos-delay="350">
+    <header class="header additional_links--{{ section.settings.disable_additional_links }} header--{{ section.settings.desktop_header_layout }} header--mobile-{{ section.settings.mobile_desktop_header_layout }} page-width{% if section.settings.menu != blank %} header--has-menu{% endif %} enable-item-highlight--{{ section.settings.enable_item_highlight }} {% if section.settings.header_icons_decoration == 'circle' %} header--icons-circle{% endif %} {% if section.settings.header_icons_decoration == 'line' %} header--icons-line{% endif %} {%- if section.settings.menu_type_desktop == 'drawer' -%}desktop-header-drawer{% endif %} {% if section.settings.show_search_icon == true %} header-two-row-alternative{% endif %}">
+    {% comment %} Start Mobile Menu {% endcomment %}
+    {%- if section.settings.menu != blank -%}
+      <header-drawer data-breakpoint="tablet">
+        <details id="Details-menu-drawer-container" class="menu-drawer-container">
+          <summary class="header__icon header__icon--menu header__icon--summary link focus-inset" aria-label="{{ 'sections.header.menu' | t }}">
+            <span>
+              {% render 'icon-hamburger' %}
+              {% render 'icon-close' %}
+            </span>
+          </summary>
+          <div id="menu-drawer" class="menu-drawer motion-reduce" tabindex="-1">
+            <div class="menu-drawer-inner-container">
+              <div class="menu-drawer__navigation-container">
+                <nav class="menu-drawer__navigation">
+                  <ul class="menu-drawer__menu has-submenu list-menu" role="list">
+                    {%- for link in section.settings.menu.links -%}
+                      <li>
+                        {%- if link.links != blank -%}
+                          <details id="Details-menu-drawer-menu-item-{{ forloop.index }}">
+                            <summary class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.child_active %} menu-drawer__menu-item--active{% endif %}">
+                              {{ link.title | escape }}
+                              {% render 'icon-arrow' %}
+                              {% render 'icon-caret' %}
+                            </summary>
+                            <div id="link-{{ link.handle | escape }}" class="menu-drawer__submenu has-submenu motion-reduce" tabindex="-1">
+                              <div class="menu-drawer-inner-submenu">
+                                <button class="menu-drawer-close-button link link--text focus-inset" aria-expanded="true">
+                                  {% render 'icon-arrow' %}
+                                  {{ link.title | escape }}
+                                </button>
+                                <ul class="menu-drawer__menu list-menu" role="list" tabindex="-1">
+                                  {%- for childlink in link.links -%}
+                                    <li>
+                                      {%- if childlink.links == blank -%}
+                                        <a href="{{ childlink.url }}" class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if childlink.current %} menu-drawer__menu-item--active{% endif %}"{% if childlink.current %} aria-current="page"{% endif %}>
+                                          {{ childlink.title | escape }}
+                                        </a>
+                                      {%- else -%}
+                                        <details id="Details-menu-drawer-submenu-{{ forloop.index }}">
+                                          <summary class="menu-drawer__menu-item link link--text list-menu__item focus-inset">
+                                            {{ childlink.title | escape }}
+                                            {% render 'icon-arrow' %}
+                                            {% render 'icon-caret' %}
+                                          </summary>
+                                          <div id="childlink-{{ childlink.handle | escape }}" class="menu-drawer__submenu has-submenu motion-reduce">
+                                            <button class="menu-drawer-close-button link link--text focus-inset" aria-expanded="true">
+                                              {% render 'icon-arrow' %}
+                                              {{ childlink.title | escape }}
+                                            </button>
+                                            <ul class="menu-drawer__menu list-menu" role="list" tabindex="-1">
+                                              {%- for grandchildlink in childlink.links -%}
+                                                <li>
+                                                  <a href="{{ grandchildlink.url }}" class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if grandchildlink.current %} menu-drawer__menu-item--active{% endif %}"{% if grandchildlink.current %} aria-current="page"{% endif %}>
+                                                    {{ grandchildlink.title | escape }}
+                                                  </a>
+                                                </li>
+                                              {%- endfor -%}
+                                            </ul>
+                                          </div>
+                                        </details>
+                                      {%- endif -%}
+                                    </li>
+                                  {%- endfor -%}
+                                </ul>
+                              </div>
+                            </div>
+                          </details>
+                        {%- else -%}
+                          
+                        {% comment %} Start Mega Image Navigation {% endcomment %}
+                          {% assign mega_image_menu_items = "" %}
+                          {% for block in section.blocks %}
+                            {% case block.type %}                      
+                              {% when 'mega_image_menu' %}                           
+                              {% if block.settings.mega_image_menu_item %}    
+                                {% assign mega_image_menu_items = mega_image_menu_items | append: block.settings.mega_image_menu_item | append: ',' %}
+                                {% if link.title == block.settings.mega_image_menu_item %}                     
+                                  <details id="Details-menu-drawer-menu-item-{{ forloop.index }}">
+                                    <summary class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.child_active %} menu-drawer__menu-item--active{% endif %}">
+                                      {{ link.title | escape }}
+                                      {% render 'icon-arrow' %}
+                                      {% render 'icon-caret' %}
+                                    </summary>
+                                    <div id="link-{{ link.handle | escape }}" class="menu-drawer__submenu has-submenu motion-reduce" tabindex="-1">
+                                      <div class="menu-drawer-inner-submenu">
+                                        <button class="menu-drawer-close-button link link--text focus-inset" aria-expanded="true">
+                                          {% render 'icon-arrow' %}
+                                          {{ link.title | escape }}
+                                        </button>
+                                        <ul class="mega-image-menu-mobile__list page-width"> 
+                                          {% render 'mega-image-menu', block_settings: block.settings %}  
+                                        </ul>  
+                                      </div>
+                                    </div>
+                                  </details>                                                 
+                                  {% endif %}
+                                {% endif %}
+                              {% endcase %}
+                            {% endfor %}  
+                          {% if mega_image_menu_items.size == 0 %}
+                            <a href="{{ link.url }}" class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"{% if link.current %} aria-current="page"{% endif %}>
+                              {{ link.title | escape }}
+                            </a>  
+                            {% else %}
+                            {% for mega_image_menu_item in mega_image_menu_items %}
+                              {% unless mega_image_menu_item contains link.title %}                                                                               
+                                <a href="{{ link.url }}" class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"{% if link.current %} aria-current="page"{% endif %}>
+                                  {{ link.title | escape }}
+                                </a>  
+                              {% endunless %}                           
+                              {% endfor %}
+                            {% endif %}
+                          {% comment %} End Mega Image Navigation {% endcomment %}
+                          {%- endif -%}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </nav>
+
+                <div class="language-country-switcher">
+                {% comment %} Start Country Switcher {% endcomment %}
+                {%- if section.settings.enable_country_selector_mobile -%}
+                <div class="menu-drawer__localization">
+                  <noscript>
+                    {%- form 'localization', id: 'AnnouncementCountryFormNoScript', class: 'localization-form' -%}
+                      <div class="localization-form__select">
+                        <span class="visually-hidden" id="AnnouncementCountryLabelNoScript">{{ 'localization.country_label' | t }}</span>
+                        <select class="localization-selector link" name="country_code" aria-labelledby="AnnouncementCountryLabelNoScript">
+                          {%- for country in localization.available_countries -%}
+                            <option value="{{ country.iso_code }}" {%- if country.iso_code == localization.country.iso_code %} selected{% endif %}>
+                              {{ country.name }} ({{ country.currency.iso_code }} {{ country.currency.symbol }})
+                            </option>
+                          {%- endfor -%}
+                        </select>
+                        {% render 'icon-caret' %}
+                      </div>
+                      <button class="button button--tertiary">{{ 'localization.update_country' | t }}</button>
+                    {%- endform -%}
+                  </noscript>
+                  <localization-form>
+                    {%- form 'localization', id: 'AnnouncementCountryForm', class: 'localization-form' -%}
+                      <div class="no-js-hidden">
+                        <span class="caption-large text-body" id="AnnouncementCountryLabel">{{ 'localization.country_label' | t }}</span>
+                        <div class="disclosure">
+                          <button type="button" class="disclosure__button localization-form__select localization-selector link link--text caption-large" aria-expanded="false" aria-controls="AnnouncementCountryList" aria-describedby="AnnouncementCountryLabel">
+                            <span class="flag-image">
+                              {{ localization.country | image_url: width: 18 | image_tag }}
+                            </span>
+                              {{ localization.country.iso_code }} ({{ localization.country.currency.symbol }})
+                            {% render 'icon-caret' %}
+                          </button>
+                          <div class="disclosure__list-wrapper" hidden>
+                            <ul id="AnnouncementCountryList" role="list" class="disclosure__list list-unstyled">
+                              {%- for country in localization.available_countries -%}
+                                <li class="disclosure__item" tabindex="-1">
+                                  <a class="link link--text disclosure__link caption-large{% if country.iso_code == localization.country.iso_code %} disclosure__link--active{% endif %} focus-inset" href="#"{% if country.iso_code == localization.country.iso_code %} aria-current="true"{% endif %} data-value="{{ country.iso_code }}">
+                                    <span class="flag-image">
+                                      {{ country | image_url: width: 18 | image_tag }}
+                                    </span>
+                                    {{ country.iso_code }}
+                                    <span class="localization-form__currency"> ({{ country.currency.symbol }}) </span>
+                                  </a>
+                                </li>
+                              {%- endfor -%}
+                            </ul>
+                          </div>
+                        </div>
+                        <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}">
+                      </div>
+                    {%- endform -%}
+                  </localization-form>
+                </div>
+              {%- endif -%}
+              {% comment %} End Country Switcher {% endcomment %}
+
+              {% comment %} End Language Switcher {% endcomment %}
+              {%- if section.settings.enable_language_selector_mobile and localization.available_languages.size > 1 -%}
+                <div class="menu-drawer__localization">
+                <noscript>
+                  {%- form 'localization', id: 'HeaderLanguageFormNoScript', class: 'localization-form header-lang' -%}
+                    <div class="localization-form__select">
+                      <select
+                        class="localization-selector link"
+                        name="locale_code"
+                        aria-labelledby="FooterLanguageLabelNoScript"
+                      >
+                        {%- for language in localization.available_languages -%}
+                          <option
+                            value="{{ language.iso_code }}"
+                            lang="{{ language.iso_code }}"
+                            {%- if language.iso_code == localization.language.iso_code %}
+                              selected
+                            {% endif %}
+                          >
+                            {{ language.iso_code | upcase }}
+                          </option>
+                        {%- endfor -%}
+                      </select>
+                      {% render 'icon-caret' %}
+                    </div>
+                    <button class="button button--tertiary">{{ 'localization.update_language' | t }}</button>
+                  {%- endform -%}
+                </noscript>
+      
+                <localization-form>
+                  {%- form 'localization', id: 'HeaderLanguageForm', class: 'localization-form header-lang' -%}
+                    <div class="no-js-hidden">
+                      <div class="disclosure">
+                        <button
+                          type="button"
+                          class="disclosure__button localization-form__select localization-selector link link--text caption-large"
+                          aria-expanded="false"
+                          aria-controls="FooterLanguageList"
+                          aria-describedby="FooterLanguageLabel"
+                        >
+                          {{ localization.language.iso_code | upcase }}
+                          {% render 'icon-caret' %}
+                        </button>
+                        <div class="disclosure__list-wrapper" hidden>
+                          <ul id="FooterLanguageList" role="list" class="disclosure__list list-unstyled">
+                            {%- for language in localization.available_languages -%}
+                              <li class="disclosure__item" tabindex="-1">
+                                <a
+                                  class="link link--text disclosure__link caption-large{% if language.iso_code == localization.language.iso_code %} disclosure__link--active{% endif %} focus-inset"
+                                  href="#"
+                                  hreflang="{{ language.iso_code }}"
+                                  lang="{{ language.iso_code }}"
+                                  {% if language.iso_code == localization.language.iso_code %}
+                                    aria-current="true"
+                                  {% endif %}
+                                  data-value="{{ language.iso_code }}"
+                                >
+                                  {{ language.endonym_name | capitalize }}
+                                </a>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        </div>
+                      </div>
+                      <input type="hidden" name="locale_code" value="{{ localization.language.iso_code }}">
+                    </div>
+                  {%- endform -%}
+                </localization-form>
+                </div>
+              {%- endif -%}
+              {% comment %} End Language Switcher {% endcomment %}
+            </div>
+
+              {% comment %} Start Account {% endcomment %}
+                <div class="menu-drawer__utility-links">
+                  {%- if shop.customer_accounts_enabled -%}
+                    <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}" class="menu-drawer__account link focus-inset h5">
+                      {% render 'icon-account' %}
+                      {%- liquid
+                        if customer
+                          echo 'customer.account_fallback' | t
+                        else
+                          echo 'customer.log_in' | t
+                        endif
+                      -%}
+                    </a>
+                  {%- endif -%}
+                </div>
+                {% comment %} End Account {% endcomment %}
+                
+                
+                {% comment %} Start Featured Collection 1 {% endcomment %}
+                <div class="collection-list-one mobile-collection featured-collections-wrapper grid">
+                  {% if section.settings.featured_collection_1 != blank %}
+                    <div class="grid-item">
+                      {% render 'card-collection-one',
+                        card_collection: section.settings.featured_collection_1,
+                        media_aspect_ratio: section.settings.image_ratio
+                      %}
+                    </div>
+                      {%- endif -%}
+                  {% comment %} End Featured Collection 1 {% endcomment %}
+
+                  {% comment %} Start Featured Collection 2 {% endcomment %}
+                  {% if section.settings.featured_collection_2 != blank %}
+                    <div class="grid-item">
+                      {% render 'card-collection-one',
+                        card_collection: section.settings.featured_collection_2,
+                        media_aspect_ratio: section.settings.image_ratio
+                      %}
+                    </div>
+                  {%- endif -%}
+                </div>
+                {% comment %} End Featured Collection 2 {% endcomment %}
+                
+              </div>
+            </div>
+          </div>
+        </details>
+      </header-drawer>
+    {%- endif -%}
+    {% comment %} End Mobile Menu {% endcomment %}
+
+    {% comment %} Start Search for Centered Two Row Layout {% endcomment %}
+    {%- if section.settings.desktop_header_layout == 'centered-two-row' or section.settings.menu == blank -%}
+
+      {%- if section.settings.show_search_icon == true -%}
+        <details-modal class="header__search">
+          <details>
+            <summary class="header__icon header__icon--search header__icon--summary link focus-inset modal__toggle" aria-haspopup="dialog" aria-label="{{ 'general.search.search' | t }}">
+              <span>
+                <svg class="modal__toggle-open icon icon-search" aria-hidden="true" focusable="false">
+                  <use href="#icon-search">
+                </svg>
+                <svg class="modal__toggle-close icon icon-close" aria-hidden="true" focusable="false">
+                  <use href="#icon-close">
+                </svg>
+              </span>
+            </summary>
+            <div class="search-modal modal__content" role="dialog" aria-modal="true" aria-label="{{ 'general.search.search' | t }}">
+              <div class="modal-overlay"></div>
+              <div class="search-modal__content{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} search-modal__content-top{% else %} search-modal__content-bottom{% endif %}" tabindex="-1">
+                {%- if settings.predictive_search_enabled -%}
+                  <predictive-search class="search-modal__form" data-loading-text="{{ 'accessibility.loading' | t }}">
+                {%- else -%}
+                  <search-form class="search-modal__form">
+                {%- endif -%}
+                    <form action="{{ routes.search_url }}" method="get" role="search" class="search search-modal__form">
+                      <div class="field">
+                        <input class="search__input field-input"
+                          id="Search-In-Modal"
+                          type="search"
+                          name="q"
+                          value="{{ search.terms | escape }}"
+                          placeholder="{{ 'general.search.search' | t }}"
+                          {%- if settings.predictive_search_enabled -%}
+                            role="combobox"
+                            aria-expanded="false"
+                            aria-owns="predictive-search-results"
+                            aria-controls="predictive-search-results"
+                            aria-haspopup="listbox"
+                            aria-autocomplete="list"
+                            autocorrect="off"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                          {%- endif -%}
+                        >
+                        <label class="field-label" for="Search-In-Modal">{{ 'general.search.search' | t }}</label>
+                        <input type="hidden" name="options[prefix]" value="last">
+                        <button type="reset" class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}" aria-label="{{ 'general.search.reset' | t }}">
+                          <svg class="icon icon-close" aria-hidden="true" focusable="false">
+                            <use xlink:href="#icon-reset">
+                          </svg>
+                        </button>
+                        <button class="search__button field__button" aria-label="{{ 'general.search.search' | t }}">
+                          <svg class="icon icon-search" aria-hidden="true" focusable="false">
+                            <use href="#icon-search">
+                          </svg>
+                        </button>
+                      </div>
+  
+                      {%- if settings.predictive_search_enabled -%}
+                        <div class="predictive-search predictive-search--header" tabindex="-1" data-predictive-search>
+                          <div class="predictive-search__loading-state">
+                            <svg aria-hidden="true" focusable="false" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                              <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                            </svg>
+                          </div>
+                        </div>
+  
+                        <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+                      {%- endif -%}
+                    </form>
+                  {%- if settings.predictive_search_enabled -%}
+                    </predictive-search>
+                  {%- else -%}
+                    </search-form>
+                  {%- endif -%}
+                <button type="button" class="search-modal__close-button modal__close-button link link--text focus-inset" aria-label="{{ 'accessibility.close' | t }}">
+                  <svg class="icon icon-close" aria-hidden="true" focusable="false">
+                    <use href="#icon-close">
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </details>
+        </details-modal>
+        {% comment %} End Search {% endcomment %}
+  
+      {%- else -%}
+        
+        <div class="header__search">
+            <div class="search" role="dialog" aria-modal="false" aria-label="{{ 'general.search.search' | t }}">
+              <div class="modal-overlay"></div>
+              <div class="search-modal__content{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} search-modal__content-top{% else %} search-modal__content-bottom{% endif %}" tabindex="-1">
+                {%- if settings.predictive_search_enabled -%}
+                  <predictive-search class="search-modal__form" data-loading-text="{{ 'accessibility.loading' | t }}">
+                {%- else -%}
+                  <search-form class="search-modal__form">
+                {%- endif -%}
+                    <form action="{{ routes.search_url }}" method="get" role="search" class="search search-modal__form">
+                      <div class="field">
+                        <input class="search__input field-input"
+                          id="Search-In-Modal"
+                          type="search"
+                          name="q"
+                          value="{{ search.terms | escape }}"
+                          placeholder="{{ 'general.search.search' | t }}"
+                          {%- if settings.predictive_search_enabled -%}
+                            role="combobox"
+                            aria-expanded="false"
+                            aria-owns="predictive-search-results"
+                            aria-controls="predictive-search-results"
+                            aria-haspopup="listbox"
+                            aria-autocomplete="list"
+                            autocorrect="off"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                          {%- endif -%}
+                        >
+                        <label class="field-label" for="Search-In-Modal">{{ 'general.search.search' | t }}</label>
+                        <input type="hidden" name="options[prefix]" value="last">
+                        <button type="reset" class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}" aria-label="{{ 'general.search.reset' | t }}">
+                          <svg class="icon icon-close" aria-hidden="true" focusable="false">
+                            <use xlink:href="#icon-reset">
+                          </svg>
+                        </button>
+                        <button class="search__button field__button" aria-label="{{ 'general.search.search' | t }}">
+                          <svg class="icon icon-search" aria-hidden="true" focusable="false">
+                            <use href="#icon-search">
+                          </svg>
+                        </button>
+                      </div>
+  
+                      {%- if settings.predictive_search_enabled -%}
+                        <div class="predictive-search predictive-search--header" tabindex="-1" data-predictive-search>
+                          <div class="predictive-search__loading-state">
+                            <svg aria-hidden="true" focusable="false" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                              <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                            </svg>
+                          </div>
+                        </div>
+  
+                        <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+                      {%- endif -%}
+                    </form>
+                  {%- if settings.predictive_search_enabled -%}
+                    </predictive-search>
+                  {%- else -%}
+                    </search-form>
+                  {%- endif -%}
+              </div>
+            </div>
+        </div>
+      {%- endif -%}
+                            
+      {%- endif -%}
+      {% comment %} End Search for Centered Two Row Layout {% endcomment %}
+
+  {%- if section.settings.desktop_header_layout != 'menu-logo-icons'  -%}
+    {% comment %} Start Logo or Title for all option that are not middle center {% endcomment %}
+    {%- if request.page_type == 'index' and settings.logo_h1  -%}
+      <h1 class="header__heading">
+    {%- endif -%}
+        <a href="{{ routes.root_url }}" class="header__heading-link link link--text focus-inset">
+          {%- if settings.logo != blank -%}
+            {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
+            {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
+            {{ settings.logo | image_url: width: 500 | image_tag:
+              class: 'header__heading-logo motion-reduce',
+              widths: '50, 100, 150, 200, 250, 300, 400, 500',
+              height: logo_height,
+              width: settings.logo_width,
+              alt: logo_alt
+            }}
+          {%- else -%}
+            <span class="h2">{{ shop.name }}</span>
+          {%- endif -%}
+        </a>
+    {%- if request.page_type == 'index' and settings.logo_h1  -%}
+      </h1>
+    {%- endif -%}
+    {% comment %} End Logo or Title {% endcomment %}
+  {%- endif -%}
+
+  {%- if section.settings.desktop_header_layout == 'centered-two-row'  -%}<div class="navigation-buttons">{%- endif -%}
+  {% comment %} Start Desktop Navigation {% endcomment %}
+    {%- if section.settings.menu != blank -%}
+      {% comment %} Start Dropdown Navigation {% endcomment %}
+      {%- if section.settings.menu_type_desktop == 'dropdown' -%}
+        <nav class="main-navigation">
+          <ul class="navigation-menu" role="list">
+            {%- for link in section.settings.menu.links -%}
+              <li>
+                {%- if link.links != blank -%}
+              
+                      <div class="nav-menu-item list-menu__item link focus-inset">
+                        <span tabindex="0" {%- if link.child_active %} class="header__active-menu-item"{% endif %}>{{ link.title | escape }}</span>
+                        {% render 'icon-caret' %}
+                      </div>
+                      <ul id="HeaderMenu-MenuList-{{ forloop.index }}" class="navigation-submenu list-menu color-{{ section.settings.color_scheme }} gradient caption-large motion-reduce" role="list" tabindex="-1">
+                        {%- for childlink in link.links -%}
+                          <li>
+                            {%- if childlink.links == blank -%}
+                              <a href="{{ childlink.url }}" class="nav-menu-item list-menu__item link link--text focus-inset caption-large{% if childlink.current %} list-menu__item--active{% endif %}"{% if childlink.current %} aria-current="page"{% endif %}>
+                                <span>{{ childlink.title | escape }}</span>
+                              </a>
+                            {%- else -%}
+                                <div class="nav-menu-item link link--text list-menu__item focus-inset caption-large">
+                                  <span tabindex="0">{{ childlink.title | escape }}</span>
+                                  {% render 'icon-caret' %}
+                                </div>
+                                <ul id="HeaderMenu-SubMenuList-{{ forloop.index }}" class="navigation-submenu list-menu color-{{ section.settings.color_scheme }} gradient motion-reduce">
+                                  {%- for grandchildlink in childlink.links -%}
+                                    <li>
+                                      <a href="{{ grandchildlink.url }}" class="nav-menu-item list-menu__item link link--text focus-inset caption-large{% if grandchildlink.current %} list-menu__item--active{% endif %}"{% if grandchildlink.current %} aria-current="page"{% endif %}>
+                                        <span>{{ grandchildlink.title | escape }}</span>
+                                      </a>
+                                    </li>
+                                  {%- endfor -%}
+                                </ul>
+                            {%- endif -%}
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                {%- else -%}
+                  <a href="{{ link.url }}" class="nav-menu-item list-menu__item link link--text focus-inset"{% if link.current %} aria-current="page"{% endif %}>
+                    <span {%- if link.current %} class="header__active-menu-item"{% endif %}>{{ link.title | escape }}</span>
+                  </a>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {% comment %} End Dropdown Navigation {% endcomment %}
+
+      {% comment %} Start Mega Navigation {% endcomment %}
+      {%- else -%}
+      <nav class="main-navigation-mega">
+        <ul class="navigation-menu" role="list">
+            {%- for link in section.settings.menu.links -%}
+              <li>
+                {%- if link.links != blank -%}
+                      <div class="nav-menu-item list-menu__item link focus-inset">
+                        <span tabindex="0" {%- if link.child_active %} class="header__active-menu-item"{% endif %}>{{ link.title | escape }}</span>
+                        {% render 'icon-caret' %}
+                      </div>
+                      <div id="MegaMenu-Content-{{ forloop.index }}" class="navigation-submenu top mega-menu__content color-{{ section.settings.color_scheme }} gradient motion-reduce global-settings-popup {% if section.settings.all_items_mega != true %}{% if link.levels == 1 %} mega-menu__list--condensed{% endif %}{% endif %}" tabindex="-1">
+                        <ul class="mega-menu__list page-width" role="list">
+                          {%- for childlink in link.links -%}
+                            <li>
+                              <a href="{{ childlink.url }}" class="mega-menu__link mega-menu__link--level-2 heading-bold link{% if childlink.current %} mega-menu__link--active{% endif %}"
+                                {% if childlink.current %} aria-current="page"{% endif %}
+                              >
+                                <span>{{ childlink.title | escape }}</span>
+                              </a>
+                              {%- if childlink.links != blank -%}
+                                <ul class="list-unstyled" role="list">
+                                  {%- for grandchildlink in childlink.links -%}
+                                    <li>
+                                      <a href="{{ grandchildlink.url }}" class="mega-menu__link link{% if grandchildlink.current %} mega-menu__link--active{% endif %}"{% if grandchildlink.current %} aria-current="page"{% endif %}>
+                                        <span>{{ grandchildlink.title | escape }}</span>
+                                      </a>
+                                    </li>
+                                  {%- endfor -%}
+                                </ul>
+                              {%- endif -%}
+                            </li>
+                          {%- endfor -%}
+                  
+                          {% comment %} Start Mega Menu Promotion {% endcomment %}
+                            {% for block in section.blocks %}
+                              {% case block.type %}
+                                {% when 'mega_promotion' %}                           
+                                  {% if block.settings.mega_promotion_item %}                                           
+                                    {% if link.title == block.settings.mega_promotion_item %}  
+                                      <div class="mega-menu-collection" {{ block.shopify_attributes }}>                                    
+                                      {%- if block.settings.mega_promotion_title != blank -%}
+                                            <p class="title heading-bold">{{ block.settings.mega_promotion_title }}</p>
+                                          {%- endif -%}                                    
+                                        <div class="mega-menu-collection-image">                                          
+                                          {%- if block.settings.mega_promotion_image != blank -%}
+                                            <a href="{{ block.settings.mega_promotion_link }}" class="title-link">
+                                              {{ block.settings.mega_promotion_image | image_url: width: 250 | image_tag: loading: 'lazy'}}
+                                            </a>
+                                          {%- else -%}
+                                            {{ 'hero-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+                                          {%- endif -%}
+                                         </div>
+
+                                        <div class="mega-menu-collection-text">
+                                          {%- if block.settings.mega_promotion_caption != blank -%}
+                                            <p class="caption-with-letter-spacing "{{ block.shopify_attributes }}>
+                                              {{ block.settings.mega_promotion_caption | escape }}
+                                            </p>
+                                          {%- endif -%}                                                                           
+                                        </div>
+
+                                        <div class="mega-menu-link link">
+                                          {%- if block.settings.mega_promotion_link_label != blank -%}
+                                            <a class="link animate-arrow" {% if block.settings.mega_promotion_link == blank %}role="link" aria-disabled="true"{% else %}href="{{ block.settings.mega_promotion_link }}"{% endif %}>{{ block.settings.mega_promotion_link_label | escape }}</a>
+                                          {%- endif -%}
+                                        </div>
+                        
+                                      </div>
+                                    {% endif %}                       
+                                  {% endif %}                    
+                                {% endcase %}
+                              {% endfor %}
+                           {% comment %} End Mega Menu Promotion {% endcomment %}
+                  
+                        </ul>
+                      </div>
+                {%- else -%}
+                  
+                {% comment %} Start Mega Image Navigation {% endcomment %}
+                  {% assign mega_image_menu_items = "" %}
+                  {% for block in section.blocks %}
+                    {% case block.type %}                      
+                      {% when 'mega_image_menu' %}                         
+                      {% if block.settings.mega_image_menu_item %} 
+                        {% assign mega_image_menu_items = mega_image_menu_items | append: block.settings.mega_image_menu_item | append: ',' %}
+                        {% if link.title == block.settings.mega_image_menu_item %}  
+                          <div class="nav-menu-item list-menu__item link link--text focus-inset">
+                            <span tabindex="0" {%- if link.child_active %} class="header__active-menu-item"{% endif %}>{{ link.title | escape }}</span>
+                            {% render 'icon-caret' %}
+                          </div>
+                          <div class="navigation-submenu {{ section.settings.submenu_animation_position }} mega-menu__content color-{{ section.settings.color_scheme }} motion-reduce global-settings-popup {% if section.settings.all_items_mega != true %}{% if link.levels == 1 %} mega-menu__list--condensed{% endif %}{% endif %}" tabindex="-1">                                         
+                            <ul class="mega-image-menu__list page-width"> 
+                              {% render 'mega-image-menu', block_settings: block.settings %}                              
+                            </ul>                                
+                          </div>                          
+                          {% endif %}
+                        {% endif %}
+                      {% endcase %}
+                    {% endfor %}
+                  {% if mega_image_menu_items.size == 0 %}
+                    <a href="{{ link.url }}" class="nav-menu-item list-menu__item link link--text focus-inset"{% if link.current %} aria-current="page"{% endif %}>
+                      <span {%- if link.current %} class="header__active-menu-item"{% endif %}>{{ link.title | escape }}</span>
+                    </a>
+                      {% else %}
+                    {% for mega_image_menu_item in mega_image_menu_items %}
+                      {% unless mega_image_menu_item contains link.title %}                                                                               
+                        <a href="{{ link.url }}" class="nav-menu-item list-menu__item link link--text focus-inset"{% if link.current %} aria-current="page"{% endif %}>
+                          <span {%- if link.current %} class="header__active-menu-item"{% endif %}>{{ link.title | escape }}</span>
+                        </a>
+                      {% endunless %}                           
+                      {% endfor %}
+                    {% endif %}
+                {% comment %} End Mega Image Navigation {% endcomment %}
+                  
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {%- endif -%}
+      {% comment %} End Mega Navigation {% endcomment %}
+
+      {%- if section.settings.desktop_header_layout == 'centered-two-row'  -%}
+        <div class="right-block-buttons menu-icon-{{ section.settings.image_size }}">
+        {%- if section.settings.button_label != blank -%}
+          <a
+            class="menu-button-primary"
+            {% if section.settings.button_link == blank %}
+              role="link" aria-disabled="true"
+            {% else %}
+              href="{{ section.settings.button_link }}"
+            {% endif %}
+          >
+            {%- if section.settings.image_1 != blank -%}
+              {{
+              section.settings.image_1
+              | image_url: width: 100
+              | image_tag: loading: 'lazy'
+              }}
+            {%- else -%}
+              {% render 'icon-bookmark' %}
+            {%- endif -%}
+            {{ section.settings.button_label | escape }}
+          </a>
+        {%- endif -%}
+
+        {%- if section.settings.button_label_one != blank -%}
+          <a
+            class="menu-button-secondary"
+            {% if section.settings.button_link_one == blank %}
+              role="link" aria-disabled="true"
+            {% else %}
+              href="{{ section.settings.button_link_one }}"
+            {% endif %}
+          >
+            {%- if section.settings.image_2 != blank -%}
+              {{
+              section.settings.image_2
+              | image_url: width: 100
+              | image_tag: loading: 'lazy'
+              }}
+            {%- else -%}
+              {% render 'icon-bookmark' %}
+            {%- endif -%}
+            {{ section.settings.button_label_one | escape }}
+          </a>
+        {%- endif -%}
+        </div>
+      {%- endif -%}
+      
+      {%- endif -%} 
+    {% comment %} End Desktop Navigation {% endcomment %}
+    {%- if section.settings.desktop_header_layout == 'centered-two-row'  -%}</div>{%- endif -%}
+    
+
+    {%- if section.settings.desktop_header_layout == 'menu-logo-icons' -%}
+      {% comment %} Start Logo or Title for all option that are not middle center {% endcomment %}
+      {%- if request.page_type == 'index' and settings.logo_h1 -%}
+        <h1 class="header__heading">
+      {%- endif -%}
+          <a href="{{ routes.root_url }}" class="header__heading-link link link--text focus-inset">
+            {%- if settings.logo != blank -%}
+              {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
+              {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
+              {{ settings.logo | image_url: width: 500 | image_tag:
+                class: 'header__heading-logo motion-reduce',
+                widths: '50, 100, 150, 200, 250, 300, 400, 500',
+                height: logo_height,
+                width: settings.logo_width,
+                alt: logo_alt
+              }}
+            {%- else -%}
+              <span class="h2">{{ shop.name }}</span>
+            {%- endif -%}
+          </a>
+      {%- if request.page_type == 'index' and settings.logo_h1  -%}
+        </h1>
+      {%- endif -%}
+      {% comment %} End Logo or Title {% endcomment %}
+    {%- endif -%}
+
+    {% comment %} Start Search {% endcomment %}
+    <div class="header__icons">
+      {%- if section.settings.desktop_header_layout == 'menu-logo-icons' or section.settings.desktop_header_layout == 'logo-centermenu-icons'  -%}
+        <div class="right-block-buttons menu-icon-{{ section.settings.image_size }}">
+        {%- if section.settings.button_label != blank -%}
+          <a
+            class="menu-button-primary"
+            {% if section.settings.button_link == blank %}
+              role="link" aria-disabled="true"
+            {% else %}
+              href="{{ section.settings.button_link }}"
+            {% endif %}
+          >
+            {%- if section.settings.image_1 != blank -%}
+              {{
+              section.settings.image_1
+              | image_url: width: 100
+              | image_tag: loading: 'lazy'
+              }}
+            {%- else -%}
+              {% render 'icon-bookmark' %}
+            {%- endif -%}
+            {{ section.settings.button_label | escape }}
+          </a>
+        {%- endif -%}
+
+        {%- if section.settings.button_label_one != blank -%}
+          <a
+            class="menu-button-secondary"
+            {% if section.settings.button_link_one == blank %}
+              role="link" aria-disabled="true"
+            {% else %}
+              href="{{ section.settings.button_link_one }}"
+            {% endif %}
+          >
+            {%- if section.settings.image_2 != blank -%}
+              {{
+              section.settings.image_2
+              | image_url: width: 100
+              | image_tag: loading: 'lazy'
+              }}
+            {%- else -%}
+              {% render 'icon-tag' %}
+            {%- endif -%}
+            {{ section.settings.button_label_one | escape }}
+          </a>
+        {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <details-modal class="header__search">
+        <details>
+          <summary class="header__icon header__icon--search header__icon--summary link focus-inset modal__toggle" aria-haspopup="dialog" aria-label="{{ 'general.search.search' | t }}">
+            <span>
+              <svg class="modal__toggle-open icon icon-search" aria-hidden="true" focusable="false">
+                <use href="#icon-search">
+              </svg>
+              <svg class="modal__toggle-close icon icon-close" aria-hidden="true" focusable="false">
+                <use href="#icon-close">
+              </svg>
+            </span>
+          </summary>
+          <div class="search-modal modal__content" role="dialog" aria-modal="true" aria-label="{{ 'general.search.search' | t }}">
+            <div class="modal-overlay"></div>
+            <div class="search-modal__content{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} search-modal__content-top{% else %} search-modal__content-bottom{% endif %}" tabindex="-1">
+              {%- if settings.predictive_search_enabled -%}
+                <predictive-search class="search-modal__form" data-loading-text="{{ 'accessibility.loading' | t }}">
+              {%- else -%}
+                <search-form class="search-modal__form">
+              {%- endif -%}
+                  <form action="{{ routes.search_url }}" method="get" role="search" class="search search-modal__form">
+                    <div class="field">
+                      <input class="search__input field-input"
+                        id="Search-In-Modal"
+                        type="search"
+                        name="q"
+                        value="{{ search.terms | escape }}"
+                        placeholder="{{ 'general.search.search' | t }}"
+                        {%- if settings.predictive_search_enabled -%}
+                          role="combobox"
+                          aria-expanded="false"
+                          aria-owns="predictive-search-results"
+                          aria-controls="predictive-search-results"
+                          aria-haspopup="listbox"
+                          aria-autocomplete="list"
+                          autocorrect="off"
+                          autocomplete="off"
+                          autocapitalize="off"
+                          spellcheck="false"
+                        {%- endif -%}
+                      >
+                      <label class="field-label" for="Search-In-Modal">{{ 'general.search.search' | t }}</label>
+                      <input type="hidden" name="options[prefix]" value="last">
+                      <button type="reset" class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}" aria-label="{{ 'general.search.reset' | t }}">
+                        <svg class="icon icon-close" aria-hidden="true" focusable="false">
+                          <use xlink:href="#icon-reset">
+                        </svg>
+                      </button>
+                      <button class="search__button field__button" aria-label="{{ 'general.search.search' | t }}">
+                        <svg class="icon icon-search" aria-hidden="true" focusable="false">
+                          <use href="#icon-search">
+                        </svg>
+                      </button>
+                    </div>
+
+                    {%- if settings.predictive_search_enabled -%}
+                      <div class="predictive-search predictive-search--header" tabindex="-1" data-predictive-search>
+                        <div class="predictive-search__loading-state">
+                          <svg aria-hidden="true" focusable="false" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                            <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+                    {%- endif -%}
+                  </form>
+                {%- if settings.predictive_search_enabled -%}
+                  </predictive-search>
+                {%- else -%}
+                  </search-form>
+                {%- endif -%}
+              <button type="button" class="search-modal__close-button modal__close-button link link--text focus-inset" aria-label="{{ 'accessibility.close' | t }}">
+                <svg class="icon icon-close" aria-hidden="true" focusable="false">
+                  <use href="#icon-close">
+                </svg>
+              </button>
+            </div>
+          </div>
+        </details>
+      </details-modal>
+      {% comment %} End Search {% endcomment %}
+
+        {% comment %} Start Country Switcher {% endcomment %}
+        {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
+          <noscript class="header-localization-form">
+            {%- form 'localization', id: 'AnnouncementCountryFormNoScript', class: 'localization-form header-part' -%}
+              <div class="localization-form__select">
+                <h2 class="visually-hidden" id="AnnouncementCountryLabelNoScript">
+                  {{ 'localization.country_label' | t }}
+                </h2>
+                <select
+                  class="localization-selector link"
+                  name="country_code"
+                  aria-labelledby="AnnouncementCountryLabelNoScript"
+                >
+                  {%- for country in localization.available_countries -%}
+                    <option
+                      value="{{ country.iso_code }}"
+                      {%- if country.iso_code == localization.country.iso_code %}
+                        selected
+                      {% endif %}
+                    >
+                      {{ country.name }} ({{ country.currency.iso_code }}
+                      {{ country.currency.symbol }})
+                    </option>
+                  {%- endfor -%}
+                </select>
+              </div>
+              <button class="button button--tertiary">{{ 'localization.update_country' | t }}</button>
+            {%- endform -%}
+          </noscript>
+          <localization-form class="header-localization-form">
+            {%- form 'localization', id: 'AnnouncementCountryForm', class: 'localization-form header-part' -%}
+              <div class="no-js-hidden">
+                <div class="disclosure">
+                  <button
+                    type="button"
+                    class="disclosure__button localization-form__select localization-selector link link--text caption-large"
+                    aria-expanded="false"
+                    aria-controls="AnnouncementCountryList"
+                    aria-describedby="AnnouncementCountryLabel"
+                  >
+                 <span class="flag-image">
+                  {{ localization.country | image_url: width: 18 | image_tag }}
+                </span>
+
+                  </button>
+                  <div class="disclosure__list-wrapper" hidden>
+                    <ul id="AnnouncementCountryList" role="list" class="disclosure__list list-unstyled">
+                      {%- for country in localization.available_countries -%}
+                        <li class="disclosure__item" tabindex="-1">
+                          <a
+                            class="link link--text disclosure__link caption-large{% if country.iso_code == localization.country.iso_code %} disclosure__link--active{% endif %} focus-inset"
+                            href="#"
+                            {% if country.iso_code == localization.country.iso_code %}
+                              aria-current="true"
+                            {% endif %}
+                            data-value="{{ country.iso_code }}"
+                          >
+                            <span class="flag-image">
+                              {{ country | image_url: width: 18 | image_tag }}
+                            </span>
+                              {{ country.iso_code }}
+                            <span class="localization-form__currency"> ({{ country.currency.symbol }}) </span>
+                          </a>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+                </div>
+                <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}">
+              </div>
+            {%- endform -%}
+          </localization-form>
+        {%- endif -%}
+        {% comment %} End Country Switcher {% endcomment %}
+
+        {% comment %} End Language Switcher {% endcomment %}
+        {%- if section.settings.enable_language_selector and localization.available_languages.size > 1 -%}
+          <noscript>
+            {%- form 'localization', id: 'HeaderLanguageFormNoScript', class: 'localization-form header-lang' -%}
+              <div class="localization-form__select">
+                <select
+                  class="localization-selector link"
+                  name="locale_code"
+                  aria-labelledby="FooterLanguageLabelNoScript"
+                >
+                  {%- for language in localization.available_languages -%}
+                    <option
+                      value="{{ language.iso_code }}"
+                      lang="{{ language.iso_code }}"
+                      {%- if language.iso_code == localization.language.iso_code %}
+                        selected
+                      {% endif %}
+                    >
+                      {{ language.iso_code | upcase }}
+                    </option>
+                  {%- endfor -%}
+                </select>
+              </div>
+              <button class="button button--tertiary">{{ 'localization.update_language' | t }}</button>
+            {%- endform -%}
+          </noscript>
+
+          <localization-form>
+            {%- form 'localization', id: 'HeaderLanguageForm', class: 'localization-form header-lang' -%}
+              <div class="no-js-hidden">
+                <div class="disclosure">
+                  <button
+                    type="button"
+                    class="disclosure__button localization-form__select localization-selector link link--text caption-large"
+                    aria-expanded="false"
+                    aria-controls="FooterLanguageList"
+                    aria-describedby="FooterLanguageLabel"
+                  >
+                    {{ localization.language.iso_code | upcase }}
+                  </button>
+                  <div class="disclosure__list-wrapper" hidden>
+                    <ul id="FooterLanguageList" role="list" class="disclosure__list list-unstyled">
+                      {%- for language in localization.available_languages -%}
+                        <li class="disclosure__item" tabindex="-1">
+                          <a
+                            class="link link--text disclosure__link caption-large{% if language.iso_code == localization.language.iso_code %} disclosure__link--active{% endif %} focus-inset"
+                            href="#"
+                            hreflang="{{ language.iso_code }}"
+                            lang="{{ language.iso_code }}"
+                            {% if language.iso_code == localization.language.iso_code %}
+                              aria-current="true"
+                            {% endif %}
+                            data-value="{{ language.iso_code }}"
+                          >
+                            {{ language.endonym_name | capitalize }}
+                          </a>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+                </div>
+                <input type="hidden" name="locale_code" value="{{ localization.language.iso_code }}">
+              </div>
+            {%- endform -%}
+          </localization-form>
+        {%- endif -%}
+      {% comment %} End Language Switcher {% endcomment %}
+                    
+      {% comment %} Start Account {% endcomment %}
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}" class="header__icon header__icon--account link focus-inset{% if section.settings.menu != blank %} small-hide{% endif %}">
+          {% render 'icon-account' %}
+          <span class="visually-hidden">
+            {%- liquid
+              if customer
+                echo 'customer.account_fallback' | t
+              else
+                echo 'customer.log_in' | t
+              endif
+            -%}
+          </span>
+        </a>
+      {%- endif -%}
+      {% comment %} End Account {% endcomment %}
+
+      {% comment %} Start Cart {% endcomment %}
+      <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
+        {% if settings.cart_icon == 'bag' %}
+        {%- render 'icon-cart'-%}
+        {% else %}
+        {%- render 'icon-trolley' -%}
+        {% endif %}
+        <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
+        {%- if cart != empty -%}
+          <div class="cart-count-bubble">
+            {%- if cart.item_count < 100 -%}
+              <span aria-hidden="true">{{ cart.item_count }}</span>
+            {%- endif -%}
+            <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+          </div>
+        {%- endif -%}
+      </a>
+      {% comment %} End Cart {% endcomment %}
+      
+                    
+    </div>
+  </header>
+</{% if section.settings.sticky_header_type != 'none' %}sticky-header{% else %}div{% endif %}>
+{% comment %} End Header {% endcomment %}
+
+{%- if settings.cart_type == "notification" -%}
+  {%- render 'cart-notification', color_scheme: section.settings.color_scheme -%}
+{%- endif -%}
+
+{% javascript %}
+  
+class StickyHeader extends HTMLElement {
+  constructor() {
+    super();
+  }
+
+  connectedCallback() {
+    this.header = document.querySelector('.section-header');
+    this.headerIsAlwaysSticky = this.getAttribute('data-sticky-type') === 'always' || this.getAttribute('data-sticky-type') === 'reduce-logo-size';
+    this.headerBounds = {};
+
+    this.setHeaderHeight();
+
+    const marginDesktopValue = this.getAttribute('data-margin-desktop');
+    // Fetch data-margin-desktop and calculate percentage
+    this.marginDesktopPercentage = parseFloat(marginDesktopValue) || 2; 
+    this.marginDesktopThreshold = this.marginDesktopPercentage*2 / 100; 
+
+    const marginMobileValue = this.getAttribute('data-margin-mobile');
+    this.marginMobilePercentage = parseFloat(marginMobileValue) || 2; 
+    this.marginMobileThreshold = this.marginMobilePercentage / 300; 
+
+    window.matchMedia('(max-width: 990px)').addEventListener('change', this.setHeaderHeight.bind(this));
+
+    if (this.headerIsAlwaysSticky) {
+      this.header.classList.add('shopify-section-header-sticky');
+    };
+
+    this.currentScrollTop = 0;
+    this.preventReveal = false;
+    this.predictiveSearch = this.querySelector('predictive-search');
+
+    this.onScrollHandler = this.onScroll.bind(this);
+    this.hideHeaderOnScrollUp = () => this.preventReveal = true;
+
+    this.addEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+    window.addEventListener('scroll', this.onScrollHandler, false);
+
+    this.createObserver();
+  }
+
+  setHeaderHeight() {
+    document.documentElement.style.setProperty('--header-height', `${this.header.offsetHeight}px`);
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+    window.removeEventListener('scroll', this.onScrollHandler);
+  }
+
+  createObserver() {
+    let observer = new IntersectionObserver((entries, observer) => {
+      this.headerBounds = entries[0].intersectionRect;
+      observer.disconnect();
+    });
+
+    observer.observe(this.header);
+  }
+
+  onScroll() {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollThreshold = 250; 
+    const viewportWidth = window.innerWidth;
+    let resetOffset;
+
+    if (viewportWidth < 990) {
+      resetOffset = window.innerHeight * this.marginMobileThreshold;
+    } else {
+      // Using desktop threshold
+      resetOffset = window.innerHeight * this.marginDesktopThreshold;
+    }
+    
+    if (this.predictiveSearch && this.predictiveSearch.isOpen) return;
+
+    if (scrollTop > this.currentScrollTop && scrollTop > (this.headerBounds.bottom + scrollThreshold)) {
+      this.header.classList.add('scrolled-past-header');
+      if (this.preventHide) return;
+      requestAnimationFrame(this.hide.bind(this));
+    } else if (scrollTop < this.currentScrollTop && scrollTop > (this.headerBounds.bottom + scrollThreshold)) {
+      this.header.classList.add('scrolled-past-header');
+      if (!this.preventReveal) {
+        requestAnimationFrame(this.reveal.bind(this));
+      } else {
+        window.clearTimeout(this.isScrolling);
+
+        this.isScrolling = setTimeout(() => {
+          this.preventReveal = false;
+        }, 66);
+
+        requestAnimationFrame(this.hide.bind(this));
+      }
+    } else if (scrollTop <= this.headerBounds.top + resetOffset) {
+      this.header.classList.remove('scrolled-past-header');
+      requestAnimationFrame(this.reset.bind(this));
+    }
+
+    this.currentScrollTop = scrollTop;
+  }
+
+  hide() {
+    if (this.headerIsAlwaysSticky) return;
+    this.header.classList.add('shopify-section-header-hidden');
+    this.header.classList.remove('shopify-section-header-sticky');
+    this.closeMenuDisclosure();
+    this.closeSearchModal();
+  }
+
+  reveal() {
+    if (this.headerIsAlwaysSticky) return;
+    this.header.classList.add('shopify-section-header-sticky');
+    this.header.classList.remove('shopify-section-header-hidden');
+  }
+
+  reset() {
+    if (this.headerIsAlwaysSticky) return;
+    this.header.classList.remove('shopify-section-header-hidden', 'shopify-section-header-sticky');
+  }
+
+  closeMenuDisclosure() {
+    this.disclosures = this.disclosures || this.header.querySelectorAll('header-menu');
+    this.disclosures.forEach(disclosure => disclosure.close());
+  }
+
+  closeSearchModal() {
+    this.searchModal = this.searchModal || this.header.querySelector('details-modal');
+    this.searchModal.close(false);
+  }
+}
+
+customElements.define('sticky-header', StickyHeader);
+
+  function initIntersectionObserver() {
+  const headers = document.querySelectorAll('.enable-fixed-header-part--true.enable-header-full-width--false');
+
+  if (!headers.length) return; // Ensure there are elements to observe
+
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target); 
+      }
+    });
+  }, { threshold: 1 });
+
+  headers.forEach(header => {
+    observer.observe(header);
+  });
+}
+
+initIntersectionObserver();
+
+document.addEventListener('shopify:section:load', () => {
+  initIntersectionObserver();
+});
+
+{% endjavascript %}
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    {% if settings.logo %}
+      "logo": {{ settings.logo | image_url: width: 500 | prepend: "https:" | json }},
+    {% endif %}
+    "url": {{ request.origin | append: page.url | json }}
+  }
+</script>
+
+{%- if request.page_type == 'index' -%}
+  {% assign potential_action_target = request.origin | append: routes.search_url | append: "?q={search_term_string}" %}
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "WebSite",
+      "name": {{ shop.name | json }},
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {{ potential_action_target | json }},
+        "query-input": "required name=search_term_string"
+      },
+      "url": {{ request.origin | append: page.url | json }}
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:sections.header.name",
+  "class": "section-header",
+  "blocks": [
+    {
+      "type": "mega_promotion",
+      "name": "t:sections.header.blocks.mega_promotion.name",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:sections.header.blocks.mega_promotion.settings.info.content"
+        },
+        {
+          "type": "text",
+          "id": "mega_promotion_item",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_item.label",
+          "info": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_item.info"
+        },
+        {
+          "type": "image_picker",
+          "id": "mega_promotion_image",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_image.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_promotion_caption",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_caption.label",
+          "default": "20% Sale"
+        },
+        {
+          "type": "text",
+          "id": "mega_promotion_title",
+          "default": "Mega Promotion",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_title.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_promotion_link_label",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link_label.label"
+        },
+        {
+          "type": "url",
+          "id": "mega_promotion_link",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link.label"
+        }
+      ]
+    },
+    {
+      "type": "mega_image_menu",
+      "name": "t:sections.header.blocks.mega_image_menu.name",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:sections.header.blocks.mega_promotion.settings.info.content"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_item",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_item.label",
+          "info": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_item.info"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_image_menu.settings.heading_1.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "mega_image_menu_image_1",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_image.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_caption_1",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_caption.label",
+          "default": "20% Sale"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_title_1",
+          "default": "Title",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_title.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_link_label_1",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link_label.label"
+        },
+        {
+          "type": "url",
+          "id": "mega_image_menu_link_1",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_image_menu.settings.heading_2.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "mega_image_menu_image_2",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_image.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_caption_2",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_caption.label",
+          "default": "20% Sale"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_title_2",
+          "default": "Title",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_title.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_link_label_2",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link_label.label"
+        },
+        {
+          "type": "url",
+          "id": "mega_image_menu_link_2",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_image_menu.settings.heading_3.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "mega_image_menu_image_3",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_image.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_caption_3",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_caption.label",
+          "default": "20% Sale"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_title_3",
+          "default": "Title",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_title.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_link_label_3",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link_label.label"
+        },
+        {
+          "type": "url",
+          "id": "mega_image_menu_link_3",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_image_menu.settings.heading_4.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "mega_image_menu_image_4",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_image.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_caption_4",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_caption.label",
+          "default": "20% Sale"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_title_4",
+          "default": "Title",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_title.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_link_label_4",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link_label.label"
+        },
+        {
+          "type": "url",
+          "id": "mega_image_menu_link_4",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_image_menu.settings.heading_5.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "mega_image_menu_image_5",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_image.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_caption_5",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_caption.label",
+          "default": "20% Sale"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_title_5",
+          "default": "Title",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_title.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_link_label_5",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link_label.label"
+        },
+        {
+          "type": "url",
+          "id": "mega_image_menu_link_5",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_image_menu.settings.heading_6.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "mega_image_menu_image_6",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_image.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_caption_6",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_caption.label",
+          "default": "20% Sale"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_title_6",
+          "default": "Title",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_title.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_link_label_6",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link_label.label"
+        },
+        {
+          "type": "url",
+          "id": "mega_image_menu_link_6",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_image_menu.settings.heading_7.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "mega_image_menu_image_7",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_image.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_caption_7",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_caption.label",
+          "default": "20% Sale"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_title_7",
+          "default": "Title",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_title.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_link_label_7",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link_label.label"
+        },
+        {
+          "type": "url",
+          "id": "mega_image_menu_link_7",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_image_menu.settings.heading_8.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "mega_image_menu_image_8",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_image.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_caption_8",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_caption.label",
+          "default": "20% Sale"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_title_8",
+          "default": "Title",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_title.label"
+        },
+        {
+          "type": "text",
+          "id": "mega_image_menu_link_label_8",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link_label.label"
+        },
+        {
+          "type": "url",
+          "id": "mega_image_menu_link_8",
+          "label": "t:sections.header.blocks.mega_promotion.settings.mega_promotion_link.label"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:sections.header.settings.logo_help.content"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "t:sections.header.settings.menu.label"
+    },
+      {
+      "type": "select",
+      "id": "menu_type_desktop",
+      "options": [
+        {
+          "value": "dropdown",
+          "label": "t:sections.header.settings.menu_type_desktop.options__1.label"
+        },
+        {
+          "value": "mega",
+          "label": "t:sections.header.settings.menu_type_desktop.options__2.label"
+        },
+        {
+          "value": "drawer",
+          "label": "t:sections.header.settings.menu_type_desktop.options__3.label"
+        }
+      ],
+      "default": "dropdown",
+      "label": "t:sections.header.settings.menu_type_desktop.label",
+      "info": "t:sections.header.settings.menu_type_desktop.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "all_items_mega",
+      "label": "t:sections.header.settings.all_items_mega.label",
+      "info": "t:sections.header.settings.all_items_mega.info",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_layout.content"
+    },
+    {
+      "type": "select",
+      "id": "desktop_header_layout",
+      "options": [
+        {
+          "value": "centered-two-row",
+          "label": "t:sections.header.settings.desktop_header_layout.options__1.label"
+        },
+        {
+          "value": "menu-logo-icons",
+          "label": "t:sections.header.settings.desktop_header_layout.options__3.label"
+        },
+        {
+          "value": "logo-centermenu-icons",
+          "label": "t:sections.header.settings.desktop_header_layout.options__4.label"
+        }
+      ],
+      "default": "menu-logo-icons",
+      "label": "t:sections.header.settings.desktop_header_layout.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search_icon",
+      "label": "t:sections.header.settings.show_search_icon.label",
+      "info": "t:sections.header.settings.show_search_icon.info",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_header_full_width",
+      "label": "t:sections.header.settings.enable_header_full_width.label",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "sticky_header_type",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:sections.header.settings.sticky_header_type.options__1.label"
+        },
+        {
+          "value": "on-scroll-up",
+          "label": "t:sections.header.settings.sticky_header_type.options__2.label"
+        },
+        {
+          "value": "always",
+          "label": "t:sections.header.settings.sticky_header_type.options__3.label"
+        },
+        {
+          "value": "reduce-logo-size",
+          "label": "t:sections.header.settings.sticky_header_type.options__4.label"
+        }
+      ],
+      "default": "on-scroll-up",
+      "label": "t:sections.header.settings.sticky_header_type.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_transparent.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_fixed_header_type",
+      "label": "t:sections.header.settings.enable_fixed_header_type.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_fixed_header_type_collection",
+      "label": "t:sections.header.settings.enable_fixed_header_type_collection.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_fixed_header_type_all",
+      "label": "t:sections.header.settings.enable_fixed_header_type_all.label",
+      "default": false
+    },
+    {
+      "type": "link_list",
+      "id": "transparent_menu",
+      "label": "t:sections.header.settings.transparent_menu.label",
+      "info": "t:sections.header.settings.transparent_menu.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_fixed_header_transparent",
+      "label": "t:sections.header.settings.enable_fixed_header_transparent.label",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "fixed_header_type_margin",
+      "min": 0,
+      "max": 15,
+      "step": 1,
+      "unit": "%",
+      "label": "t:sections.header.settings.fixed_header_type_margin.label",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "fixed_header_type_margin_mobile",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "label": "t:sections.header.settings.fixed_header_type_margin_mobile.label",
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_additional_links.content"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:sections.header.settings.button_label.label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:sections.header.settings.button_link.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "t:sections.quick-info-bar.settings.image_1.label"
+    },
+    {
+      "type": "text",
+      "id": "button_label_one",
+      "label": "t:sections.header.settings.button_label_one.label"
+    },
+    {
+      "type": "url",
+      "id": "button_link_one",
+      "label": "t:sections.header.settings.button_link_one.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "t:sections.quick-info-bar.settings.image_2.label"
+    },
+    {
+      "type": "select",
+      "id": "image_size",
+      "options": [
+        {
+          "value": "small",
+          "label": "t:sections.quick-info-bar.settings.image_size.options_1.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.quick-info-bar.settings.image_size.options_2.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.quick-info-bar.settings.image_size.options_3.label"
+        }
+      ],
+      "default": "small",
+      "label": "t:sections.quick-info-bar.settings.image_size.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_additional_links",
+      "label": "t:sections.header.settings.disable_additional_links.label",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_highlight.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_item_highlight",
+      "label": "t:sections.header.settings.enable_item_highlight.label",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "item_highlight_text",
+      "label": "t:sections.header.settings.item_highlight_text.label",
+      "default": "HOT"
+    },
+    {
+      "type": "select",
+      "id": "item_highlight_position",
+      "options": [
+        {
+          "value": "first-child",
+          "label": "t:sections.header.settings.item_highlight_position.options__1.label"
+        },
+        {
+          "value": "nth-child(2)",
+          "label": "t:sections.header.settings.item_highlight_position.options__2.label"
+        },
+        {
+          "value": "nth-child(3)",
+          "label": "t:sections.header.settings.item_highlight_position.options__3.label"
+        },
+        {
+          "value": "nth-child(4)",
+          "label": "t:sections.header.settings.item_highlight_position.options__4.label"
+        },
+        {
+          "value": "nth-child(5)",
+          "label": "t:sections.header.settings.item_highlight_position.options__5.label"
+        },
+        {
+          "value": "nth-child(6)",
+          "label": "t:sections.header.settings.item_highlight_position.options__6.label"
+        },
+        {
+          "value": "nth-child(7)",
+          "label": "t:sections.header.settings.item_highlight_position.options__7.label"
+        },
+        {
+          "value": "nth-child(8)",
+          "label": "t:sections.header.settings.item_highlight_position.options__8.label"
+        },
+        {
+          "value": "nth-child(9)",
+          "label": "t:sections.header.settings.item_highlight_position.options__9.label"
+        },
+        {
+          "value": "nth-child(10)",
+          "label": "t:sections.header.settings.item_highlight_position.options__10.label"
+        }
+      ],
+      "default": "nth-child(3)",
+      "label": "t:sections.header.settings.item_highlight_position.label"
+    },
+    {
+      "type": "range",
+      "id": "adjust_item_highlight_position",
+      "min": 0,
+      "max": 85,
+      "step": 1,
+      "unit": "px",
+      "label": "t:sections.header.settings.adjust_item_highlight_position.label",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.country_selector_content.content",
+      "info": "t:sections.header.settings.country_selector_info.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "default": false,
+      "label": "t:sections.header.settings.enable_country_selector.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.footer.settings.header__5.content",
+      "info": "t:sections.footer.settings.header__6.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "default": false,
+      "label": "t:sections.footer.settings.enable_language_selector.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_icons_deco.content"
+    },
+    {
+      "type": "select",
+      "id": "header_icons_decoration",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:sections.header.settings.header_icons_decoration.options__1.label"
+        },
+        {
+          "value": "circle",
+          "label": "t:sections.header.settings.header_icons_decoration.options__2.label"
+        },
+        {
+          "value": "line",
+          "label": "t:sections.header.settings.header_icons_decoration.options__3.label"
+        }
+      ],
+      "default": "line",
+      "label": "t:sections.header.settings.header_icons_decoration.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "option-1"
+    },
+    {
+      "type": "color",
+      "id": "item_highlight_background_color",
+      "label": "t:sections.header.settings.item_highlight_background_color.label",
+      "default": "#ffa680"
+    },
+    {
+      "type": "color",
+      "id": "item_highlight_color",
+      "label": "t:sections.header.settings.item_highlight_color.label",
+      "default": "#1d1d1d"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_mobile.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector_mobile",
+      "default": true,
+      "label": "t:sections.header.settings.enable_country_selector_mobile.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_language_selector_mobile",
+      "default": true,
+      "label": "t:sections.header.settings.enable_language_selector_mobile.label"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection_1",
+      "label": "t:sections.header.settings.featured_collection_1.label"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection_2",
+      "label": "t:sections.header.settings.featured_collection_2.label"
+    },
+    {
+      "type": "select",
+      "id": "mobile_desktop_header_layout",
+      "options": [
+        {
+          "value": "center",
+          "label": "t:sections.header.settings.mobile_desktop_header_layout.options__1.label"
+        },
+        {
+          "value": "left",
+          "label": "t:sections.header.settings.mobile_desktop_header_layout.options__2.label"
+        }
+      ],
+      "default": "center",
+      "label": "t:sections.header.settings.mobile_desktop_header_layout.label"
+    }
+  ]
+}
+{% endschema %}

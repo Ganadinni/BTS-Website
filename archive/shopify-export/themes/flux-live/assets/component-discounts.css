@@ -1,0 +1,31 @@
+.discounts {
+  font-size: 1.2rem;
+}
+
+.discounts-discount {
+  display: flex;
+  align-items: center;
+  line-height: calc(1 + 0.5 / var(--font-body-scale));
+}
+
+.discounts-discount svg {
+  color: rgba(var(--color-button), var(--alpha-button-background));
+}
+
+.discounts-discount--position {
+  justify-content: center;
+}
+
+.discounts-discount > .icon {
+  color: rgb(var(--color-foreground));
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.7rem;
+}
+
+
+@media screen and (min-width: 750px) {
+  .discounts-discount--position {
+    justify-content: flex-end;
+  }
+}

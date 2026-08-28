@@ -1,0 +1,101 @@
+.featured-product .product__media-list {
+  width: 100%;
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.featured-product .product-media-container {
+  margin-bottom: var(--media-shadow-vertical-offset);
+  max-width: 100%;
+}
+
+.featured-product .product-media-item {
+  padding-left: 0;
+  width: 100%;
+}
+
+.product__media-item.placeholder {
+  border-radius: var(--media-radius);
+  box-shadow: var(--shadow-horizontal-offset) var(--shadow-vertical-offset) var(--shadow-blur-radius) rgba(var(--color-shadow), var(--shadow-opacity));
+  width: 100%;
+  height: 100%;
+}
+
+.background-secondary .featured-product {
+  padding: 2.5rem;
+}
+
+.featured-product .share-button:nth-last-child(2) {
+  display: inline-flex;
+}
+
+.share-button + .product-view-details {
+  display: inline-flex;
+  float: right;
+  align-items: center;
+}
+
+.share-button + .product-view-details::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.featured-product .awards-image .placeholder-svg {
+  height: 300px;
+  width: 100%;
+}
+
+.featured-product.product .price .badge {
+  padding: 7px 10px;
+  font-size: 1.2rem;
+  z-index: 1;
+}
+
+@media screen and (max-width: 990px) {
+  .featured-product .thumbnail-slider {
+    display: none;
+  }
+  .featured-product .grid-item.product-media-wrapper {
+      width: 100%;
+  }
+  .featured-product.product .price .badge {
+      padding: 7px;
+      font-size: 1rem;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .featured-product .product-media-item {
+    padding-bottom: 0;
+  }
+
+  .background-secondary .featured-product {
+    padding: 5rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .featured-product .featured-product:not(.product--no-media) > .product-info-wrapper {
+    padding: 0;
+  }
+  
+  .featured-product-section--false .ignore-background-padding--true {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  
+  .background-secondary .featured-product:not(.product--no-media) > .product-info-wrapper {
+    padding: 0 0 0 5rem;
+  }
+
+  .background-secondary .featured-product:not(.product--no-media).product--right > .product-info-wrapper {
+    padding: 0 5rem 0 0;
+  }
+
+  .background-secondary .featured-product {
+    padding: 6rem 7rem;
+    position: relative;
+    z-index: 1;
+  }
+}

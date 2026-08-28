@@ -1,0 +1,285 @@
+
+button.disclosure__button.localization-form__select.global-media-settings {
+  border: none;
+}
+
+button.disclosure__button:focus-visible {
+  outline: 0.2rem solid rgba(var(--color-foreground),.75);
+  outline-offset: 0.3rem;
+}
+
+.flag-image img {
+  border-radius: 2px;
+}
+
+.social-bar:empty {
+  display: none;
+}
+
+.footer__follow-on-shop {
+  display: flex;
+  text-align: center;
+}
+
+.social-bar.list-social:only-child {
+  justify-content: center;
+}
+
+.localization-form:only-child .button,
+.localization-form:only-child .localization-form__select {
+  flex-grow: 1;
+}
+
+span#AnnouncementCountryLabel,
+h2#AnnouncementCountryLabel {
+  display: none;
+}
+
+.flag-image img {
+  border-radius: 2px;
+  margin-right: 5px;
+}
+
+span.flag-image {
+  height: 14px;
+}
+
+.localization-form__select .icon-caret {
+  height: 0.5rem;
+}
+
+.localization-selector.link {
+  text-decoration: none;
+  font-size: 1.3rem;
+}
+
+.localization-selector.link {
+  padding-right: 3.2rem;
+}
+
+.header__icons .header-lang .disclosure .localization-form__select {
+  padding-top: 0;
+}
+
+.header__icons .header-lang .localization-selector.link {
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.header__icons .header-lang .localization-form__select {
+  margin-bottom: 0;
+  padding-left: 0;
+  text-align: center;
+  min-height: aut0;
+  min-width: auto;
+}
+
+.header__icons .localization-form.header-lang:only-child {
+  margin: 0;
+}
+
+.header__icons .localization-form.header-lang .disclosure__list-wrapper {
+  top: 135%;
+  left: -20px;
+  bottom: auto;;
+}
+
+.header__icons .localization-form.header-lang .localization-selector.link {
+  font-size: 1.4rem;
+}
+
+@media screen and (min-width: 750px) {
+
+  .localization-form {
+    padding: 1rem 2rem 1rem 0;
+  }
+
+  .header .localization-form {
+    padding: 0;
+  }
+
+  .localization-form:first-of-type {
+    padding-left: 0;
+  }
+
+  .localization-form:only-child {
+    justify-content: start;
+    width: auto;
+    margin: 0 1rem 0 0;
+  }
+
+  .footer .localization-form:only-child {
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 989px) {
+  noscript .localization-form:only-child {
+    width: 100%;
+  }
+}
+
+.localization-form .button {
+  padding: 1rem;
+}
+
+.localization-form__currency {
+  display: inline-block;
+}
+
+@media screen and (max-width: 749px) {
+  .localization-form .button {
+    word-break: break-all;
+  }
+}
+
+.localization-form__select {
+  border-radius: var(--inputs-radius-outset);
+  position: relative;
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  text-align: left;
+  min-height: calc(4rem + var(--inputs-border-width) * 2);
+  min-width: calc(7rem + var(--inputs-border-width) * 2);
+}
+
+.header-localization-form .localization-form__select {
+  min-height: auto;
+  min-width: auto;
+}
+
+.header-localization-form .localization-form__select {
+  margin-bottom: 0;
+}
+
+.disclosure__button.localization-form__select.global-media-settings:after {
+  box-shadow: none;
+}
+
+noscript .localization-form__select {
+  padding-left: 0rem;
+}
+
+@media screen and (min-width: 750px) {
+  noscript .localization-form__select {
+    min-width: 20rem;
+  }
+}
+
+.localization-form__select .icon-caret {
+  position: absolute;
+  content: '';
+  height: 0.5rem;
+  right: calc(var(--inputs-border-width) + 1.5rem);
+  top: calc(50% - 0.2rem);
+}
+
+.header-localization-form .localization-form__select .icon-caret {
+  top: 25%;
+}
+
+.localization-selector.link {
+  text-decoration: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  color: rgb(var(--color-foreground));
+  width: 100%;
+  padding-right: 3.2rem;
+  padding-bottom: 1.5rem;
+}
+
+.header-localization-form  .localization-selector.link {
+  padding-right: 0;
+}
+
+.header-localization-form  .localization-selector.link {
+  padding-bottom: 0;
+}
+
+noscript .localization-selector.link {
+  padding-top: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.disclosure .localization-form__select {
+  padding-top: 1.5rem;
+}
+
+.header-localization-form .disclosure .localization-form__select {
+  min-width: auto;
+  height: auto;
+  padding-top: 0;
+}
+
+.header localization-form {
+  margin-top: 0;
+  margin-right: 5px;
+  border-radius: 50%;
+  width: 4.4rem;
+  height: 4.4rem;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+.header.header--icons-line localization-form {
+  margin-right: 0;
+}
+
+.header--icons-circle localization-form {
+  border: 1px solid rgba(var(--color-base-border-1));
+}
+
+.header--icons-line localization-form {
+  border-radius: 0;
+}
+
+.header .flag-image img {
+  margin: 0;
+}
+
+.localization-selector option {
+  color: #000000;
+}
+
+.localization-selector + .disclosure__list-wrapper {
+  border: 1px solid rgba(var(--color-base-border-1));
+  opacity: 1;
+  animation: appear-up 0.3s ease-in-out;
+}
+
+.header-localization-form .localization-form.header-part {
+  min-width: auto;
+  height: auto;
+}
+
+@media screen and (max-width: 990px) {
+  .header-localization-form {
+    display: none;
+  }
+  
+  .header localization-form {
+    margin-right: 0;
+    border: none;
+    border-radius: 0;
+    width: max-content;
+    height: auto;
+  }
+}
+
+.header-localization-form .disclosure__button {
+  font-size: 1.3rem;
+}
+
+@keyframes appear-up {
+  0% {
+    opacity: 0;
+    margin-top: 2rem;
+  }
+  100% {
+    opacity: 1;
+    margin-top: 0;
+  }
+}

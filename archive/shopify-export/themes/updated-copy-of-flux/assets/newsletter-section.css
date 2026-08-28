@@ -1,0 +1,124 @@
+.newsletter-full-width.page-width {
+  max-width: 100%;
+  padding: 0;
+}
+
+.layout-reverse {
+  flex-direction: row-reverse;
+}
+
+.newsletter-wrapper {
+  padding-right: calc(1.5rem / var(--font-body-scale));
+  padding-left: calc(1.5rem / var(--font-body-scale));
+}
+
+.newsletter-wrapper > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.newsletter-wrapper > * + * {
+  margin-top: 2rem;
+}
+
+.newsletter-wrapper > * + .newsletter-form {
+  margin-top: 3rem;
+}
+
+.newsletter-wrapper .newsletter-form__field-wrapper {
+  max-width: 36rem;
+}
+
+.newsletter-form__field-wrapper .newsletter-form-message {
+  margin-top: 1.5rem;
+}
+
+.newsletter__button {
+  margin-top: 3rem;
+  width: fit-content;
+}
+
+.newsletter-banner-heading,
+.newsletter-subheading.rte.body {
+  margin: 0 0 1.5rem 0;
+}
+
+.newsletter-banner-caption {
+  margin: 0;
+}
+
+.newsletter-layout .banner-media .placeholder-svg {
+  border-radius: 0;
+}
+
+.newsletter-layout .banner-media,
+.grid.newsletter-banner {
+  border-radius: var(--media-radius);
+}
+
+.newsletter-full-width .banner-media {
+  border-radius: 0;
+}
+
+.newsletter-layout.style-two .newsletter-content {
+  padding: 0;
+}
+
+.newsletter label.field-label,
+.newsletter-layout.style-three label.field-label {
+  animation: none;
+}
+
+.newsletter-layout.style-three .grid-item.banner-media {
+  display: none;
+}
+
+.newsletter-layout.style-three {
+  text-align: center;
+}
+
+.newsletter-layout .banner:after, 
+.newsletter-layout .banner-media:after {
+  display: none;
+}
+
+
+@media screen and (min-width: 990px) {
+  .newsletter-layout.style-two .banner-media {
+    width: calc(25% - var(--grid-desktop-horizontal-spacing) * 3 / 4);
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .newsletter-wrapper {
+    padding-right: 9rem;
+    padding-left: 9rem;
+  }
+
+  .newsletter-content {
+    justify-content: center;
+    align-self: center;
+  }
+
+  .newsletter__button {
+    flex-shrink: 0;
+    margin: 0 0 0 1rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .newsletter-subheading.rte.body {
+    font-size: calc(var(--font-body-scale) * 1.8rem);
+  }
+}
+
+@media screen and (max-width: 990px) {
+  .newsletter-layout .grid-item {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+  .grid-item.newsletter-content.page-width {
+    padding: 0;
+  }
+}

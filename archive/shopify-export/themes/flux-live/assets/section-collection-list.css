@@ -1,0 +1,111 @@
+.collection-list {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.collection-list h3.card-heading-q {
+    display: inline;
+}
+
+.collection-list-title {
+  margin: 0;
+}
+
+.collection-list__item:only-child {
+  max-width: 100%;
+  width: 100%;
+}
+
+.collection-list-view-all {
+  margin-top: 2rem;
+}
+
+.card-wrapper .card-content-1 {
+  box-shadow: var(--shadow-horizontal-offset) var(--shadow-vertical-offset) var(--shadow-blur-radius) rgba(var(--color-shadow),var(--shadow-opacity));
+  border-bottom-left-radius: calc(var(--media-radius) - var(--media-border-width));
+  border-bottom-right-radius: calc(var(--media-radius) - var(--media-border-width));
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  padding: 10px;
+  width: 100%;
+}
+
+.card-wrapper .card-content-1 .card-heading {
+    display: inline;
+}
+
+.card-wrapper .card-content-1 .full-unstyled-link {
+    display: inline;
+}
+
+.main-list-collections-section .card-information-1 {
+  background: none;
+}
+
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  .slider.collection-list--1-items,
+  .slider.collection-list--2-items,
+  .slider.collection-list--3-items,
+  .slider.collection-list--4-items {
+    padding-bottom: 0;
+  }
+}
+
+@media screen and (min-width: 960px) and (max-width: 1280px) {
+  .collection-list.grid--5-col-desktop .grid-item {
+    width: calc(25% - var(--grid-desktop-horizontal-spacing)* 3 / 4);
+    max-width: calc(25% - var(--grid-desktop-horizontal-spacing)* 3 / 4);
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .collection-list h3.card-heading-q {
+    font-size: calc(var(--font-heading-scale) * 2.4rem);
+  }
+
+  .collection-list.grid--5-col-desktop h3.card-heading-q {
+    font-size: calc(var(--font-heading-scale) * 1.8rem);
+  }
+
+  .collection-list.grid--5-col-desktop .icon-arrow {
+    width: 1.1rem;
+  }
+
+  .collection-list__item a:hover {
+    box-shadow: none;
+  }
+
+  .collection-list.grid {
+    column-gap: var(--grid-desktop-horizontal-spacing);
+    row-gap: calc(2.5 * var(--grid-desktop-vertical-spacing));
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .slider.collection-list--1-items {
+    padding-bottom: 0;
+  }
+
+  .collection-list:not(.slider) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .section-collection-list .page-width {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .section-collection-list .collection-list:not(.slider) {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+}
+
+@media screen and (max-width: 989px) {
+  .collection-list.slider .collection-list__item {
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,160 @@
+<div class="timer">
+  {% if title != blank %}
+    <p class=" title heading-bold" class="timer__title">{{ title }}</p>
+  {% endif %}
+  <div class="timer-display">
+    <countdown-timer
+      end-date="{{ end_date }}"
+      end-time="{{ end_time }}"
+      countdown_finished_message="{{ countdown_finished_message }}"
+    ></countdown-timer>
+  </div>
+</div>
+
+<style>
+    /* styles for timer */
+    .timer--expired {
+      display: none;
+    }
+
+    .countdown-option-1 .timer {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+    }
+
+    .countdown-option-1.countdown-text-position-left .timer {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .countdown-option-1 .timer .title {
+      font-size: calc(var(--font-heading-scale) * 1.8rem);
+      font-weight: 500;
+      margin: 0 5px;
+    }
+
+    .countdown-option-1.countdown-text-position-left .timer .title {
+      margin: 0 1rem 0 0;
+      max-width: 40%;
+      line-height: 1.2;
+    }
+
+    .countdown-option-1 countdown-timer {
+      font-weight: 600;
+      font-size: calc(var(--font-heading-scale) * 2.2rem);
+      display: flex;
+    }
+
+    .countdown-option-1 countdown-timer div {
+      padding-right: 5px;
+    }
+
+    .countdown-option-1.style-one countdown-timer .timer-number {
+      background: rgb(var(--color-countdown-background-top));
+      color: rgb(var(--color-countdown-text-top));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 0 10px;
+      border-radius: var(--media-radius);
+      border-right: 4px solid rgba(var(--color-base-border-1));
+      overflow: hidden;
+    }
+
+    .countdown-option-1.style-one countdown-timer .timer-number::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: .05rem;
+      background-color: rgba(var(--color-base-border-1));
+      transform: translateY(-50%);
+    }
+
+    .countdown-option-1.style-two countdown-timer .timer-number {
+      background: rgb(var(--color-countdown-background-top));
+      color: rgb(var(--color-countdown-text-top));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 0 10px;
+      border-top-right-radius: calc(var(--media-radius) - var(--media-border-width));
+      border-top-left-radius: calc(var(--media-radius) - var(--media-border-width));
+      overflow: hidden;
+    }
+
+    .countdown-option-1.style-two countdown-timer .timer-text {
+      background: rgb(var(--color-countdown-background-bottom));
+      color: rgb(var(--color-countdown-text-bottom));
+      border-bottom-right-radius: calc(var(--media-radius) - var(--media-border-width));
+      border-bottom-left-radius: calc(var(--media-radius) - var(--media-border-width));
+      padding: 0 5px;
+    }
+
+    .countdown-option-1.style-one countdown-timer .timer-text,
+    .countdown-option-1.style-two countdown-timer .timer-text{
+      display: block;
+    }
+
+    .countdown-option-1 countdown-timer .timer-text {
+      font-size: calc(var(--font-heading-scale)* 1rem);
+      font-weight: 100;
+      margin-top: 0;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .column-right .countdown-option-1.countdown-text-position-left .title {
+      font-size: calc(var(--font-heading-scale)* 1.3rem);
+    }
+
+    .column-right .countdown-option-1.countdown-text-position-left .timer-number {
+      font-size: calc(var(--font-heading-scale)* 1.5rem);
+      padding: 0 5px;
+    }
+
+    @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .js-timer-seconds .timer-number {
+    display: inline-block;
+    animation: pulse 2s infinite;
+  }
+
+
+    @media only screen and (max-width: 990px) {
+      .countdown-option-1 .timer .title {
+        font-size: calc(var(--font-heading-scale)* 1.6rem);
+      }
+      .countdown-option-1.countdown-text-position-left .title {
+        font-size: calc(var(--font-heading-scale)* 1.3rem);
+      }
+      .countdown-option-1 countdown-timer div .timer-number {
+        font-size: calc(var(--font-heading-scale)* 2rem);
+      }
+      .countdown-option-1.countdown-text-position-left .timer-number {
+        font-size: calc(var(--font-heading-scale)* 1.5rem);
+        padding: 0 5px;
+      }
+      .countdown-option-1 countdown-timer .timer-text {
+        font-size: calc(var(--font-heading-scale)* .8rem);
+      }
+    }
+</style>

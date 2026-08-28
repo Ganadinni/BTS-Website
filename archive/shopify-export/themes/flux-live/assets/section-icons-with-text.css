@@ -1,0 +1,43 @@
+.icons-with-text .media img {
+    padding: 10px;
+    background: rgb(var(--color-base-accent-2));
+    box-shadow: var(--shadow-horizontal-offset) var(--shadow-vertical-offset) var(--shadow-blur-radius) rgba(var(--color-shadow),var(--shadow-opacity));
+}
+
+.icons-with-text.multicolumn.color-option-3 .media img,
+.icons-with-text.multicolumn.color-option-4 .media img {
+    background: rgb(var(--color-background));
+}
+
+.icons-with-text .media--circle img {
+    border-radius: 50%;
+}
+
+.icons-with-text .media--asymmetrical img {
+    border-radius: 95% 81% 100% 70%/100% 100% 80% 79%;
+}
+
+.icons-with-text.multicolumn .slider-component-desktop .slider-buttons {
+  justify-content: center;
+}
+
+@media screen and (min-width: 990px) {
+  .icons-with-text.multicolumn .slider-component-desktop {
+    margin-bottom: 0;
+  }
+  .icons-with-text.multicolumn .slider-component-desktop .slider-slide {
+    padding-bottom: 20px;
+  }
+  .icons-with-text.multicolumn slider-component {
+    --desktop-margin-left-first-item: 0;
+  }
+  .icons-with-text.multicolumn .slider-component-desktop .slider-buttons {
+    display: flex;
+  }
+}
+
+@media screen and (max-width: 990px) {
+.icons-with-text.multicolumn .grid--peek .grid-item  {
+    width: 100%;
+}
+}

@@ -1,0 +1,35 @@
+{%- if section.settings.anchor != blank -%}
+    <p class="anchor" id="{{ section.settings.anchor }}"></p>
+  {% endif %}
+  {% style %}
+    .anchor {
+      visibility: hidden;
+    }
+    p.anchor:empty {
+      display: block;
+    }
+  {% endstyle %}
+  
+  {% schema %}
+    {
+    "name": "t:sections.anchor_link.name",
+    "tag": "section",
+    "class": "section",
+    "disabled_on": {
+      "groups": ["header", "footer"]
+    },
+    "settings": [
+      {
+        "type": "text",
+        "id": "anchor",
+        "label": "t:sections.anchor_link.settings.anchor.label",
+        "info": "t:sections.anchor_link.settings.anchor.info"
+      }
+    ],
+      "presets": [
+      {
+        "name": "t:sections.anchor_link.presets.name"
+      }
+    ]
+  }
+  {% endschema %}

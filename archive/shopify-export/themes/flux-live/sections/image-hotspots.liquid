@@ -1,0 +1,575 @@
+{{ 'section-image-hotspots.css' | asset_url | stylesheet_tag }}
+
+{% comment %} CSS {% endcomment %}
+{%- assign button_width_small = 18 -%}
+{%- assign button_width_large = 20 -%}
+{%- assign tooltip_max_width = 320 -%}
+{%- assign image_aspect_ratio = section.settings.image.aspect_ratio | default: 1 -%}
+{%- assign section_selector = '[data-tooltips="' | append: section.id | append: '"]' -%}
+
+<style>
+
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  @media screen and (max-width: 990px) {
+    .margin-spacing-negative.section-{{ section.id }}-margin {
+      margin-top: -{{ section.settings.margin_top }}px;
+    }
+    .margin-spacing-positive.section-{{ section.id }}-margin {
+      margin-top: {{ section.settings.margin_top }}px;
+    }
+  }
+  
+  .tooltip-index {
+      line-height: {{ button_width_small }}px;
+      width: {{ button_width_small }}px;
+  }
+
+  @keyframes box-shadow-animation {
+      0% {
+          box-shadow: 0 0 0 4px rgba(0, 0, 0, .2);
+      }
+
+      50% {
+          box-shadow: 0 0 0 12px rgba(0, 0, 0, .2);
+      }
+
+      100% {
+          box-shadow: 0 0 0 4px rgba(0, 0, 0, .2);
+      }
+  }
+
+  @media screen and (max-width: 990px) {
+      .tooltip-index {
+          line-height: 18px;
+          width: 18px;
+      }
+
+  @keyframes box-shadow-animation {
+      0% {
+          box-shadow: 0 0 0 2px rgba(0, 0, 0, .2);
+      }
+
+      50% {
+          box-shadow: 0 0 0 8px rgba(0, 0, 0, .2);
+      }
+
+      100% {
+          box-shadow: 0 0 0 2px rgba(0, 0, 0, .2);
+      }
+  }
+  }
+
+  {{ section_selector }} .tooltip-index {
+      background-color: {{ section.settings.tooltip_background_color }};
+  }
+
+  {%- for block in section.blocks -%}
+  {{ section_selector }} .tooltip-item:nth-child({{ forloop.index }}) .tooltip-index {
+      top: 0px;
+      margin-top: {{ block.settings.top | divided_by: image_aspect_ratio }}%;
+      left: {{ block.settings.left }}%;
+  }
+  {%- endfor -%}
+
+  @media screen and (min-width: 750px) {
+      .tooltip-button .tooltip-index {
+          line-height: {{ button_width_large }}px;
+          width: {{ button_width_large }}px;
+          cursor: pointer;
+      }
+
+      .tooltip-button {
+          width: {{ button_width_large }}px;
+          height: {{ button_width_large }}px;
+      }
+
+      .tooltip-item {
+          max-width: {{ tooltip_max_width }}px;
+      }
+
+      [aria-expanded="true"] ~ .tooltip-overlay {
+          margin-left: -{{ button_width_large }}px;
+      }
+
+      {%- for block in section.blocks -%}
+      {%- assign y = block.settings.top | divided_by: image_aspect_ratio -%}
+      {%- assign tooltip_selector = '#tooltip-' | append: block.id -%}
+
+      {{ tooltip_selector }} .tooltip-button {
+          top: 0px;
+          margin-top: {{ y }}%;
+          left: {{ block.settings.left }}%;
+      }
+
+      {{ tooltip_selector }} .tooltip-overlay {
+          top: -{{ button_width_large }}px;
+          margin-top: {{ y }}%;
+          left: {{ block.settings.left }}%;
+          margin-left: -40px;
+      }
+
+      {{ tooltip_selector }} .tooltip-button .tooltip-index {
+          margin-top: 10px;
+      }
+      {%- endfor -%}
+  }
+
+</style>
+
+<div class="ignore-{{ section.settings.ignore_spacing }} color-{{ section.settings.color_scheme }} margin-spacing-{{ section.settings.margin_spacing }} section-{{ section.id }}-margin">
+  <image-hotspots
+    data-tooltips="{{ section.id }}"
+    class="{% if section.settings.full_width %}image-hotspots--full-width{% endif %} {% if section.settings.full_width == false %}image-hotspots--boxed{% endif %} section-{{ section.id }}-padding"
+  >
+    <div
+      class="image-hotspots page-width tooltip-content-style-two section-{{ section.id }}-padding {% if section.settings.layout == 'text_first' %}desktop-text-first{% endif %} {% if section.settings.layout_mobile == 'text_first' %}mobile-text-first{% endif %}"
+      data-aos="fade-up"
+    >
+      <div class="grid">
+        <!-- Left Grid for Image and Hotspots -->
+        <div
+          class="grid-item left tooltips-section"
+        >
+          <figure class="tooltips-figure">
+            {%- if section.settings.image == blank -%}
+              {{ 'product-1' | placeholder_svg_tag: 'tooltips-picture' }}
+            {%- else -%}
+              <picture class="tooltips-picture">
+                <div
+                  class="media global-media-settings" 
+                  {% if section.settings.image != blank and section.settings.image_size == 'default' %}style="height: 100%; padding-bottom: 60%;"{% endif %}
+                  {% if section.settings.image_size == 'portrait' %}style="height: 100%; padding-bottom: 80%;"{% endif %}
+                >
+                  {%- if section.settings.image != blank -%}
+                    {%- capture sizes -%}
+                      (max-width: 680px) 100vw, 50vw
+                    {%- endcapture -%}
+                    {{ section.settings.image | image_url: width: 1780 | image_tag: loading: 'lazy', sizes: sizes }}
+                  {%- else -%}
+                    {{ 'collection-3' | placeholder_svg_tag: 'placeholder-svg' }}
+                  {%- endif -%}
+                </div>
+              </picture>
+            {%- endif -%}
+          </figure>
+
+          <!-- Tooltips List -->
+          <ol class="tooltips-list" aria-label="{{ section.settings.title }}">
+            {%- for block in section.blocks -%}
+              <li class="tooltip-item" id="tooltip-{{ block.id }}">
+                <button
+                  class="tooltip-button"
+                  type="button"
+                  value="{{ block.id }}"
+                  aria-describedby="tooltip-overlay-{{ block.id }}"
+                  aria-label="{{ forloop.index }}, {{ block.settings.title }}"
+                  aria-expanded="false"
+                  data-tooltip-trigger
+                  {{ block.shopify_attributes }}
+                >
+                  <div class="tooltip-index" role="none">{{ forloop.index }}</div>
+                </button>
+                <!-- Hidden content for the tooltip -->
+                <aside
+                  class="color-{{ section.settings.color_scheme_1 }} gradient tooltip-overlay global-media-settings"
+                  id="tooltip-overlay-{{ block.id }}"
+                  data-tooltip-overlay
+                >
+                  {%- if block.settings.product != blank -%}
+                    <a href="{{ block.settings.product.url }}">
+                      {{
+                        block.settings.product.featured_image
+                        | image_url: width: 260, height: 260
+                        | image_tag: loading: 'lazy'
+                      }}
+                    </a>
+                    {% assign product = block.settings.product %}
+                    <h4 class="column product-title">
+                      <a
+                        class="link"
+                        {% if block.settings.product.url == blank %}
+                          role="link" aria-disabled="true"
+                        {% else %}
+                          href="{{ block.settings.product.url }}"
+                        {% endif %}
+                      >
+                        {%- if block.settings.product.title != blank -%}
+                          {{ block.settings.product.title | escape }}
+                        {%- else -%}
+                          {{ 'onboarding.product_title' | t }}
+                        {%- endif -%}
+                      </a>
+                    </h4>
+                    
+                  {% assign product = block.settings.product %}
+                  {% if product %}
+                    <div class="spotlight-price">
+                      <span class="product-price">{{ product.price | money }}</span>
+                      <span class="product-price sale">{{ product.compare_at_price | money }}</span>
+                    </div>
+                  {% endif %}
+                  
+                  {%- endif -%}
+                  <p class="tooltip-text">{{ block.settings.content }}</p>
+                </aside>
+              </li>
+            {%- endfor -%}
+          </ol>
+        </div>
+
+        <!-- Right Grid for Dynamic Content -->
+        <div class="grid-item right image-hotspots-content--middle image-hotspots-content--center">
+           {%- if section.settings.caption != blank -%}
+              <p
+                class="{{ section.settings.text_style }} {{ section.settings.text_style }}--{{ section.settings.text_size }} {{ section.settings.text_style }}"
+              >
+                {{ section.settings.caption | escape }}
+              </p>
+            {%- endif -%}
+            {%- if section.settings.heading != blank -%}
+              <{{ section.settings.heading_tag }} class="heading-bold {{ section.settings.heading_size }} heading-{{ section.settings.heading_style }} ">
+                <span>{{ section.settings.heading | escape }}</span>
+              </{{ section.settings.heading_tag }}>
+            {%- endif -%}
+          <div class="dynamic-content-placeholder">
+            <!-- The content from the clicked tooltip will be dynamically inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </image-hotspots>
+</div>
+
+
+<script data-tooltips-config type="application/json">
+  {
+    "sectionId": {{ section.id | json }},
+    "blocksId": {{ section.blocks | map: 'id' | json }}
+  }
+</script>
+
+{% comment %} Settings {% endcomment %}
+
+{% schema %}
+{
+  "name": "t:sections.image-hotspots.name",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.image-hotspots.settings.image.label"
+    },
+    {
+      "type": "select",
+      "id": "image_size",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:sections.image-hotspots.settings.image_size.options__1.label"
+        },
+        {
+          "value": "portrait",
+          "label": "t:sections.image-hotspots.settings.image_size.options__2.label"
+        }
+      ],
+      "default": "default",
+      "label": "t:sections.image-hotspots.settings.image_size.label"
+    },
+  {
+    "type": "text",
+    "id": "caption",
+    "default": "Caption",
+    "label": "t:sections.image-hotspots.settings.caption.label"
+  },
+  {
+    "type": "select",
+    "id": "text_style",
+    "options": [
+      {
+        "value": "subtitle",
+        "label": "t:sections.image-hotspots.settings.text_style.options__1.label"
+      },
+      {
+        "value": "caption-with-letter-spacing",
+        "label": "t:sections.image-hotspots.settings.text_style.options__2.label"
+      }
+    ],
+    "default": "caption-with-letter-spacing",
+    "label": "t:sections.image-hotspots.settings.text_style.label"
+  },
+  {
+    "type": "select",
+    "id": "text_size",
+    "options": [
+      {
+        "value": "small",
+        "label": "t:sections.image-hotspots.settings.text_size.options__1.label"
+      },
+      {
+        "value": "medium",
+        "label": "t:sections.image-hotspots.settings.text_size.options__2.label"
+      },
+      {
+        "value": "large",
+        "label": "t:sections.image-hotspots.settings.text_size.options__3.label"
+      }
+    ],
+    "default": "medium",
+    "label": "t:sections.image-hotspots.settings.text_size.label"
+  },
+  {
+      "type": "text",
+      "id": "heading",
+      "default": "Heading",
+      "label": "t:sections.image-hotspots.settings.heading.label"
+  },
+  {
+    "type": "select",
+    "id": "heading_size",
+    "options": [
+      {
+        "value": "large",
+        "label": "t:sections.all.heading_size.options__2.label"
+      },
+      {
+        "value": "medium",
+        "label": "t:sections.all.heading_size.options__3.label"
+      },
+      {
+        "value": "small",
+        "label": "t:sections.all.heading_size.options__4.label"
+      }
+    ],
+    "default": "small",
+    "label": "t:sections.all.heading_size.label"
+  },
+  {
+    "type": "select",
+    "id": "heading_style",
+    "options": [
+      {
+        "value": "default",
+        "label": "t:sections.all.heading_style.options__1.label"
+      },
+      {
+        "value": "uppercase",
+        "label": "t:sections.all.heading_style.options__2.label"
+      }
+    ],
+    "default": "default",
+    "label": "t:sections.all.heading_style.label"
+  },
+  {
+    "type": "select",
+    "id": "heading_tag",
+    "options": [
+      {
+        "value": "h1",
+        "label": "t:sections.all.heading_tag.options__1.label"
+      },
+      {
+        "value": "h2",
+        "label": "t:sections.all.heading_tag.options__2.label"
+      },
+      {
+        "value": "h3",
+        "label": "t:sections.all.heading_tag.options__3.label"
+      },
+      {
+        "value": "h4",
+        "label": "t:sections.all.heading_tag.options__4.label"
+      },
+      {
+        "value": "h5",
+        "label": "t:sections.all.heading_tag.options__5.label"
+      },
+      {
+        "value": "h6",
+        "label": "t:sections.all.heading_tag.options__6.label"
+      }
+    ],
+    "default": "h2",
+    "label": "t:sections.all.heading_tag.label",
+    "info": "t:sections.all.heading_tag.info"
+  },
+    {
+      "type": "select",
+      "id": "layout",
+      "options": [
+        {
+          "value": "image_first",
+          "label": "t:sections.image-hotspots.settings.layout.options__1.label"
+        },
+        {
+          "value": "text_first",
+          "label": "t:sections.image-hotspots.settings.layout.options__2.label"
+        }
+      ],
+      "default": "image_first",
+      "label": "t:sections.image-hotspots.settings.layout.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.image-hotspots.settings.full_width.label",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "option-1"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_background_color",
+      "label": "t:sections.image-hotspots.settings.tooltip_background_color.label",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "ignore_spacing",
+      "default": false,
+      "label": "t:sections.all.ignore_spacing.label"
+    },
+    {
+        "type": "header",
+        "content": "t:sections.featured-collection.settings.header_mobile.content"
+      },
+      {
+        "type": "select",
+        "id": "margin_spacing",
+        "options": [
+          {
+            "value": "negative",
+            "label": "t:sections.all.margin_spacing.options__1.label"
+          },
+          {
+            "value": "positive",
+            "label": "t:sections.all.margin_spacing.options__2.label"
+          }
+        ],
+        "default": "negative",
+        "label": "t:sections.all.margin_spacing.label"
+      },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.margin_top",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "layout_mobile",
+      "options": [
+        {
+          "value": "image_first",
+          "label": "t:sections.image-hotspots.settings.layout_mobile.options__1.label"
+        },
+        {
+          "value": "text_first",
+          "label": "t:sections.image-hotspots.settings.layout_mobile.options__2.label"
+        }
+      ],
+      "default": "image_first",
+      "label": "t:sections.image-hotspots.settings.layout_mobile.label"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "Tooltip",
+      "name": "Tooltip",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "t:sections.image-hotspots.blocks.tooltip.settings.product.label"
+        },
+        {
+          "type": "text",
+          "id": "content",
+          "label": "t:sections.image-hotspots.blocks.tooltip.settings.content.label",
+          "default": "I am a tooltip, I provide additional explanatory content and showcase product features."
+        },
+        {
+          "type": "range",
+          "id": "top",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.image-hotspots.blocks.tooltip.settings.top.label",
+          "default": 20
+        },
+        {
+          "type": "range",
+          "id": "left",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.image-hotspots.blocks.tooltip.settings.left.label",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.image-hotspots.presets.name",
+      "blocks": [
+        {
+          "type": "Tooltip"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

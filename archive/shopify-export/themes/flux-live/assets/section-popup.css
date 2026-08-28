@@ -1,0 +1,257 @@
+.subscribe-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 50;
+  background: rgba(var(--color-base-opacity),.5);
+  pointer-events: none;
+}
+.subscribe-modal {
+  --img-ratio: 3/2;
+  display: none;
+  width: max(20vw, 500px);
+  max-width: 100%;
+  max-height: 100%;
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  top: 50%;
+  flex-direction: column;
+  animation: fade-in-scale-sub 0.6s ease forwards;
+}
+.subscribe-modal.test-popup {
+  transform: translate(-50%, -50%);
+}
+.popup-style-3.subscribe-modal {
+  left: auto;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  transform: none;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0;
+  animation: fade-in-scale 0.6s ease forwards;
+}
+.subscribe-modal > * + * {
+  margin-top: 1rem;
+}
+.subscribe-modal > img {
+  height: max(18vh, 12rem);
+  object-fit: cover;
+  width: 100%;
+  margin-top: 0;
+  border-radius: var(--media-radius);
+  box-shadow: var(--media-shadow-horizontal-offset)
+    var(--media-shadow-vertical-offset) var(--media-shadow-blur-radius)
+    rgba(var(--color-shadow), var(--media-shadow-opacity));
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+@supports (aspect-ratio: 1) {
+  .subscribe-modal > img {
+    aspect-ratio: var(--img-ratio);
+    height: auto;
+  }
+}
+.subscribe-modal > :last-of-type:not(img, h1, h2, p, input, button) {
+  margin-bottom: 3rem;
+}
+.subscribe-modal h2 {
+  text-align: center;
+  margin-bottom: 0 !important;
+  margin-top: 1rem;
+}
+.subscribe-modal p {
+  margin-top: 0;
+  text-align: center;
+}
+.email {
+  background: none;
+  border: solid 0.1rem;
+  flex-grow: 1;
+  text-align: left;
+  margin: var(--inputs-border-width);
+  transition: box-shadow var(--duration-short) ease;
+  appearance: none;
+  color: rgb(var(--color-foreground));
+  font-size: 1.6rem;
+  padding: 0.25em 0.75em;
+  height: auto;
+  min-width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  border-radius: var(--buttons-radius-outset);
+  position: relative;
+}
+.email:focus {
+  outline-style: solid;
+  outline-color: transparent;
+  box-shadow: 0 0 0 0.1rem rgb(var(--color-foreground));
+  padding: 0.25em 0.75em;
+}
+.closeBtn {
+  color: rgb(var(--color-foreground));
+  background-color: rgb(var(--color-background));
+  border: 0.1rem solid rgba(var(--color-foreground), 0.1);
+  border-radius: 50%;
+  position: absolute;
+  z-index: 5;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 1.2rem;
+  width: 4rem;
+  cursor: pointer;
+}
+.closeBtn:hover {
+  outline: none;
+}
+.closeBtn:focus-visible {
+  border: 0.1rem solid rgba(var(--color-foreground), 0.5);
+  outline: none;
+  box-shadow: none;
+}
+
+.visible {
+  display: flex;
+}
+
+.subscribe-modal > * {
+  animation: fade-in-scale 0.6s ease forwards;
+}
+
+.subscribe-modal .form-inputs {
+  width: 100%;
+}
+
+.subscribe-modal .banner-buttons {
+  margin-bottom: .5rem;
+}
+
+/* Image Animation */
+@keyframes fade-in-scale {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-out-scale {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+@keyframes fade-in-scale-sub {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes fade-out-scale-sub {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+}
+
+.fade-out {
+  animation: fade-out-scale-sub 0.6s ease forwards;
+}
+
+.submit-btn {
+  background-color: rgb(var(--color-base-solid-button));
+  color: rgb(var(--color-base-solid-button-labels));
+  font-size: 1.6rem;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: start;
+  border-radius: var(--buttons-radius-outset);
+  padding: 0.25em 0.75em;
+  min-width: 100%;
+  min-height: 44px;
+  text-align: center;
+  line-height: 1.1;
+  transition: 220ms all ease-in-out;
+  margin-top: 1rem;
+}
+.submit-btn:focus {
+  outline-style: solid;
+  outline-color: transparent;
+  box-shadow: 0 0 0 4px #3e68ff;
+}
+.subscribe-message {
+  font-size: 1.25rem;
+  margin-top: 3rem;
+}
+.test-popup {
+  display: flex;
+  animation: fade-in 1s;
+}
+.subscribe-modal .socials {
+  margin-top: 1rem;
+}
+.popup-style-3.subscribe-modal.fade-out {
+  animation: fade-out-scale 0.6s ease forwards;    
+}
+
+@media screen and (min-width: 990px) {
+  .subscribe-modal form#contact_form {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-left: 0 auto;
+  }
+  .popup-style-2.subscribe-modal,
+  .popup-style-3.subscribe-modal {
+    flex-direction: row;
+    width: 90rem;
+    padding: 2rem;
+  }
+  .popup-style-3.subscribe-modal {
+    width: 70rem;
+  }
+  .popup-style-2.subscribe-modal form#contact_form,
+  .popup-style-3.subscribe-modal form#contact_form{
+    padding: 20px;
+  }
+  .popup-style-2.subscribe-modal>img,
+  .popup-style-3.subscribe-modal>img{
+    border-radius: var(--media-radius);
+}
+}
+
+@media screen and (max-width: 990px) {
+  .subscribe-modal {
+    max-width: 90%;
+  }
+}

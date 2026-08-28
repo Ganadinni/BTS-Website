@@ -1,0 +1,473 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "text": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "column": "left",
+            "text": "<p>List essential product characteristics here</p>",
+            "text_style": "body",
+            "show_text_background": true,
+            "margin_top": 0,
+            "color_scheme_1": "option-1"
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "heading_size": "large",
+            "column": "left",
+            "margin_top": 0
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "column": "left",
+            "margin_top": 0
+          }
+        },
+        "spacer": {
+          "type": "spacer",
+          "settings": {
+            "column": "left",
+            "margin_top": 0
+          }
+        },
+        "inventory": {
+          "type": "inventory",
+          "settings": {
+            "column": "left",
+            "inventory_threshold": 10,
+            "show_inventory_quantity": true,
+            "margin_top": 0
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {
+            "column": "left",
+            "margin_top": 0
+          }
+        },
+        "complementary": {
+          "type": "complementary",
+          "settings": {
+            "column": "left",
+            "block_heading": "Goes well with",
+            "product_list_limit": 10,
+            "image_ratio": "square",
+            "enable_quick_add": false,
+            "columns": "one",
+            "disable_arrow_mobile": true,
+            "color_scheme_1": "option-1",
+            "margin_top": 0
+          }
+        },
+        "delivery_estimator": {
+          "type": "delivery_estimator",
+          "settings": {
+            "column": "right",
+            "delivery_estimator_text": "Delivery between",
+            "earliest_delivery": "2",
+            "latest_delivery": "4",
+            "color_scheme_1": "option-1",
+            "margin_top": 0,
+            "hide_mobile": false,
+            "hide_desktop": false
+          }
+        },
+        "collapsible_tab_1": {
+          "type": "collapsible_tab",
+          "settings": {
+            "column": "right",
+            "heading": "Shipping & Returns",
+            "heading_size": "medium",
+            "heading_tag": "h4",
+            "icon": "truck",
+            "no_padding": true,
+            "content": "<p>If you’re looking to return or exchange your order for whatever reason, we're here to help! We offer <strong>free returns</strong> within <strong>30 days </strong>of purchase. You can return your product for<strong> store credit</strong>, <strong>a different product</strong>, or a <strong>refund </strong>to the original payment method.</p>",
+            "page": "",
+            "custom_liquid": "",
+            "open_first_collapsible_row": false,
+            "margin_top": 0,
+            "color_scheme_1": "option-2"
+          }
+        },
+        "spacer_2": {
+          "type": "spacer",
+          "settings": {
+            "column": "right",
+            "margin_top": 0
+          }
+        },
+        "collapsible_tab_2": {
+          "type": "collapsible_tab",
+          "settings": {
+            "column": "right",
+            "heading": "24/7 Support",
+            "heading_size": "medium",
+            "heading_tag": "h4",
+            "icon": "headset",
+            "no_padding": true,
+            "content": "<p>You can reach out to us through our [contact channels, e.g., email form, contact page] with any feedback or questions you may have. We'll respond as soon as possible during our regular business hours.</p>",
+            "page": "",
+            "custom_liquid": "",
+            "open_first_collapsible_row": false,
+            "margin_top": 0,
+            "color_scheme_1": "option-2"
+          }
+        },
+        "spacer_3": {
+          "type": "spacer",
+          "settings": {
+            "column": "right",
+            "margin_top": 0
+          }
+        },
+        "collapsible_tab_bffg8P": {
+          "type": "collapsible_tab",
+          "settings": {
+            "column": "right",
+            "heading": "Main Benefits",
+            "heading_size": "medium",
+            "heading_tag": "h4",
+            "icon": "headset",
+            "no_padding": true,
+            "content": "<p>Our Flux Protein-Rich, Plant-Based Food offers a variety of benefits. It’s packed with high-quality plant-based protein to support muscle growth and recovery, and it’s enriched with essential vitamins and minerals to boost your overall health. Plus, it's made from all-natural ingredients, free from artificial additives, and is easy to digest, making it a perfect addition to any balanced diet.</p>",
+            "page": "",
+            "custom_liquid": "",
+            "open_first_collapsible_row": false,
+            "margin_top": 0,
+            "color_scheme_1": "option-2"
+          }
+        },
+        "text_ybHCc6": {
+          "type": "text",
+          "settings": {
+            "column": "right",
+            "text": "<h3>⭐ Limited time offer ⭐ - 20% Sale</h3><p>Use this space to promote any limited-time offers or special discounts on your product. For example: Limited Time Offer - Save 20% on this item! Create urgency by highlighting the duration of the sale and encourage customers to take advantage of the deal before it's gone.</p><p></p>",
+            "text_style": "body",
+            "show_text_background": false,
+            "margin_top": 10,
+            "color_scheme_1": "option-2"
+          }
+        },
+        "payment_enable": {
+          "type": "payment_enable",
+          "disabled": true,
+          "settings": {
+            "column": "right",
+            "margin_top": 0,
+            "hide_mobile": false,
+            "hide_desktop": false
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {
+            "column": "right",
+            "share_label": "Share",
+            "margin_top": 0
+          }
+        }
+      },
+      "block_order": [
+        "text",
+        "title",
+        "price",
+        "spacer",
+        "inventory",
+        "description",
+        "complementary",
+        "delivery_estimator",
+        "collapsible_tab_1",
+        "spacer_2",
+        "collapsible_tab_2",
+        "spacer_3",
+        "collapsible_tab_bffg8P",
+        "text_ybHCc6",
+        "payment_enable",
+        "share"
+      ],
+      "settings": {
+        "enable_full_width": false,
+        "enable_sticky_info": true,
+        "product_gallery_width": 30,
+        "gallery_layout": "columns",
+        "media_position": "left",
+        "media_fit": "contain",
+        "thumbnail_size": "large",
+        "image_zoom": "lightbox",
+        "hide_variants": false,
+        "enable_video_looping": false,
+        "quantity_selector": 4,
+        "color_scheme": "option-2",
+        "in_stock_background_color": "#ffa680",
+        "in_stock_color": "#1d1d1d",
+        "under_gallery": "second",
+        "mobile_thumbnails": "hide",
+        "padding_top": 0,
+        "padding_bottom": 36,
+        "ignore_spacing": false
+      }
+    },
+    "quick_order_list": {
+      "type": "quick-order-list",
+      "settings": {
+        "show_image": true,
+        "show_sku": false,
+        "color_scheme": "option-1",
+        "color_scheme_1": "",
+        "padding_top": 36,
+        "padding_bottom": 24
+      }
+    },
+    "tabs": {
+      "type": "tabs",
+      "blocks": {
+        "tab_1": {
+          "type": "tab",
+          "settings": {
+            "heading": "Product description",
+            "hide_image": false,
+            "row_content": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style_secondary": false
+          }
+        },
+        "tab_2": {
+          "type": "tab",
+          "settings": {
+            "heading": "Nutritional Info",
+            "hide_image": false,
+            "row_content": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style_secondary": false
+          }
+        },
+        "tab_3": {
+          "type": "tab",
+          "settings": {
+            "heading": "Shipping & Returns",
+            "hide_image": false,
+            "row_content": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style_secondary": false
+          }
+        }
+      },
+      "block_order": [
+        "tab_1",
+        "tab_2",
+        "tab_3"
+      ],
+      "settings": {
+        "tabs_style": "style-2",
+        "full_width": true,
+        "color_scheme": "option-2",
+        "color_scheme_1": "option-1",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "ignore_spacing": false,
+        "margin_spacing": "negative",
+        "margin_top": 0
+      }
+    },
+    "slick_slider": {
+      "type": "slick-slider",
+      "blocks": {
+        "slide_1": {
+          "type": "slide",
+          "settings": {
+            "heading": "Image slide heading",
+            "caption": "Image slide caption",
+            "button_label": "Button label",
+            "link": ""
+          }
+        },
+        "slide_2": {
+          "type": "slide",
+          "settings": {
+            "heading": "Image slide heading",
+            "caption": "Image slide caption",
+            "button_label": "Button label",
+            "link": ""
+          }
+        },
+        "slide_3": {
+          "type": "slide",
+          "settings": {
+            "heading": "Image slide heading",
+            "caption": "Image slide caption",
+            "button_label": "Button label",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "slide_1",
+        "slide_2",
+        "slide_3"
+      ],
+      "settings": {
+        "auto_rotate": true,
+        "slider_interval": 4,
+        "full_width": false,
+        "image_opacity": 0.6,
+        "opacity_mobile": true,
+        "heading_size": 9,
+        "heading_tag": "h2",
+        "heading_style": "none",
+        "caption_size": 1.9,
+        "caption_style": "none",
+        "color_scheme": "",
+        "margin_spacing": "negative",
+        "margin_top": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "ignore_spacing": false
+      }
+    },
+    "related-products": {
+      "type": "related-products",
+      "settings": {
+        "caption": "",
+        "text_style": "caption-with-letter-spacing",
+        "text_size": "medium",
+        "heading": "Related Products",
+        "heading_size": "medium",
+        "heading_style": "default",
+        "heading_tag": "h2",
+        "products_to_show": 7,
+        "columns_desktop": 5,
+        "image_ratio": "square",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": true,
+        "color_scheme": "option-2",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "ignore_spacing": false,
+        "margin_spacing": "negative",
+        "margin_top": 0,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "disable_arrow_mobile": true
+      }
+    },
+    "collapsible_content": {
+      "type": "collapsible-content",
+      "blocks": {
+        "collapsible_row_1": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Question Title",
+            "icon": "question_mark",
+            "row_content": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_2": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Question Title",
+            "icon": "question_mark",
+            "row_content": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_3": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Question Title",
+            "icon": "question_mark",
+            "row_content": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_4": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Question Title",
+            "icon": "check_mark",
+            "row_content": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_5": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Question Title",
+            "icon": "check_mark",
+            "row_content": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "collapsible_row_1",
+        "collapsible_row_2",
+        "collapsible_row_3",
+        "collapsible_row_4",
+        "collapsible_row_5"
+      ],
+      "settings": {
+        "caption": "",
+        "text_style": "caption-with-letter-spacing",
+        "text_size": "medium",
+        "heading": "faq",
+        "heading_size": "medium",
+        "heading_style": "uppercase",
+        "heading_tag": "h2",
+        "heading_alignment": "center",
+        "open_first_collapsible_row": false,
+        "color_scheme": "option-1",
+        "color_scheme_1": "option-2",
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "ignore_spacing": true,
+        "margin_spacing": "negative",
+        "margin_top": 0
+      }
+    },
+    "quick_info_bar": {
+      "type": "quick-info-bar",
+      "settings": {
+        "heading-1": "Heading",
+        "caption-1": "Subheading",
+        "heading-2": "Heading",
+        "caption-2": "Subheading",
+        "heading-3": "Heading",
+        "caption-3": "Subheading",
+        "heading-4": "Heading",
+        "caption-4": "Subheading",
+        "image_size": "small",
+        "add_border": false,
+        "full_width_background": false,
+        "color_scheme": "option-2",
+        "color_scheme_1": "option-1",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "ignore_spacing": true,
+        "margin_spacing": "negative",
+        "margin_top": 0
+      }
+    }
+  },
+  "order": [
+    "main",
+    "quick_order_list",
+    "tabs",
+    "slick_slider",
+    "related-products",
+    "collapsible_content",
+    "quick_info_bar"
+  ]
+}

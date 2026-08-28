@@ -1,0 +1,45 @@
+.image-with-text-media-item {
+  border-radius: var(--media-radius);
+}
+
+.multirow .rte ul {
+  padding-left: 0;
+}
+
+.multirow .rte ul li {
+  list-style: none;
+  margin-bottom: 15px;
+}
+
+.multirow .rte ul li:before {
+  content: "✔";
+  font-weight: 700;
+  display: inline-block;
+  border-radius: 100%;
+  background: rgb(var(--color-base-accent-2));
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  min-width: 32px;
+  text-align: center;
+  margin-right: 10px;
+}
+
+.multirow .placeholder svg.placeholder-svg {
+  border-radius: var(--media-radius);
+  width: 100%;
+  height: 100%;
+}
+
+.image-with-text-media.image--style_two {
+  box-shadow: 12px 12px rgba(var(--color-base-border-1));
+}
+
+.image-with-text-media.image--style_three {
+  border-bottom: 4px solid rgba(var(--color-base-border-1));
+}
+
+.image-with-text-media.image--style_three:hover {
+  transform: none;
+}

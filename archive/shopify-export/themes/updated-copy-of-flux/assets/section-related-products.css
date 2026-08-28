@@ -1,0 +1,36 @@
+.related-products {
+  display: block;
+}
+
+.related-products__heading {
+  margin: 0 0 1rem;
+}
+
+.related-products p.caption-with-letter-spacing {
+    margin-bottom: 0;
+}
+
+.related-products .card--media,
+.related-products .card-inner {
+  background: transparent;
+}
+
+.related-products .quick-add {
+  display: none;
+}
+
+@media screen and (max-width: 990px) {
+  .related-products .grid--peek.slider .grid-item:first-of-type {
+      margin-left: 0;
+  }
+  .related-products .slider-buttons {
+    justify-content: left;
+    margin-left: -.6rem;
+  }
+  .related-products button.slider-button.slider-button--prev {
+    margin-left: -6px;
+  }
+  .related-products.no-margin-right slider-component {
+    margin-right: 0;
+  }
+}

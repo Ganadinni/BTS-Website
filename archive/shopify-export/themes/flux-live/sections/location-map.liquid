@@ -1,0 +1,467 @@
+{{ 'section-location-map.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  @media screen and (max-width: 990px) {
+    .margin-spacing-negative.section-{{ section.id }}-margin {
+      margin-top: -{{ section.settings.margin_top }}px;
+    }
+    .margin-spacing-positive.section-{{ section.id }}-margin {
+      margin-top: {{ section.settings.margin_top }}px;
+    }
+  }
+{%- endstyle -%}
+
+<!-- Example usage of the custom Google Maps element -->
+<div class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding ignore-{{ section.settings.ignore_spacing }}">
+  <div class="location-map-section {% if section.settings.layout != 'full-width' %}page-width{% endif %} {% if section.settings.layout == 'content-left-map-right' %}grid{% endif %} {% if section.settings.layout == 'map-left-content-right' %}grid row-reverse{% endif %} margin-spacing-{{ section.settings.margin_spacing }} section-{{ section.id }}-margin" data-aos="fade-up">
+    <div class="location-map-title {% if section.settings.layout == 'full-width' %}page-width{% endif %} {% if section.settings.layout == 'content-left-map-right' %}grid-item left{% endif %} {% if section.settings.layout == 'map-left-content-right' %}grid-item left{% endif %}">
+      <p class="caption {{ section.settings.text_style }} {{ section.settings.text_style }}--{{ section.settings.text_size }} {{ section.settings.text_style }}">
+        {{ section.settings.caption | escape }}
+      </p>
+      <{{ section.settings.heading_tag }} class="title {{ section.settings.heading_size }} heading-{{ section.settings.heading_style }} heading-bold">
+        {{ section.settings.title | escape }}
+      </{{ section.settings.heading_tag }}>
+  
+      <div class="location-map-content {% if section.settings.layout == 'full-width' or section.settings.layout == 'boxed' %}content-length{% endif %}">
+        <span>{{ section.settings.content }}</span>
+      </div>
+
+      {% if section.settings.show_contact_form == true %}
+      <!-- Contact Form Section (Right) -->
+      <div class="contact-form-section">
+        <div class="contact__wrapper">
+          {%- form 'contact', id: 'ContactForm', class: 'extract' -%}
+            {%- if form.posted_successfully? -%}
+              <h2 class="form-status form-status-list form-message" tabindex="-1" autofocus>
+                {% render 'icon-success' %}
+                {{ 'templates.contact.form.post_success' | t }}
+              </h2>
+            {%- elsif form.errors -%}
+              <div class="form-message">
+                <h2 class="form-status caption-large text-body" role="alert" tabindex="-1" autofocus>
+                  {% render 'icon-error' %}
+                  {{ 'templates.contact.form.error_heading' | t }}
+                </h2>
+              </div>
+              <ul class="form-status-list caption-large" role="list">
+                <li>
+                  <a href="#ContactForm-email" class="link">
+                    {{ form.errors.translated_fields.email | capitalize }}
+                    {{ form.errors.messages.email }}
+                  </a>
+                </li>
+              </ul>
+            {%- endif -%}
+            <div class="contact__fields">
+              <div class="field">
+                <input
+                  class="field-input"
+                  autocomplete="name"
+                  type="text"
+                  id="ContactForm-name"
+                  name="contact[{{ 'templates.contact.form.name' | t }}]"
+                  value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+                  placeholder="{{ 'templates.contact.form.name' | t }}"
+                >
+                <label class="field-label" for="ContactForm-name">{{ 'templates.contact.form.name' | t }}</label>
+              </div>
+              <div class="field field--with-error">
+                <input
+                  autocomplete="email"
+                  type="email"
+                  id="ContactForm-email"
+                  class="field-input"
+                  name="contact[email]"
+                  spellcheck="false"
+                  autocapitalize="off"
+                  value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+                  aria-required="true"
+                  {% if form.errors contains 'email' %}
+                    aria-invalid="true"
+                    aria-describedby="ContactForm-email-error"
+                  {% endif %}
+                  placeholder="{{ 'templates.contact.form.email' | t }}"
+                >
+                <label class="field-label" for="ContactForm-email">
+                  {{- 'templates.contact.form.email' | t }}
+                  <span aria-hidden="true">*</span></label
+                >
+                {%- if form.errors contains 'email' -%}
+                  <small class="contact__field-error" id="ContactForm-email-error">
+                    <span class="visually-hidden">{{ 'accessibility.error' | t }}</span>
+                    <span class="form-message">
+                      {%- render 'icon-error' -%}
+                      {{- form.errors.translated_fields.email | capitalize }}
+                      {{ form.errors.messages.email -}}
+                    </span>
+                  </small>
+                {%- endif -%}
+              </div>
+            </div>
+
+            {% if section.settings.hide_phone_field == false %}
+            <div class="field">
+              <input
+                type="tel"
+                id="ContactForm-phone"
+                class="field-input"
+                autocomplete="tel"
+                name="contact[{{ 'templates.contact.form.phone' | t }}]"
+                pattern="[0-9\-]*"
+                value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+                placeholder="{{ 'templates.contact.form.phone' | t }}"
+              >
+              <label class="field-label" for="ContactForm-phone">{{ 'templates.contact.form.phone' | t }}</label>
+            </div>
+            {%- endif -%}
+            <div class="field">
+              <textarea
+                rows="10"
+                id="ContactForm-body"
+                class="text-area field-input"
+                name="contact[{{ 'templates.contact.form.comment' | t }}]"
+                placeholder="{{ 'templates.contact.form.comment' | t }}"
+              >
+              {{- form.body -}}
+              </textarea>
+              <label class="form-label field-label" for="ContactForm-body">
+                {{- 'templates.contact.form.comment' | t -}}
+              </label>
+            </div>
+            <div class="contact-button button-arrow">
+              <button type="submit" class="button">
+                {{ 'templates.contact.form.send' | t }}
+                {%- if settings.show_button_arrow -%}{% render 'icon-slider-arrows' %}{% endif %}
+              </button>
+            </div>
+          {%- endform -%}
+        </div>
+      </div>
+    {% endif %}
+        
+    </div>
+  
+    {%- if section.settings.api_key != blank -%}
+      <div
+        id="map"
+        class="{% if section.settings.layout == 'content-left-map-right' %}grid-item right{% endif %} {% if section.settings.layout == 'map-left-content-right' %}grid-item right{% endif %}"
+        style="height: 400px;"
+      >
+        <location-map
+          api-key="{{ section.settings.api_key }}"
+          address="{{ section.settings.address }}"
+          zoom-level="{{ section.settings.zoom_level }}"
+          marker-content="{{ section.settings.marker_content }}"
+        ></location-map>
+      </div>
+    {%- else -%}
+      <div
+        id="map"
+        class="{% if section.settings.layout == 'content-left-map-right' %}grid-item right{% endif %} {% if section.settings.layout == 'map-left-content-right' %}grid-item right{% endif %}"
+      >
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.location-map.name",
+  "class": "section section-location-map",
+  "tag": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:sections.location-map.settings.info.content"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "t:sections.location-map.settings.caption.label"
+    },
+    {
+      "type": "select",
+      "id": "text_style",
+      "options": [
+        {
+          "value": "subtitle",
+          "label": "t:sections.all.text_style.options__1.label"
+        },
+        {
+          "value": "caption-with-letter-spacing",
+          "label": "t:sections.all.text_style.options__2.label"
+        }
+      ],
+      "default": "caption-with-letter-spacing",
+      "label": "t:sections.all.text_style.label"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "options": [
+        {
+          "value": "small",
+          "label": "t:sections.all.text_size.options__1.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.all.text_size.options__2.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.all.text_size.options__3.label"
+        }
+      ],
+      "default": "medium",
+      "label": "t:sections.all.text_size.label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Our Store",
+      "label": "t:sections.location-map.settings.title.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "extra-large",
+          "label": "t:sections.all.heading_size.options__1.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.all.heading_size.options__2.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.all.heading_size.options__3.label"
+        }
+      ],
+      "default": "medium",
+      "label": "t:sections.all.heading_size.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_style",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:sections.all.heading_style.options__1.label"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:sections.all.heading_style.options__2.label"
+        }
+      ],
+      "default": "default",
+      "label": "t:sections.all.heading_style.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "options": [
+        {
+          "value": "h1",
+          "label": "t:sections.all.heading_tag.options__1.label"
+        },
+        {
+          "value": "h2",
+          "label": "t:sections.all.heading_tag.options__2.label"
+        },
+        {
+          "value": "h3",
+          "label": "t:sections.all.heading_tag.options__3.label"
+        },
+        {
+          "value": "h4",
+          "label": "t:sections.all.heading_tag.options__4.label"
+        },
+        {
+          "value": "h5",
+          "label": "t:sections.all.heading_tag.options__5.label"
+        },
+        {
+          "value": "h6",
+          "label": "t:sections.all.heading_tag.options__6.label"
+        }
+      ],
+      "default": "h2",
+      "label": "t:sections.all.heading_tag.label",
+      "info": "t:sections.all.heading_tag.info"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "default": "<p>We’d be delighted to connect with you! Our team is ready to assist. Reach out by filling in the email form below.</p>",
+      "label": "t:sections.location-map.settings.content.label",
+      "info": "t:sections.location-map.settings.content.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.location-map.settings.header_contact.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_form",
+      "label": "t:sections.location-map.settings.show_contact_form.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_phone_field",
+      "label": "t:sections.location-map.settings.hide_phone_field.label",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "api_key",
+      "label": "t:sections.location-map.settings.api_key.label",
+      "info": "t:sections.location-map.settings.api_key.info"
+    },
+    {
+      "type": "range",
+      "id": "zoom_level",
+      "default": 12,
+      "min": 1,
+      "max": 18,
+      "step": 1,
+      "label": "t:sections.location-map.settings.zoom_level.label",
+      "info": "t:sections.location-map.settings.zoom_level.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.location-map.settings.header.content"
+    },
+    {
+      "type": "text",
+      "id": "address",
+      "default": "New York, USA",
+      "label": "t:sections.location-map.settings.address.label",
+      "info": "t:sections.location-map.settings.address.info"
+    },
+    {
+      "type": "richtext",
+      "id": "marker_content",
+      "label": "Marker Content",
+      "default": "<h2>Marker 1</h2><p>This is the content for the marker.</p>",
+      "info": "t:sections.location-map.settings.marker_content.label"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "options": [
+        {
+          "value": "full-width",
+          "label": "t:sections.location-map.settings.layout.options__1.label"
+        },
+        {
+          "value": "boxed",
+          "label": "t:sections.location-map.settings.layout.options__2.label"
+        },
+        {
+          "value": "content-left-map-right",
+          "label": "t:sections.location-map.settings.layout.options__3.label"
+        },
+        {
+          "value": "map-left-content-right",
+          "label": "t:sections.location-map.settings.layout.options__4.label"
+        }
+      ],
+      "default": "content-left-map-right",
+      "label": "t:sections.location-map.settings.layout.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "option-3"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 32
+    },
+    {
+      "type": "checkbox",
+      "id": "ignore_spacing",
+      "default": false,
+      "label": "t:sections.all.ignore_spacing.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.featured-collection.settings.header_mobile.content"
+    },
+    {
+      "type": "select",
+      "id": "margin_spacing",
+      "options": [
+        {
+          "value": "negative",
+          "label": "t:sections.all.margin_spacing.options__1.label"
+        },
+        {
+          "value": "positive",
+          "label": "t:sections.all.margin_spacing.options__2.label"
+        }
+      ],
+      "default": "negative",
+      "label": "t:sections.all.margin_spacing.label"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.margin_top",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Location map"
+    }
+  ]
+}
+{% endschema %}

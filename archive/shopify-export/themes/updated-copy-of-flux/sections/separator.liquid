@@ -1,0 +1,251 @@
+{%- style -%}
+
+  .spacer-separator svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .spacer-line {
+    width: 100%;
+    height: 1px;
+    border: none;  
+  }
+  
+  @media screen and (min-width: 990px) {
+    .section-{{ section.id }}-margin-desktop {
+      margin-top: {{ section.settings.margin_top_desktop }}px;
+      margin-bottom: {{ section.settings.margin_bottom_desktop }}px;
+    }
+  }
+
+  @media screen and (max-width: 990px) {
+    .margin-spacing-negative.section-{{ section.id }}-margin {
+      margin-top: -{{ section.settings.margin_top }}px;
+    }
+    .margin-spacing-positive.section-{{ section.id }}-margin {
+      margin-top: {{ section.settings.margin_top }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="spacer-section ignore-{{ section.settings.ignore_spacing }}">
+  {% if section.settings.separator_style == 'line' %}
+    <div
+      class="spacer-line section-{{ section.id }}-margin-desktop margin-spacing-{{ section.settings.margin_spacing }} section-{{ section.id }}-margin"
+      data-aos="fade-up" style="background-color: {{ section.settings.spacer_color }};"
+    >
+      &nbsp;
+    </div>
+  {% else %}
+    <div class="spacer-separator section-{{ section.id }}-margin-desktop margin-spacing-{{ section.settings.margin_spacing }} section-{{ section.id }}-margin" data-aos="fade-up">
+      {% case section.settings.separator_style %}
+        {% when 'wave' %}
+          <svg class="wave" width="100%" height="100%" viewBox="0 0 1200 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="{{ section.settings.spacer_color }}" d="M0 20C50 40 100 40 150 20C200 0 250 0 300 20C350 40 400 40 450 20C500 0 550 0 600 20C650 40 700 40 750 20C800 0 850 0 900 20C950 40 1000 40 1050 20C1100 0 1150 0 1200 20V0H0V20Z"></path>
+          </svg>
+
+        {% when 'wave-1' %}
+          <svg class="wave-1" width="100%" height="100%" viewBox="0 0 1200 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="{{ section.settings.spacer_color }}" 
+              d="M0 12C8 7.38466 16 7.38466 24 12C32 16.6153 40 16.6153 48 12C56 7.38466 64 7.38466 72 12C80 16.6153 88 16.6153 96 12C104 7.38466 112 7.38466 120 12C128 16.6153 136 16.6153 144 12C152 7.38466 160 7.38466 168 12C176 16.6153 184 16.6153 192 12C200 7.38466 208 7.38466 216 12C224 16.6153 232 16.6153 240 12C248 7.38466 256 7.38466 264 12C272 16.6153 280 16.6153 288 12C296 7.38466 304 7.38466 312 12C320 16.6153 328 16.6153 336 12C344 7.38466 352 7.38466 360 12C368 16.6153 376 16.6153 384 12C392 7.38466 400 7.38466 408 12C416 16.6153 424 16.6153 432 12C440 7.38466 448 7.38466 456 12C464 16.6153 472 16.6153 480 12C488 7.38466 496 7.38466 504 12C512 16.6153 520 16.6153 528 12C536 7.38466 544 7.38466 552 12C560 16.6153 568 16.6153 576 12C584 7.38466 592 7.38466 600 12C608 16.6153 616 16.6153 624 12C632 7.38466 640 7.38466 648 12C656 16.6153 664 16.6153 672 12C680 7.38466 688 7.38466 696 12C704 16.6153 712 16.6153 720 12C728 7.38466 736 7.38466 744 12C752 16.6153 760 16.6153 768 12C776 7.38466 784 7.38466 792 12C800 16.6153 808 16.6153 816 12C824 7.38466 832 7.38466 840 12C848 16.6153 856 16.6153 864 12C872 7.38466 880 7.38466 888 12C896 16.6153 904 16.6153 912 12C920 7.38466 928 7.38466 936 12C944 16.6153 952 16.6153 960 12C968 7.38466 976 7.38466 984 12C992 16.6153 1000 16.6153 1008 12C1016 7.38466 1024 7.38466 1032 12C1040 16.6153 1048 16.6153 1056 12C1064 7.38466 1072 7.38466 1080 12C1088 16.6153 1096 16.6153 1104 12C1112 7.38466 1120 7.38466 1128 12C1136 16.6153 1144 16.6153 1152 12C1160 7.38466 1168 7.38466 1176 12C1184 16.6153 1192 16.6153 1200 12V0H0V12Z">
+            </path>
+          </svg>
+
+        {% when 'wave-2' %}
+          <svg class="wave-2" width="100%" height="100%" viewBox="0 0 1200 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="{{ section.settings.spacer_color }}" 
+              d="M1200 23C1150 3 1100 3 1050 23C1000 43 950 43 900 23C850 3 800 3 750 23C700 43 650 43 600 23C550 3 500 3 450 23C400 43 350 43 300 23C250 3 200 3 150 23C100 43 50 43 0 23V43H1200V23Z">
+            </path>
+          </svg>
+
+        {% when 'wave-3' %}
+          <svg class="wave-3" width="100%" height="100%" viewBox="0 0 1200 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="{{ section.settings.spacer_color }}" 
+              d="M1200 8C1192 12.6153 1184 12.6153 1176 8C1168 3.38466 1160 3.38466 1152 8C1144 12.6153 1136 12.6153 1128 8C1120 3.38466 1112 3.38466 1104 8C1096 12.6153 1088 12.6153 1080 8C1072 3.38466 1064 3.38466 1056 8C1048 12.6153 1040 12.6153 1032 8C1024 3.38466 1016 3.38466 1008 8C1000 12.6153 992 12.6153 984 8C976 3.38466 968 3.38466 960 8C952 12.6153 944 12.6153 936 8C928 3.38466 920 3.38466 912 8C904 12.6153 896 12.6153 888 8C880 3.38466 872 3.38466 864 8C856 12.6153 848 12.6153 840 8C832 3.38466 824 3.38466 816 8C808 12.6153 800 12.6153 792 8C784 3.38466 776 3.38466 768 8C760 12.6153 752 12.6153 744 8C736 3.38466 728 3.38466 720 8C712 12.6153 704 12.6153 696 8C688 3.38466 680 3.38466 672 8C664 12.6153 656 12.6153 648 8C640 3.38466 632 3.38466 624 8C616 12.6153 608 12.6153 600 8C592 3.38466 584 3.38466 576 8C568 12.6153 560 12.6153 552 8C544 3.38466 536 3.38466 528 8C520 12.6153 512 12.6153 504 8C496 3.38466 488 3.38466 480 8C472 12.6153 464 12.6153 456 8C448 3.38466 440 3.38466 432 8C424 12.6153 416 12.6153 408 8C400 3.38466 392 3.38466 384 8C376 12.6153 368 12.6153 360 8C352 3.38466 344 3.38466 336 8C328 12.6153 320 12.6153 312 8C304 3.38466 296 3.38466 288 8C280 12.6153 272 12.6153 264 8C256 3.38466 248 3.38466 240 8C232 12.6153 224 12.6153 216 8C208 3.38466 200 3.38466 192 8C184 12.6153 176 12.6153 168 8C160 3.38466 152 3.38466 144 8C136 12.6153 128 12.6153 120 8C112 3.38466 104 3.38466 96 8C88 12.6153 80 12.6153 72 8C64 3.38466 56 3.38466 48 8C40 12.6153 32 12.6153 24 8C16 3.38466 8 3.38466 0 8V20H1200V8Z">
+            </path>
+          </svg>
+
+        {% when 'cloud' %}
+        <svg class="cloud" width="100%" height="100%" viewBox="0 0 1440 161" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill="{{ section.settings.spacer_color }}" 
+            d="M0 78.39V0h1440v90.626c-30.89 31.83-74.14 51.61-122 51.61-63.1 0-118.17-34.378-147.5-85.426C1142.71 64.362 1108.71 76 1072 76c-31.24 0-60.51-8.425-85.658-23.126C960.369 113.516 900.146 156 830 156c-54.706 0-103.377-25.84-134.472-65.98C665.944 134.965 627.728 150 586 150c-56.114 0-105.879-27.188-136.839-69.109C422.007 118.267 389.257 129 354 129c-26.516 0-51.613-6.07-73.979-16.898C250.339 161.754 196.052 195 134 195c-54.43 0-102.885-25.58-134-65.374Z">
+          </path>
+        </svg>
+
+        {% when 'cloud-1' %}
+          <svg viewBox="0 0 1440 150" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <path fill="{{ section.settings.spacer_color }}" fill-opacity="1"
+              d="M0,120 C60,80 120,40 240,60 C360,80 480,140 600,140 C720,140 840,80 960,60 C1080,40 1200,60 1320,80 L1440,100 L1440,150 L0,150Z">
+            </path>
+          </svg>
+
+         {% when 'hills' %}
+          <svg viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <path fill="{{ section.settings.spacer_color }}" fill-opacity="1"
+              d="M0,100 C180,20 360,140 540,80 C720,20 900,140 1080,80 C1260,20 1440,140 1440,80 L1440,120 L0,120Z">
+            </path>
+          </svg>
+
+        {% when 'hills-1' %}
+          <svg viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <path fill="{{ section.settings.spacer_color }}" fill-opacity="1"
+              d="M0,20 C180,100 360,0 540,60 C720,120 900,0 1080,60 C1260,120 1440,0 1440,60 L1440,0 L0,0Z">
+            </path>
+          </svg>
+    
+        {% when 'scalloped' %}
+          <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg">
+            <path fill="{{ section.settings.spacer_color }}" fill-opacity="1"
+              d="M0,40 Q30,0 60,40 T120,40 T180,40 T240,40 T300,40 T360,40 T420,40 T480,40 T540,40 T600,40 T660,40 T720,40 T780,40 T840,40 T900,40 T960,40 T1020,40 T1080,40 T1140,40 T1200,40 T1260,40 T1320,40 T1380,40 T1440,40 L1440,80 L0,80Z">
+            </path>
+          </svg>
+
+        {% when 'scalloped-1' %}
+          <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg">
+            <path fill="{{ section.settings.spacer_color }}" fill-opacity="1"
+              d="M0,40 Q30,80 60,40 T120,40 T180,40 T240,40 T300,40 T360,40 T420,40 T480,40 T540,40 T600,40 T660,40 T720,40 T780,40 T840,40 T900,40 T960,40 T1020,40 T1080,40 T1140,40 T1200,40 T1260,40 T1320,40 T1380,40 T1440,40 L1440,0 L0,0Z">
+            </path>
+          </svg>
+
+      {% endcase %}
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.separator.name",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "separator_style",
+      "options": [
+        {
+          "value": "line",
+          "label": "t:sections.separator.settings.separator_style.options__1.label"
+        },
+        {
+          "value": "wave",
+          "label": "t:sections.separator.settings.separator_style.options__2.label"
+        },
+        {
+          "value": "wave-1",
+          "label": "t:sections.separator.settings.separator_style.options__3.label"
+        },
+        {
+          "value": "wave-2",
+          "label": "t:sections.separator.settings.separator_style.options__4.label"
+        },
+        {
+          "value": "wave-3",
+          "label": "t:sections.separator.settings.separator_style.options__5.label"
+        },
+        {
+          "value": "cloud",
+          "label": "t:sections.separator.settings.separator_style.options__6.label"
+        },
+        {
+          "value": "cloud-1",
+          "label": "t:sections.separator.settings.separator_style.options__7.label"
+        },
+        {
+          "value": "hills",
+          "label": "t:sections.separator.settings.separator_style.options__8.label"
+        },
+        {
+          "value": "hills-1",
+          "label": "t:sections.separator.settings.separator_style.options__9.label"
+        },
+        {
+          "value": "scalloped",
+          "label": "t:sections.separator.settings.separator_style.options__10.label"
+        },
+        {
+          "value": "scalloped-1",
+          "label": "t:sections.separator.settings.separator_style.options__11.label"
+        }
+      ],
+      "default": "line",
+      "label": "t:sections.separator.settings.separator_style.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.header_color_box.content"
+    },
+    {
+      "type": "color",
+      "id": "spacer_color",
+      "label": "t:sections.separator.settings.spacer_color.label",
+      "default": "#d1d1d1"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "margin_top_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.separator.settings.margin_top_desktop.label",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.separator.settings.margin_bottom_desktop.label",
+      "default": 36
+    },
+    {
+      "type": "checkbox",
+      "id": "ignore_spacing",
+      "default": false,
+      "label": "t:sections.all.ignore_spacing.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.promotion-cards.settings.header_mobile.content"
+    },
+    {
+      "type": "select",
+      "id": "margin_spacing",
+      "options": [
+        {
+          "value": "negative",
+          "label": "t:sections.all.margin_spacing.options__1.label"
+        },
+        {
+          "value": "positive",
+          "label": "t:sections.all.margin_spacing.options__2.label"
+        }
+      ],
+      "default": "negative",
+      "label": "t:sections.all.margin_spacing.label"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.margin_top",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.separator.presets.name"
+    }
+  ]
+}
+{% endschema %}

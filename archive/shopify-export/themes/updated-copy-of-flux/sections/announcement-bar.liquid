@@ -1,0 +1,429 @@
+{{ 'component-list-social.css' | asset_url | stylesheet_tag }}
+{{ 'localization.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .announcement-bar .countdown {
+    margin-top: -10px;
+  }
+  .announcement-bar__message{
+    text-align: center;
+    padding: 15px 0;
+  }
+  .announcement-bar__message .timer {
+    margin: 10px 0;
+  }
+  .announcement-bar .timer {
+    justify-content: center;
+  }
+  .announcement-bar .disclosure__list-wrapper {
+    transform: translateY(-.5rem);
+  }
+  .announcement-bar.position-left,
+  .announcement-bar.position-right {
+    top: {{ section.settings.vertical_position }}%;
+  }
+  .announcement-bar .announcement-bar__message p {
+    color: {{ section.settings.announcement_text_color }};
+    margin: 0;
+  }
+  .announcement-bar__message{
+    text-align: center;
+  }
+  .announcement-bar a.link.animate-arrow:hover,
+  .announcement-bar a.link.animate-arrow {
+    background-image: none;
+    padding: 0;
+  }
+  .announcement-bar .announcement-bar__message p,
+  .announcement-bar .announcement-bar__message a {
+    color: {{ section.settings.announcement_text_color }};
+    margin: 0;
+  }
+
+text-slider div {
+  position: absolute;
+  opacity: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -75%);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+text-slider div.active {
+  opacity: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@media screen and (max-width: 990px) {
+  .announcement-bar.position-top.hide-countdown {
+    padding: 15px 20px;
+  }
+  .announcement-bar.position-right,
+  .announcement-bar.position-left {
+    grid-template-columns: auto;
+    justify-content: center;
+  }
+  text-slider div.active {
+    width: 100%;
+  }
+}
+
+{%- endstyle -%}
+
+{% if section.settings.enable_announcement_bar_desktop_sticky %}
+  {%- style -%}
+    @media screen and (min-width: 990px) {
+    .announcement-bar-section {
+        position: sticky;
+        width: 100%;
+        top: 0;
+        }
+      }
+  {%- endstyle -%}
+{% endif %}
+{% if section.settings.enable_announcement_bar_mobile_sticky %}
+  {%- style -%}
+    @media screen and (max-width: 990px) {
+    .announcement-bar-section {
+        position: sticky;
+        width: 100%;
+        top: 0;
+        }
+      }
+
+  {%- endstyle -%}
+{% endif %}
+
+{% comment %} Start Announcement Bar {% endcomment %}
+<div
+  class="announcement-bar {{ section.settings.announcement_position }} color-{{ section.settings.color_scheme }} gradient {% if section.settings.enable_country_selector == false %} disable-localization{% endif %} {% if section.settings.show_countdown != true %}hide-countdown{% endif %}"
+  data-aos="fade-up" data-aos-offset="-200"
+>
+  {% comment %} Start Social Icons {% endcomment %}
+  {%- liquid
+    assign has_social_icons = true
+    if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
+      assign has_social_icons = false
+    endif
+  -%}
+  <div class="announcement-bar__socials">
+    {%- if section.settings.show_social and has_social_icons -%}
+      {%- render 'social-icons' -%}
+    {%- endif -%}
+  </div>
+  {% comment %} End Social Icons {% endcomment %}
+
+  {% comment %} Start Text/Link {% endcomment %}
+  <div class="announcement-bar__message">
+  {% if section.settings.show_countdown != true %}
+  <text-slider>
+  {% for block in section.blocks %}   
+      <div class="announcement-text">{{ block.settings.slider-text }}</div>   
+  {% endfor %}
+  </text-slider>
+    {% endif %}
+    {% if section.settings.show_countdown %}
+      <div class="countdown-option-1 countdown-text-position-{{ section.settings.countdown-text-position }} {{ section.settings.countdown-date-time-style}}">
+        {% render 'countdown-timer',
+          title: section.settings['countdown-text'],
+          end_date: section.settings['countdown-date'],
+          end_time: section.settings['countdown-time'],
+          countdown_finished_message: section.settings.countdown_finished_message
+        %}
+      </div>
+    {% endif %}
+  </div>
+  {% comment %} End Text/Link {% endcomment %}
+
+  {% comment %} Start Country Switcher {% endcomment %}
+  {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
+    <noscript>
+      {%- form 'localization', id: 'AnnouncementCountryFormNoScript', class: 'localization-form' -%}
+        <div class="localization-form__select">
+          <h2 class="visually-hidden" id="AnnouncementCountryLabelNoScript">
+            {{ 'localization.country_label' | t }}
+          </h2>
+          <select
+            class="localization-selector link"
+            name="country_code"
+            aria-labelledby="AnnouncementCountryLabelNoScript"
+          >
+            {%- for country in localization.available_countries -%}
+              <option
+                value="{{ country.iso_code }}"
+                {%- if country.iso_code == localization.country.iso_code %}
+                  selected
+                {% endif %}
+              >
+                <span class="flag-image">
+                  {{ country | image_url: width: 18 | image_tag }}
+                </span>
+                {{ country.iso_code }}
+                <span class="localization-form__currency"> ({{ country.currency.symbol }}) </span>
+              </option>
+            {%- endfor -%}
+          </select>
+          {% render 'icon-caret' %}
+        </div>
+        <button class="button button--tertiary">{{ 'localization.update_country' | t }}</button>
+      {%- endform -%}
+    </noscript>
+    <localization-form>
+      {%- form 'localization', id: 'AnnouncementCountryForm', class: 'localization-form' -%}
+        <div class="no-js-hidden">
+          <div class="disclosure">
+            <button
+              type="button"
+              class="disclosure__button localization-form__select localization-selector link link--text caption-large"
+              aria-expanded="false"
+              aria-controls="AnnouncementCountryList"
+              aria-describedby="AnnouncementCountryLabel"
+            >
+              {%- if section.settings.announcement_position == 'position-top' %}
+                <span class="flag-image">
+                  {{ localization.country | image_url: width: 18 | image_tag }}
+                </span>
+                {{ localization.country.iso_code }} ({{ localization.country.currency.symbol }})
+                {% render 'icon-caret' %}
+              {%- else -%}
+                <span class="flag-image">
+                  {{ localization.country | image_url: width: 18 | image_tag }}
+                </span>
+                {{ localization.country.iso_code }} ({{ localization.country.currency.symbol }})
+              {% endif %}
+            </button>
+            <div class="disclosure__list-wrapper" hidden>
+              <ul id="AnnouncementCountryList" role="list" class="disclosure__list list-unstyled">
+                {%- for country in localization.available_countries -%}
+                  <li class="disclosure__item" tabindex="-1">
+                    <a
+                      class="link link--text disclosure__link caption-large{% if country.iso_code == localization.country.iso_code %} disclosure__link--active{% endif %} focus-inset"
+                      href="#"
+                      {% if country.iso_code == localization.country.iso_code %}
+                        aria-current="true"
+                      {% endif %}
+                      data-value="{{ country.iso_code }}"
+                    >
+                      <span class="flag-image">
+                        {{ country | image_url: width: 18 | image_tag }}
+                      </span>
+                      {{ country.iso_code }}
+                      <span class="localization-form__currency"> ({{ country.currency.symbol }}) </span>
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          </div>
+          <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}">
+        </div>
+      {%- endform -%}
+    </localization-form>
+  {%- endif -%}
+  {% comment %} End Country Switcher {% endcomment %}
+</div>
+{% comment %} End Announcement Bar {% endcomment %}
+
+{% schema %}
+{
+  "name": "t:sections.announcement-bar.name",
+  "class": "announcement-bar-section",
+  "tag": "section",
+  "enabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+        {
+          "type": "header",
+          "content": "t:sections.announcement-bar.settings.header_layout.content"
+        },
+        {
+          "type": "select",
+          "id": "announcement_position",
+          "options": [
+            {
+              "value": "position-top",
+              "label": "t:sections.announcement-bar.settings.announcement_position.options__1.label"
+            },
+            {
+              "value": "position-left",
+              "label": "t:sections.announcement-bar.settings.announcement_position.options__2.label"
+            },
+            {
+              "value": "position-right",
+              "label": "t:sections.announcement-bar.settings.announcement_position.options__3.label"
+            }
+          ],
+          "default": "position-right",
+          "label": "t:sections.announcement-bar.settings.announcement_position.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.announcement-bar.settings.sticky.content"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_announcement_bar_desktop_sticky",
+          "label": "t:sections.announcement-bar.settings.enable_announcement_bar_desktop_sticky.label",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_announcement_bar_mobile_sticky",
+          "label": "t:sections.announcement-bar.settings.enable_announcement_bar_mobile_sticky.label",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "t:sections.announcement-bar.settings.show_social_content.content",
+          "info": "t:sections.announcement-bar.settings.show_social_info.info"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_social",
+          "default": true,
+          "label": "t:sections.announcement-bar.settings.show_social.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.announcement-bar.settings.country_selector_content.content",
+          "info": "t:sections.announcement-bar.settings.country_selector_info.info"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_country_selector",
+          "default": true,
+          "label": "t:sections.announcement-bar.settings.enable_country_selector.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.announcement-bar.settings.header_vertical_bar.content"
+        },
+        {
+          "type": "range",
+          "id": "vertical_position",
+          "min": 0,
+          "max": 70,
+          "step": 5,
+          "label": "t:sections.announcement-bar.settings.vertical_position.label",
+          "default": 20
+        },
+        {
+          "type": "header",
+          "content": "t:sections.announcement-bar.settings.header_top_bar.content"
+        },        
+        {
+          "type": "color",
+          "id": "announcement_text_color",
+          "label": "t:sections.all.text_color.label",
+          "default": "#000000"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_countdown",
+          "default": false,
+          "label": "t:sections.announcement-bar.settings.show_countdown.label",
+          "info": "t:sections.announcement-bar.settings.show_countdown.info"
+        },
+        {
+          "type": "text",
+          "id": "countdown-text",
+          "label": "t:sections.all.countdown-text.label",
+          "default": "Offer Ends In"
+        },
+        {
+          "type": "select",
+          "id": "countdown-text-position",
+          "options": [
+            {
+              "value": "top",
+              "label": "t:sections.all.countdown-text-position.options__1.label"
+            },
+            {
+              "value": "left",
+              "label": "t:sections.all.countdown-text-position.options__2.label"
+            }
+          ],
+          "default": "top",
+          "label": "t:sections.all.countdown-text-position.label"
+        },
+        {
+          "type": "text",
+          "id": "countdown-date",
+          "label": "t:sections.all.countdown-date.label",
+          "info": "t:sections.all.countdown-date.info",
+          "default": "Sep 30, 2024"
+        },
+        {
+          "type": "text",
+          "id": "countdown-time",
+          "label": "t:sections.all.countdown-time.label",
+          "info": "t:sections.all.countdown-time.info",
+          "default": "9:00"
+        },
+        {
+          "type": "select",
+          "id": "countdown-date-time-style",
+          "options": [
+            {
+              "value": "style-one",
+              "label": "t:sections.all.countdown-date-time-style.options__1.label"
+            },
+            {
+              "value": "style-two",
+              "label": "t:sections.all.countdown-date-time-style.options__2.label"
+            }
+          ],
+          "default": "style-one",
+          "label": "t:sections.all.countdown-date-time-style.label"
+        },
+        {
+          "type": "text",
+          "id": "countdown_finished_message",
+          "label": "t:sections.all.countdown_finished_message.label",
+          "info": "t:sections.all.countdown_finished_message.info",
+          "default": "This offer has ended"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.all.header_color_box.content"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "label": "t:sections.all.colors.label",
+          "default": "option-2"
+        }
+  ],
+    "blocks": [
+    {
+      "type": "announcement",
+      "name": "announcement",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "slider-text",
+          "default": "<p>Your Announcement</p>",
+          "label": "Announcement text"
+        }
+      ]
+    }
+  ],
+"presets": [
+    {
+      "name": "t:sections.announcement-bar.presets.name",
+      "blocks": [
+        {
+          "type": "announcement"
+        },
+        {
+          "type": "announcement"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
