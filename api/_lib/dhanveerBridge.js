@@ -6,25 +6,27 @@
 // authenticated Chakra session, which a public storefront checkout has no
 // way to hold.
 //
-// Needs its own env var, DHANVEER_DATABASE_URL, pointed at the SAME Neon
-// database dhanveer-core uses (schema-per-module) — deliberately separate
-// from this project's own DATABASE_URL (the `bts` order-of-record schema),
-// since the checkout backend is otherwise independent by design.
+// Uses the SAME DATABASE_URL as db.js by default (founder decision
+// 2026-08-28: connect BTS to the existing shared Neon database rather than
+// spinning up a new one — one connection string does double duty, this
+// project's own `bts` schema AND the `dhanveer` schema this file writes
+// into). DHANVEER_DATABASE_URL is an optional override only, for if the two
+// are ever deliberately split onto separate databases later.
 //
 // Best-effort: a failure here must never fail the checkout. It is NOT
 // swallowed silently, though — that exact silent-failure shape has bitten
 // this bridge before (Dhwani's CLAUDE.md), so every failure is logged loudly
 // enough to be found in Vercel's runtime logs.
 const { Pool } = require('pg');
-const { pooledUrl } = require('./db');
+const { pooledUrl, getPool } = require('./db');
 
-let pool = null;
+let overridePool = null;
 function bridgePool() {
-  if (!process.env.DHANVEER_DATABASE_URL) return null;
-  if (!pool) {
-    pool = new Pool({ connectionString: pooledUrl(process.env.DHANVEER_DATABASE_URL), ssl: { rejectUnauthorized: false } });
+  if (!process.env.DHANVEER_DATABASE_URL) return getPool();
+  if (!overridePool) {
+    overridePool = new Pool({ connectionString: pooledUrl(process.env.DHANVEER_DATABASE_URL), ssl: { rejectUnauthorized: false } });
   }
-  return pool;
+  return overridePool;
 }
 
 function newLeadId() {
@@ -63,7 +65,7 @@ async function appendActivity(p, leadId, title, details) {
 async function recordOrderLead({ customer, orderName, items, total }) {
   const p = bridgePool();
   if (!p) {
-    console.warn('[dhanveer-bridge] DHANVEER_DATABASE_URL not set — order', orderName, 'was NOT mirrored to Dhanveer CRM');
+    console.warn('[dhanveer-bridge] No DATABASE_URL (or DHANVEER_DATABASE_URL override) configured — order', orderName, 'was NOT mirrored to Dhanveer CRM');
     return null;
   }
   const itemsLine = items.map((i) => `${i.qty}× ${i.name}`).join(', ');
