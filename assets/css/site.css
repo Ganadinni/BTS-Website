@@ -194,15 +194,29 @@ footer.site-foot .foot-brand img { width: 58px; height: 33px; object-fit: contai
   .explainer-faq { grid-template-columns: 1fr; gap: 20px; }
 }
 
-/* product photo marquee (home) — real pack/kit shots, auto-scrolling banner */
-.marquee { padding: 12px 0 20px; overflow: hidden; }
-.marquee-track { display: flex; gap: 16px; width: max-content; animation: marquee-scroll 32s linear infinite; }
-.marquee:hover .marquee-track, .marquee:focus-within .marquee-track { animation-play-state: paused; }
-.marquee-item { width: 200px; aspect-ratio: 1/1; border-radius: var(--radius-cup); overflow: hidden; flex-shrink: 0; background: var(--paper-raise); border: 1px solid var(--smoke-line); }
-.marquee-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-@keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
-@media (max-width: 700px) { .marquee-item { width: 150px; } }
+/* "Find Your Flavor Crush" carousel (home) — real lifestyle photography per flavour */
+.crush { padding: 8px 0 36px; }
+.crush-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.crush-head h2 { font-size: clamp(22px, 3vw, 30px); margin: 0 0 6px; }
+.crush-head p { color: var(--smoke); font-size: 14px; margin: 0; }
+.crush-nav { display: flex; gap: 8px; flex-shrink: 0; }
+.crush-arrow { width: 38px; height: 38px; border-radius: 100px; border: 1px solid var(--smoke-line); background: var(--paper); font-size: 18px; line-height: 1; cursor: pointer; color: var(--ink); }
+.crush-arrow:hover { background: var(--paper-raise); }
+.crush-track { display: flex; gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; scrollbar-width: none; }
+.crush-track::-webkit-scrollbar { display: none; }
+.crush-card { flex: 0 0 240px; scroll-snap-align: start; text-decoration: none; color: var(--ink); display: block; }
+.crush-card .pic { aspect-ratio: 4/5; border-radius: var(--radius-cup); overflow: hidden; background: var(--paper-raise); }
+.crush-card .pic img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+.crush-card:hover .pic img { transform: scale(1.05); }
+.crush-card .info { padding: 14px 2px 0; }
+.crush-card .tag { display: inline-block; font-size: 11px; letter-spacing: .03em; font-weight: 600; padding: 4px 11px; border-radius: 100px; background: color-mix(in srgb, var(--card-accent) 16%, var(--paper-raise)); color: color-mix(in srgb, var(--card-accent) 70%, black); text-transform: uppercase; }
+.crush-card h3 { font-size: 17px; margin: 9px 0 4px; }
+.crush-card .link { font-size: 13px; font-weight: 600; color: var(--card-accent); }
+@media (max-width: 700px) {
+  .crush-card { flex-basis: 168px; }
+  .crush-head { align-items: flex-start; flex-direction: column; }
+  .crush-nav { display: none; }
+}
 
 /* how-it's-made steps (home) */
 .howto { padding: 20px 0 88px; }
