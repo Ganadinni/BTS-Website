@@ -1,0 +1,81 @@
+{
+  "generated": "2026-08-28",
+  "currency": "INR",
+  "gstPercent": 18,
+  "gstInclusive": true,
+  "count": 6,
+  "products": [
+    {
+      "sku": "BTS-WEB-001",
+      "name": "Blue Hawaii Bubble Tea DIY Kit",
+      "price": 699,
+      "compareAt": 1799,
+      "currency": "INR",
+      "weightGrams": 1050,
+      "hsn": null,
+      "url": "/products/blue-hawaii-bubble-tea-diy-kit/",
+      "image": "https://cdn.shopify.com/s/files/1/0640/6134/1773/files/BlueHawaii-01.jpg?v=1745058298",
+      "file": "products/blue-hawaii-bubble-tea-diy-kit/index.html"
+    },
+    {
+      "sku": "BTS-WEB-002",
+      "name": "Bubblegum Bubble Tea DIY Kit",
+      "price": 699,
+      "compareAt": 1799,
+      "currency": "INR",
+      "weightGrams": 1050,
+      "hsn": null,
+      "url": "/products/bubblegum-bubble-tea-diy-kit/",
+      "image": "https://cdn.shopify.com/s/files/1/0640/6134/1773/files/BubbleGum-01.jpg?v=1745057775",
+      "file": "products/bubblegum-bubble-tea-diy-kit/index.html"
+    },
+    {
+      "sku": "BTS-WEB-003",
+      "name": "Classic Matcha Bubble Tea DIY Kit",
+      "price": 699,
+      "compareAt": 1799,
+      "currency": "INR",
+      "weightGrams": 1050,
+      "hsn": null,
+      "url": "/products/classic-matcha-bubble-tea-diy-kit/",
+      "image": "https://cdn.shopify.com/s/files/1/0640/6134/1773/files/ClassicMatcha-01.jpg?v=1745058871",
+      "file": "products/classic-matcha-bubble-tea-diy-kit/index.html"
+    },
+    {
+      "sku": "BTS-WEB-004",
+      "name": "Spiced Chai Bubble Tea DIY Kit",
+      "price": 699,
+      "compareAt": 1799,
+      "currency": "INR",
+      "weightGrams": 1050,
+      "hsn": null,
+      "url": "/products/spiced-chai-bubble-tea-diy-kit/",
+      "image": "https://cdn.shopify.com/s/files/1/0640/6134/1773/files/SpicedChai-01.jpg?v=1745059138",
+      "file": "products/spiced-chai-bubble-tea-diy-kit/index.html"
+    },
+    {
+      "sku": "BTS-WEB-005",
+      "name": "Taro Bubble Tea DIY Kit",
+      "price": 699,
+      "compareAt": 1799,
+      "currency": "INR",
+      "weightGrams": 1050,
+      "hsn": null,
+      "url": "/products/taro-bubble-tea-diy-kit/",
+      "image": "https://cdn.shopify.com/s/files/1/0640/6134/1773/files/Taro-01.jpg?v=1745059237",
+      "file": "products/taro-bubble-tea-diy-kit/index.html"
+    },
+    {
+      "sku": "BTS-WEB-006",
+      "name": "Thai Bubble Tea DIY Kit",
+      "price": 699,
+      "compareAt": 1799,
+      "currency": "INR",
+      "weightGrams": 1050,
+      "hsn": null,
+      "url": "/products/thai-bubble-tea-diy-kit/",
+      "image": "https://cdn.shopify.com/s/files/1/0640/6134/1773/files/Thai-01.jpg?v=1747751189",
+      "file": "products/thai-bubble-tea-diy-kit/index.html"
+    }
+  ]
+}

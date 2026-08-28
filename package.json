@@ -1,0 +1,9 @@
+{
+  "name": "bts-website",
+  "private": true,
+  "version": "1.0.0",
+  "description": "BTS — Bubble Tea Shop storefront (static site + Vercel serverless checkout API).",
+  "dependencies": {
+    "pg": "^8.13.0"
+  }
+}

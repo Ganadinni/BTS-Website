@@ -1,0 +1,57 @@
+/* BTS design tokens — approved direction: "the cup is the unit".
+   ink/paper/pop/tea/smoke everywhere; per-flavour --accent is set inline per page. */
+:root {
+  --ink: #1f1220;
+  --paper: #fff6f2;
+  --paper-raise: #ffffff;
+  --pop: #ff3e7f;
+  --pop-ink: #ffffff;
+  --tea: #c9713d;
+  --smoke: #b9a6ae;
+  --smoke-line: #eaded8;
+  --accent: var(--pop);
+  --radius-cup: 22px 22px 30px 30px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #fbeef0;
+    --paper: #211018;
+    --paper-raise: #2b1520;
+    --pop: #ff6e9c;
+    --pop-ink: #1f1220;
+    --tea: #e0925a;
+    --smoke: #7a6068;
+    --smoke-line: #3a2530;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #fbeef0;
+  --paper: #211018;
+  --paper-raise: #2b1520;
+  --pop: #ff6e9c;
+  --pop-ink: #1f1220;
+  --tea: #e0925a;
+  --smoke: #7a6068;
+  --smoke-line: #3a2530;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+h1, h2, h3, .display {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  text-wrap: balance;
+  margin: 0;
+  font-weight: 500;
+}
+a { color: inherit; }
+img { max-width: 100%; display: block; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.price-num { font-variant-numeric: tabular-nums; }

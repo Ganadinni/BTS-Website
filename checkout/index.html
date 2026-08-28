@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout — BTS Bubble Tea Shop</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Sora:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+<nav class="nav"><div class="wrap"><a href="/" class="logo">BTS<span>.</span></a><div class="links"><a href="/products/">Shop</a></div></div></nav>
+
+<section class="checkout-wrap">
+  <div class="wrap">
+    <div id="co-form-col">
+      <div class="co-card" id="empty-state" style="display:none">
+        <h2>Your cart is empty</h2>
+        <a href="/products/" class="btn">Shop the kits</a>
+      </div>
+
+      <form id="checkout-form">
+        <div class="co-card">
+          <h2>Contact</h2>
+          <div class="co-error" id="co-error"></div>
+          <div class="field"><label for="name">Full name</label><input id="name" required></div>
+          <div class="field-row">
+            <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" required pattern="[0-9]{10}" placeholder="10-digit mobile"></div>
+            <div class="field"><label for="email">Email (optional)</label><input id="email" type="email"></div>
+          </div>
+        </div>
+        <div class="co-card">
+          <h2>Delivery address</h2>
+          <div class="field"><label for="addr1">Address</label><input id="addr1" required></div>
+          <div class="field-row">
+            <div class="field"><label for="city">City</label><input id="city" required></div>
+            <div class="field"><label for="state">State</label><input id="state" required></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="pincode">PIN code</label><input id="pincode" required pattern="[0-9]{6}"></div>
+            <div class="field"><label for="country">Country</label><input id="country" value="India" disabled></div>
+          </div>
+        </div>
+        <button type="submit" class="btn block" id="pay-btn">Pay</button>
+      </form>
+    </div>
+
+    <div class="co-card" id="summary-card">
+      <h2>Order summary</h2>
+      <div id="summary-lines"></div>
+      <div class="co-summary-line"><span>Subtotal</span><span class="price-num" id="sum-subtotal">₹0</span></div>
+      <div class="co-summary-line"><span>Shipping</span><span class="price-num" id="sum-shipping">Free</span></div>
+      <div class="co-summary-line total"><span>Total</span><span class="price-num" id="sum-total">₹0</span></div>
+    </div>
+  </div>
+</section>
+
+<script src="/assets/js/cart.js"></script>
+<script>
+(function () {
+  var cart = window.btsCart.read();
+  if (!cart.length) {
+    document.getElementById('empty-state').style.display = 'block';
+    document.getElementById('checkout-form').style.display = 'none';
+    document.getElementById('summary-card').style.display = 'none';
+    return;
+  }
+
+  function money(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
+  function showError(msg) {
+    var el = document.getElementById('co-error');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function clearError() {
+    document.getElementById('co-error').classList.remove('show');
+  }
+
+  var quote = null;
+  fetch('/api/checkout/quote', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items: cart.map(function (i) { return { sku: i.sku, qty: i.qty }; }) }),
+  })
+    .then(function (r) { return r.json(); })
+    .then(function (q) {
+      if (!q.shippingAvailable) { showError(q.note || 'Shipping is not available for this address yet.'); return; }
+      quote = q;
+      document.getElementById('summary-lines').innerHTML = q.lines.map(function (l) {
+        return '<div class="co-summary-line"><span>' + l.qty + '× ' + l.name + '</span><span class="price-num">' + money(l.lineTotal) + '</span></div>';
+      }).join('');
+      document.getElementById('sum-subtotal').textContent = money(q.subtotal);
+      document.getElementById('sum-shipping').textContent = q.shipping === 0 ? 'Free' : money(q.shipping);
+      document.getElementById('sum-total').textContent = money(q.total);
+    })
+    .catch(function () { showError('Could not load your order total — refresh and try again.'); });
+
+  document.getElementById('checkout-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    clearError();
+    if (!quote) { showError('Still loading your order — try again in a moment.'); return; }
+    var payBtn = document.getElementById('pay-btn');
+    payBtn.disabled = true;
+    payBtn.textContent = 'Processing…';
+
+    var customer = {
+      name: document.getElementById('name').value,
+      phone: document.getElementById('phone').value,
+      email: document.getElementById('email').value || undefined,
+    };
+    var address = {
+      line1: document.getElementById('addr1').value,
+      city: document.getElementById('city').value,
+      state: document.getElementById('state').value,
+      pincode: document.getElementById('pincode').value,
+      country: 'IN',
+    };
+
+    fetch('/api/checkout/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cart.map(function (i) { return { sku: i.sku, qty: i.qty }; }), customer: customer, address: address }),
+    })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Could not start payment'); return j; }); })
+      .then(function (order) {
+        var rzp = new Razorpay({
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          name: 'BTS — Bubble Tea Shop',
+          description: 'Order ' + order.orderName,
+          order_id: order.razorpayOrderId,
+          prefill: { name: customer.name, contact: customer.phone, email: customer.email || '' },
+          theme: { color: '#ff3e7f' },
+          handler: function (resp) {
+            fetch('/api/checkout/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                orderName: order.orderName,
+                razorpay_order_id: resp.razorpay_order_id,
+                razorpay_payment_id: resp.razorpay_payment_id,
+                razorpay_signature: resp.razorpay_signature,
+              }),
+            })
+              .then(function (r) { return r.json(); })
+              .then(function () {
+                localStorage.removeItem('btsCart');
+                document.getElementById('co-form-col').innerHTML =
+                  '<div class="co-card"><h2>Thank you!</h2><p>Your order <strong>' + order.orderName + '</strong> is confirmed. A confirmation will reach you at ' + (customer.email || customer.phone) + '.</p><a href="/products/" class="btn">Keep shopping</a></div>';
+              })
+              .catch(function () { showError('Payment succeeded but confirmation failed — contact us with order ' + order.orderName + '.'); });
+          },
+          modal: { ondismiss: function () { payBtn.disabled = false; payBtn.textContent = 'Pay'; } },
+        });
+        rzp.on('payment.failed', function (resp) {
+          showError('Payment failed: ' + (resp.error && resp.error.description || 'try again'));
+          payBtn.disabled = false;
+          payBtn.textContent = 'Pay';
+        });
+        rzp.open();
+      })
+      .catch(function (err) {
+        showError(err.message);
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pay';
+      });
+  });
+})();
+</script>
+</body>
+</html>
