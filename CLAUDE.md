@@ -146,7 +146,7 @@ before this is done just confirms the 404, it doesn't fix it. This is a live-rep
 promotion and needs the founder's own decision on how (merge the branch? cherry-pick just this
 commit? something else?), not something to do unilaterally.
 
-### Shopify theme backup — in progress, blocked on inbox + a flaky admin (2026-08-28)
+### Shopify theme backup — Flux (live) + draft archived; Dawn still outstanding (2026-08-28)
 Before the Shopify store is deleted, the theme *code* (not just the rendered site, already
 extracted as `bts-image-manifest-179.csv` + the pushed image archive) needs backing up: **Flux**
 (live), **"Updated copy of Flux"** (draft), **Dawn** (stock draft, low priority — unmodified
@@ -167,15 +167,21 @@ not attempted; the Themes page started failing to render on repeated reloads and
 stopped rather than keep retrying blind next to **Delete**, which sits 38px below Download
 theme file in the same per-theme menu on the draft cards.
 
-**Recommended path for whatever's still missing** (Updated copy of Flux if the inbox shows
-nothing, plus Dawn): Shopify CLI (`shopify theme pull --store 1e9m5n-b1`) instead of more admin
-roulette — no email, no expiring link, no menu next to a destructive control, and it lands as
-real diffable directories instead of a zip. Needs the founder's store login once, on any
-machine with internet.
+**Resolved:** both theme emails landed. Both zips extracted (341 files / 5.3 MB live, 331 files
+/ 5.0 MB draft, standard Shopify theme structure — `assets`, `sections`, `snippets`, `templates`,
+`config`, `locales`, `layout`) and archived at `archive/shopify-export/themes/flux-live/` and
+`archive/shopify-export/themes/updated-copy-of-flux/`. Scanned for credentials before commit —
+clean; the only `password`/`token`-adjacent matches were Shopify's own password-page section
+names (`main-password-header`, `main-password-footer`) and customer-auth template boilerplate,
+not real secrets. **Founder-ruled 2026-08-28: this is reference only** — "we will design
+ourselves with the images we got." The live storefront keeps its own "cup is the unit" identity
+(`assets/css/tokens.css` / `site.css`), built from the extracted product images; the Flux theme
+is not being ported, cloned, or used as the site's design. Mine it for copy/structure/content
+only if something specific is needed later.
 
-**Once files exist** (email zips or a CLI pull), the destination is `archive/shopify-export/
-themes/` in this repo — same "extract everything before the store dies" instinct as the image
-archive, not wired into the live site.
+**Still outstanding:** Dawn (stock, unmodified 16.0.0) — lowest priority, byte-identical to a
+fresh Shopify download any time, so not worth chasing through the flaky admin. If it's ever
+wanted, `shopify theme pull --store 1e9m5n-b1` is cleaner than another email round.
 
 ## State as of 2026-08-25 (handoff from the session that stood this up)
 - **Repo:** `Ganadinni/BTS-Website` (GitHub renamed its canonical casing from the
