@@ -146,6 +146,37 @@ before this is done just confirms the 404, it doesn't fix it. This is a live-rep
 promotion and needs the founder's own decision on how (merge the branch? cherry-pick just this
 commit? something else?), not something to do unilaterally.
 
+### Shopify theme backup — in progress, blocked on inbox + a flaky admin (2026-08-28)
+Before the Shopify store is deleted, the theme *code* (not just the rendered site, already
+extracted as `bts-image-manifest-179.csv` + the pushed image archive) needs backing up: **Flux**
+(live), **"Updated copy of Flux"** (draft), **Dawn** (stock draft, low priority — unmodified
+16.0.0, recoverable from Shopify itself any time).
+
+⚠️ **There is no in-browser download for a theme's code in this admin — only email.**
+Online Store → Themes → Actions → "Download theme file" opens a dialog reading exactly *"Your
+theme files will be emailed to connect@thebubbleteastore.com"* with two buttons (Cancel / Send
+email) — no code field, no resend, no alternate address, no direct-download path. Confirmed
+identical on both Flux themes via a Chrome agent. So this cannot be pulled through this session
+or a browser agent alone; it needs (a) the send triggered in the admin and (b) someone with
+access to that inbox to retrieve the resulting link before it expires.
+
+**Status of the sends:** Flux (live) — ✅ confirmed sent, "Theme files sent" toast seen. Updated
+copy of Flux — ⚠️ unconfirmed after three attempts (stale toast, a send button stuck
+greyed-out/loading, then no toast at all) — check the inbox itself to know if it landed. Dawn —
+not attempted; the Themes page started failing to render on repeated reloads and the agent
+stopped rather than keep retrying blind next to **Delete**, which sits 38px below Download
+theme file in the same per-theme menu on the draft cards.
+
+**Recommended path for whatever's still missing** (Updated copy of Flux if the inbox shows
+nothing, plus Dawn): Shopify CLI (`shopify theme pull --store 1e9m5n-b1`) instead of more admin
+roulette — no email, no expiring link, no menu next to a destructive control, and it lands as
+real diffable directories instead of a zip. Needs the founder's store login once, on any
+machine with internet.
+
+**Once files exist** (email zips or a CLI pull), the destination is `archive/shopify-export/
+themes/` in this repo — same "extract everything before the store dies" instinct as the image
+archive, not wired into the live site.
+
 ## State as of 2026-08-25 (handoff from the session that stood this up)
 - **Repo:** `Ganadinni/BTS-Website` (GitHub renamed its canonical casing from the
   `bts-website` you typed — same repo, URLs redirect either way).
