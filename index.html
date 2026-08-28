@@ -9,6 +9,13 @@
 <meta property="og:title" content="BTS — Bubble Tea Shop | Café-style boba, built at home">
 <meta property="og:description" content="Six DIY bubble tea kits from BTS by The Tea Planet — premix, tea concentrate, topping, cups and straws for four. Ready in minutes.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://thebubbleteastore.com/">
+<meta property="og:image" content="https://thebubbleteastore.com/assets/img/web/marketing-range--all-6-for-google.jpg">
+<meta property="og:site_name" content="BTS — Bubble Tea Shop">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BTS — Bubble Tea Shop | Café-style boba, built at home">
+<meta name="twitter:description" content="Six DIY bubble tea kits from BTS by The Tea Planet — premix, tea concentrate, topping, cups and straws for four. Ready in minutes.">
+<meta name="twitter:image" content="https://thebubbleteastore.com/assets/img/web/marketing-range--all-6-for-google.jpg">
 <link rel="icon" type="image/png" href="/assets/img/web/brand-favicon--bts-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Sora:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="/assets/css/tokens.css">
@@ -20,9 +27,9 @@
   <div class="wrap">
     <a href="/" class="logo">BTS<span>.</span></a>
     <div class="links">
-      <a href="/#explainer">What's boba?</a>
+      <a href="/#explainer" class="nav-secondary">What's boba?</a>
       <a href="/products/">Shop</a>
-      <a href="tel:+918886211223">Call</a>
+      <a href="tel:+918886211223" class="nav-secondary">Call</a>
       <button class="cart-btn" id="cart-open" aria-label="Open cart">Cart <span class="cart-count" id="cart-count">0</span></button>
     </div>
   </div>
@@ -133,6 +140,15 @@
   root.addEventListener('mouseleave', start);
   root.addEventListener('focusin', stop);
   root.addEventListener('focusout', start);
+  var touchStartX = null;
+  root.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; stop(); }, { passive: true });
+  root.addEventListener('touchend', function(e) {
+    if (touchStartX === null) return;
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 40) { dx < 0 ? next() : prev(); }
+    touchStartX = null;
+    start();
+  }, { passive: true });
   start();
 })();
 </script>
