@@ -185,6 +185,14 @@ footer.site-foot .foot-brand img { width: 58px; height: 33px; object-fit: contai
 }
 .explainer-cta { margin-top: 28px; font-size: 14px; color: var(--smoke); }
 .explainer-cta a { color: var(--pop); font-weight: 600; text-decoration: none; }
+.explainer-faq { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px 32px; margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--smoke-line); }
+.explainer-faq-head { grid-column: 1 / -1; font-family: 'Fraunces', serif; font-weight: 500; font-size: 14px; color: var(--smoke); margin: 0 0 -6px; text-transform: uppercase; letter-spacing: .04em; }
+.faq-item h4 { font-size: 14.5px; font-weight: 600; margin: 0 0 5px; }
+.faq-item h4 .q { color: var(--pop); font-weight: 700; margin-right: 4px; }
+.faq-item p { font-size: 13.5px; color: var(--smoke); line-height: 1.6; margin: 0; }
+@media (max-width: 700px) {
+  .explainer-faq { grid-template-columns: 1fr; gap: 20px; }
+}
 
 /* product photo marquee (home) — real pack/kit shots, auto-scrolling banner */
 .marquee { padding: 12px 0 20px; overflow: hidden; }
