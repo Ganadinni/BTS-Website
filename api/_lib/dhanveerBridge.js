@@ -25,11 +25,15 @@ async function recordOrderLead({ customer, orderName, items, total }) {
     return null;
   }
   try {
-    const url = `${base.replace(/\/$/, '')}/api/dhanveer/bridge/lead?key=${encodeURIComponent(key)}`;
+    const url = `${base.replace(/\/$/, '')}/api/dhanveer/bridge/lead`;
     const r = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      // key travels in the body, not a query string — no reason to let it
+      // land in access logs, browser history, or a Referer header when both
+      // ends of this call are our own code.
       body: JSON.stringify({
+        key,
         customer: { name: customer.name, email: customer.email || undefined, phone: customer.phone },
         source: 'bts-website',
         orderName,
