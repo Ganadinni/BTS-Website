@@ -145,5 +145,37 @@
 .co-error.show { display: block; }
 
 footer.site-foot { border-top: 1px solid var(--smoke-line); padding: 40px 0; margin-top: 40px; }
-footer.site-foot .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; font-size: 13px; color: var(--smoke); }
+footer.site-foot .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; font-size: 13px; color: var(--smoke); align-items: center; }
 footer.site-foot a { color: var(--smoke); text-decoration: underline; }
+footer.site-foot .foot-brand { display: flex; align-items: center; gap: 16px; }
+footer.site-foot .foot-brand img { width: 58px; height: 33px; object-fit: contain; flex-shrink: 0; }
+
+/* lifestyle photo strip (home) */
+.lifestyle-strip { padding: 8px 0 8px; }
+.lifestyle-strip .grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px; }
+.lifestyle-strip .grid > a, .lifestyle-strip .grid > div { border-radius: var(--radius-cup); overflow: hidden; aspect-ratio: 4/5; background: var(--paper-raise); }
+.lifestyle-strip .grid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 700px) { .lifestyle-strip .grid { grid-template-columns: 1fr 1fr; } .lifestyle-strip .grid > div:first-child { grid-column: 1 / -1; aspect-ratio: 16/9; } }
+
+/* how-it's-made steps (home) */
+.howto { padding: 20px 0 88px; }
+.howto .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 28px; }
+@media (max-width: 700px) { .howto .steps { grid-template-columns: 1fr; } }
+.howto .step .pic { aspect-ratio: 4/3; border-radius: var(--radius-cup); overflow: hidden; margin-bottom: 14px; background: var(--paper-raise); }
+.howto .step .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.howto .step .num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 100px; background: var(--pop); color: var(--pop-ink); font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.howto .step h4 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; margin-bottom: 4px; }
+.howto .step p { font-size: 13px; color: var(--smoke); margin: 0; line-height: 1.5; }
+
+/* collection hero banner (/products/) */
+.collection-banner { border-radius: var(--radius-cup); overflow: hidden; margin-top: 28px; aspect-ratio: 1200/628; max-height: 360px; }
+.collection-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* nutrition & storage panels (PDP) */
+.info-panels { margin-top: 34px; border-top: 1px solid var(--smoke-line); padding-top: 26px; }
+.info-panels h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; margin-bottom: 14px; }
+.info-panels .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 500px) { .info-panels .grid { grid-template-columns: 1fr; } }
+.info-panels .panel { border: 1px solid var(--smoke-line); border-radius: 16px; overflow: hidden; background: var(--paper-raise); }
+.info-panels .panel img { width: 100%; display: block; }
+.info-panels .panel .cap { font-size: 12px; color: var(--smoke); padding: 8px 12px; border-top: 1px solid var(--smoke-line); text-align: center; }
