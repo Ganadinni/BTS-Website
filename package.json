@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "BTS — Bubble Tea Shop storefront (static site + Vercel serverless checkout API).",
   "dependencies": {
+    "@vercel/functions": "^3.9.5",
     "pg": "^8.13.0"
   }
 }

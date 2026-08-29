@@ -8,6 +8,7 @@ const razorpay = require('../_lib/razorpay');
 const zoho = require('../_lib/zoho');
 const { recordOrderLead } = require('../_lib/dhanveerBridge');
 const { catalog } = require('../_lib/catalog');
+const { waitUntil } = require('@vercel/functions');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -36,36 +37,51 @@ module.exports = async (req, res) => {
 
     // Everything below is best-effort and must never affect the response
     // already sent to the buyer — payment is captured and confirmed either way.
-    try {
-      const gstPercent = catalog().meta.gstPercent || 18;
-      const items = order.items; // jsonb column comes back parsed
-      if (await zoho.isConfigured()) {
-        const inv = await zoho.createD2CInvoice({
-          orderName,
-          paymentId: razorpay_payment_id,
-          customer: { name: order.customer_name, email: order.email, phone: order.phone },
-          lines: items.map((l) => ({ name: l.name, sku: l.sku, qty: l.qty, rate: l.price, hsn: l.hsn, gstPercent })),
-          shipping: Number(order.shipping) || 0,
-        });
-        await pool.query(`UPDATE bts.orders SET zoho_invoice_id = $2 WHERE order_name = $1`, [orderName, inv.invoiceId]);
-      } else {
-        console.warn('[checkout/verify] Zoho not configured — order', orderName, 'was NOT invoiced');
+    //
+    // ⚠️ Must be wrapped in waitUntil(): code placed after res.json() on a
+    // Vercel serverless function is NOT guaranteed to keep running once the
+    // response is flushed. Confirmed live 2026-08-29 in create-order.js's
+    // identical pattern — a real test checkout returned 200 but the
+    // post-response bridge call never ran at all, no error logged anywhere
+    // because the code simply never got a chance to execute. This file had
+    // the SAME pattern for BOTH the Zoho invoice and the Dhanveer bridge,
+    // never once exercised by real traffic (zero verify requests logged in
+    // 7 days) — so it would have silently skipped invoicing AND the
+    // paid-stage CRM update on the first real payment. Do not remove this
+    // wrapper or move the response send below this block without
+    // re-verifying against real traffic.
+    waitUntil((async () => {
+      try {
+        const gstPercent = catalog().meta.gstPercent || 18;
+        const items = order.items; // jsonb column comes back parsed
+        if (await zoho.isConfigured()) {
+          const inv = await zoho.createD2CInvoice({
+            orderName,
+            paymentId: razorpay_payment_id,
+            customer: { name: order.customer_name, email: order.email, phone: order.phone },
+            lines: items.map((l) => ({ name: l.name, sku: l.sku, qty: l.qty, rate: l.price, hsn: l.hsn, gstPercent })),
+            shipping: Number(order.shipping) || 0,
+          });
+          await pool.query(`UPDATE bts.orders SET zoho_invoice_id = $2 WHERE order_name = $1`, [orderName, inv.invoiceId]);
+        } else {
+          console.warn('[checkout/verify] Zoho not configured — order', orderName, 'was NOT invoiced');
+        }
+      } catch (e) {
+        console.error('[checkout/verify] Zoho invoice failed for', orderName, ':', e?.message || e);
       }
-    } catch (e) {
-      console.error('[checkout/verify] Zoho invoice failed for', orderName, ':', e?.message || e);
-    }
 
-    try {
-      const leadId = await recordOrderLead({
-        customer: { name: order.customer_name, email: order.email, phone: order.phone },
-        orderName,
-        items: order.items,
-        total: order.total,
-      });
-      if (leadId) await pool.query(`UPDATE bts.orders SET dhanveer_lead_id = $2 WHERE order_name = $1`, [orderName, leadId]);
-    } catch (e) {
-      console.error('[checkout/verify] Dhanveer bridge failed for', orderName, ':', e?.message || e);
-    }
+      try {
+        const leadId = await recordOrderLead({
+          customer: { name: order.customer_name, email: order.email, phone: order.phone },
+          orderName,
+          items: order.items,
+          total: order.total,
+        });
+        if (leadId) await pool.query(`UPDATE bts.orders SET dhanveer_lead_id = $2 WHERE order_name = $1`, [orderName, leadId]);
+      } catch (e) {
+        console.error('[checkout/verify] Dhanveer bridge failed for', orderName, ':', e?.message || e);
+      }
+    })());
   } catch (e) {
     console.error('[checkout/verify]', e);
     if (!res.headersSent) res.status(500).json({ error: e.message });

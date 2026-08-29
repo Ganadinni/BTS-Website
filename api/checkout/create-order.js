@@ -7,6 +7,7 @@ const { priceFor, shippingFor } = require('../_lib/catalog');
 const { getPool, ensureSchema, nextOrderName } = require('../_lib/db');
 const razorpay = require('../_lib/razorpay');
 const { recordOrderLead } = require('../_lib/dhanveerBridge');
+const { waitUntil } = require('@vercel/functions');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -62,18 +63,30 @@ module.exports = async (req, res) => {
     // 'paid' stage), which appends a second note to the SAME lead (dedup by
     // phone/email happens on dhanveer-core's side) rather than creating a
     // duplicate — so Sales sees "started checkout" then "paid" on one row.
-    try {
-      const leadId = await recordOrderLead({
-        customer: { name: customer.name, email: customer.email, phone: customer.phone },
-        orderName,
-        items: lines,
-        total,
-        stage: 'cart',
-      });
-      if (leadId) await pool.query(`UPDATE bts.orders SET dhanveer_lead_id = $2 WHERE order_name = $1`, [orderName, leadId]);
-    } catch (e) {
-      console.error('[checkout/create-order] Dhanveer bridge failed for', orderName, ':', e?.message || e);
-    }
+    //
+    // ⚠️ Must be wrapped in waitUntil(): code placed after res.json() on a
+    // Vercel serverless function is NOT guaranteed to keep running once the
+    // response is flushed — confirmed live 2026-08-29, a real test checkout
+    // returned 200 but the bridge call never reached dhanveer-core at all
+    // (zero hits in its logs), with no error logged on either side because
+    // the code simply never got a chance to execute. waitUntil() is Vercel's
+    // documented mechanism for exactly this: background work after the
+    // response is sent. Do not remove this wrapper or move the response
+    // send below the bridge call without re-verifying against real traffic.
+    waitUntil((async () => {
+      try {
+        const leadId = await recordOrderLead({
+          customer: { name: customer.name, email: customer.email, phone: customer.phone },
+          orderName,
+          items: lines,
+          total,
+          stage: 'cart',
+        });
+        if (leadId) await pool.query(`UPDATE bts.orders SET dhanveer_lead_id = $2 WHERE order_name = $1`, [orderName, leadId]);
+      } catch (e) {
+        console.error('[checkout/create-order] Dhanveer bridge failed for', orderName, ':', e?.message || e);
+      }
+    })());
   } catch (e) {
     console.error('[checkout/create-order]', e);
     if (!res.headersSent) res.status(500).json({ error: e.message });
