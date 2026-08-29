@@ -156,14 +156,19 @@ unset → "Payments are not configured"; Zoho/Dhanveer bridge unset → best-eff
 - ⚠️ **`BTS_ADMIN_KEY` also deliberately not minted here**, same reasoning as
   `DHANVEER_BRIDGE_KEY` above — founder generates and pastes it directly.
 
-### ⚠️ The Dhanveer bridge endpoint is NOT in production yet — DHANVEER_BRIDGE_URL will 404
-`POST /api/dhanveer/bridge/lead` (commit `7cfa165` in dhanveer-core) exists only on the preview
-deployment of `claude/bts-website-migration-op900p`. `dhanveer-core.vercel.app` serves `main`,
-which doesn't have this route. **Before the bridge can work at all, that branch — or at least
-this endpoint — needs to reach dhanveer-core's production deploy.** Redeploying bts-website
-before this is done just confirms the 404, it doesn't fix it. This is a live-repo production
-promotion and needs the founder's own decision on how (merge the branch? cherry-pick just this
-commit? something else?), not something to do unilaterally.
+### ✅ RESOLVED 2026-08-29 — the Dhanveer bridge endpoint IS in production now
+The branch was merged to dhanveer-core's `main` (`8a67530` "Merge main into
+claude/bts-website-migration-op900p before promoting to production", founder-authored) and a
+same-day fix (`619429c`, "bridge/lead endpoint was 401ing before its own key check ran" — the
+route wasn't in `serverAuth.ts`'s `PUBLIC` allow-list, so `requireAuth` 401'd it before its own
+`BRIDGE_API_KEY` check ever ran) both shipped. Confirmed via Vercel's deployment metadata: the
+live production deployment of `dhanveer-core` (`dpl_DRvctmJcNyTZwxPFxeAbfpbFAU5i`, commit
+`92aea21` on `main`) descends from both. `dhanveer-core.vercel.app` now serves this route for
+real. `BRIDGE_API_KEY` (dhanveer-core) and `DHANVEER_BRIDGE_KEY` (bts-website) were also
+rotated to a matching fresh value this same session and both projects redeployed — see the
+"2026-08-29 — abandoned-cart bridge" entry above for the code side. The bridge should now work
+end-to-end; not yet verified with a real order because Razorpay keys are still unset on
+bts-website (see "Still needed" above), so no checkout can complete to trigger it.
 
 ### Shopify theme backup — Flux (live) + draft archived; Dawn still outstanding (2026-08-28)
 Before the Shopify store is deleted, the theme *code* (not just the rendered site, already
