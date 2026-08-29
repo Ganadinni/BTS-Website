@@ -41,6 +41,7 @@ async function recordOrderLead({ customer, orderName, items, total, stage = 'pai
         key,
         customer: { name: customer.name, email: customer.email || undefined, phone: customer.phone },
         source: stage === 'cart' ? 'bts-website (checkout started)' : 'bts-website',
+        stage,
         orderName,
         items: items.map((i) => ({ qty: i.qty, name: i.name })),
         total,
