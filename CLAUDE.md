@@ -80,14 +80,14 @@ storefront, and the "exit Shopify first" ruling mentioned below is exactly what 
   with dhanveer-core — see the CRM bridge note above for why).
 
 ### ⚠️ Still needed before this can take a real payment — see `.env.example`
-Nothing above is live yet; every integration is env-gated and degrades to a clear error until
-configured (`DATABASE_URL` unset → "Order storage is not configured"; `RAZORPAY_KEY_ID/SECRET`
-unset → "Payments are not configured"; Zoho/Dhanveer bridge unset → best-effort skip, logged).
-1. **`DATABASE_URL`** — BTS's OWN Neon Postgres connection string, separate from dhanveer-core's.
-   Easiest path: this project's Vercel Storage tab → Marketplace → Neon (creates one and injects
-   the env var automatically).
-2. **`RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`** — copy theteaplanet.com's live key pair into
-   THIS Vercel project's env (per the founder's "same account" decision above).
+Every integration is env-gated and degrades to a clear error until configured (`DATABASE_URL`
+unset → "Order storage is not configured"; `RAZORPAY_KEY_ID/SECRET` unset → "Payments are not
+configured"; Zoho/Dhanveer bridge unset → best-effort skip, logged). As of 2026-08-29, items
+1, 2 and 4 below are done (see "Env setup" further down for how each was confirmed) — 3, 5, 6
+and 7 remain open.
+1. ✅ **`DATABASE_URL`** — BTS's OWN Neon Postgres connection string, separate from
+   dhanveer-core's. Done via this project's Vercel Storage tab → Marketplace → Neon.
+2. ✅ **`RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`** — set, confirmed working (see below).
 3. **`ZOHO_CLIENT_ID` / `ZOHO_CLIENT_SECRET`** — a Zoho Self Client app, then connect via
    `POST /api/checkout/zoho-connect` with JSON body `{ key, code }` — **not** a GET with
    them in the query string (fixed 2026-08-28: that would leak into browser history,
@@ -121,25 +121,24 @@ unset → "Payments are not configured"; Zoho/Dhanveer bridge unset → best-eff
   scope was requested and `vercel env pull` cannot retrieve a Sensitive value at all.
 - ✅ **`DHANVEER_BRIDGE_URL`** done — `https://dhanveer-core.vercel.app`, Production + Preview,
   set as Config (it's a public URL, not a secret).
-- ⚠️ **`DHANVEER_BRIDGE_KEY`** — NOT set. Correctly refused to be minted by a Chrome agent or by
-  Claude: putting a fresh secret's value into a chat transcript is exactly the exposure the
-  "source dashboard → Vercel's field, never through a chat window" rule exists to prevent, even
-  though it's a brand-new value rather than an extracted one. **Founder generates this one
-  personally** (any long random string — a password manager, `openssl rand -hex 32` in a
-  terminal that isn't logged anywhere, etc.) and pastes the SAME value into both this project's
-  `DHANVEER_BRIDGE_KEY` and dhanveer-core's `BRIDGE_API_KEY`.
-- ❌ **`RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`** — blocked. Both are marked **Sensitive** in
-  dhanveer-core's Vercel env (no reveal, no copy — confirmed by the same padlock-vs-eye-icon
-  check used on `DATABASE_URL`). Notably `RAZORPAY_KEY_ID` is Sensitive too, which is stricter
-  than it needs to be (Key IDs are public — they ship to the browser in Razorpay's own checkout
-  widget) but that's dhanveer-core's existing configuration, not something to change here.
-  **Fallback: Razorpay's own dashboard** (`dashboard.razorpay.com` → Settings → API Keys) — Key
-  ID is always visible there; Key Secret is normally shown only once, at generation. If it isn't
-  saved anywhere (password manager etc.), the only way to get a usable one is to regenerate it
-  in Razorpay's dashboard — which ROTATES the live key and would break theteaplanet.com's
-  checkout until dhanveer-core's own env is updated to match. **Do not do this without the
-  founder explicitly choosing to, and coordinating both projects' env vars together** — it's a
-  live-payments-affecting action, not a setup step to run casually.
+- ✅ **`DHANVEER_BRIDGE_KEY`** done 2026-08-29 — founder generated the value personally and pasted
+  it directly into this project's `DHANVEER_BRIDGE_KEY` and dhanveer-core's `BRIDGE_API_KEY`
+  (Production only on both — Preview scope deliberately skipped, see dhanveer-core's own note).
+  Both projects redeployed; values were never typed by Claude or a Chrome agent, only by the
+  founder directly into Vercel's field.
+- ✅ **`RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`** — set (as of 2026-08-28, Production only on
+  this project). Confirmed actually working via Vercel runtime logs, not just presence: the one
+  `create-order` request in the last 7 days (2026-08-28 09:08 UTC) returned **200** — that route
+  only returns 200 on the full success path (Razorpay order actually created), so the keys are
+  live and correct. No `verify` requests logged yet, though, so a real payment has never been
+  completed end-to-end — item 7 below ("first real end-to-end test order") is still open. Live
+  Key ID confirmed 2026-08-29 as `rzp_live_TV8GPoXnKdiFyg` (same account as theteaplanet.com,
+  which Razorpay treats as universal across every approved site on the account — no per-site key).
+  ⚠️ Both vars are marked **Sensitive** in Vercel (no reveal, no copy) — if this value is ever
+  suspected wrong, check runtime logs for the actual failure mode before touching either var;
+  regenerating the Secret in Razorpay's dashboard ROTATES the live key and breaks
+  theteaplanet.com's checkout until dhanveer-core's own env is updated to match. Do not do that
+  without the founder explicitly choosing to and coordinating both projects' env vars together.
 - ✅ **Zoho org — already resolved, no decision needed.** The Zoho account has three orgs
   (TPGB `60014654138` Professional · GFF `60015387691` Free · "The Tea Planet - GST"
   `60026481586` Free) — `zoho.js`'s `ORG_GFF` already hardcodes `60015387691` (GFF), matching
