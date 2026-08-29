@@ -17,7 +17,7 @@
 // enough to be found in Vercel's runtime logs. The dedupe-and-append
 // discipline (never a silent no-op on a repeat customer) lives in
 // dhanveer-core's endpoint itself now, not here.
-async function recordOrderLead({ customer, orderName, items, total }) {
+async function recordOrderLead({ customer, orderName, items, total, stage = 'paid' }) {
   const base = process.env.DHANVEER_BRIDGE_URL;
   const key = process.env.DHANVEER_BRIDGE_KEY;
   if (!base || !key) {
@@ -26,6 +26,11 @@ async function recordOrderLead({ customer, orderName, items, total }) {
   }
   try {
     const url = `${base.replace(/\/$/, '')}/api/dhanveer/bridge/lead`;
+    // stage:'cart' marks a checkout that was opened but not yet paid — same
+    // dedupe-by-phone/email lead, a distinct activity note. When (if) the
+    // order later pays, verify.js calls this again with the default 'paid'
+    // stage, appending a second note on the same lead so Sales sees the
+    // full progression rather than two disconnected rows.
     const r = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -35,7 +40,7 @@ async function recordOrderLead({ customer, orderName, items, total }) {
       body: JSON.stringify({
         key,
         customer: { name: customer.name, email: customer.email || undefined, phone: customer.phone },
-        source: 'bts-website',
+        source: stage === 'cart' ? 'bts-website (checkout started)' : 'bts-website',
         orderName,
         items: items.map((i) => ({ qty: i.qty, name: i.name })),
         total,

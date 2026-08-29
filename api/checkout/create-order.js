@@ -6,6 +6,7 @@
 const { priceFor, shippingFor } = require('../_lib/catalog');
 const { getPool, ensureSchema, nextOrderName } = require('../_lib/db');
 const razorpay = require('../_lib/razorpay');
+const { recordOrderLead } = require('../_lib/dhanveerBridge');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -52,8 +53,29 @@ module.exports = async (req, res) => {
       keyId: process.env.RAZORPAY_KEY_ID,
       subtotal, shipping: shipping.amount, total,
     });
+
+    // Best-effort, never blocks the buyer: mirror the order to Dhanveer the
+    // moment checkout opens, not only on payment. A cart abandoned right
+    // here is exactly the case this closes — previously the order sat in
+    // bts.orders as 'pending' with nothing visible to Sales unless it later
+    // paid. If it does pay, verify.js calls recordOrderLead again (default
+    // 'paid' stage), which appends a second note to the SAME lead (dedup by
+    // phone/email happens on dhanveer-core's side) rather than creating a
+    // duplicate — so Sales sees "started checkout" then "paid" on one row.
+    try {
+      const leadId = await recordOrderLead({
+        customer: { name: customer.name, email: customer.email, phone: customer.phone },
+        orderName,
+        items: lines,
+        total,
+        stage: 'cart',
+      });
+      if (leadId) await pool.query(`UPDATE bts.orders SET dhanveer_lead_id = $2 WHERE order_name = $1`, [orderName, leadId]);
+    } catch (e) {
+      console.error('[checkout/create-order] Dhanveer bridge failed for', orderName, ':', e?.message || e);
+    }
   } catch (e) {
     console.error('[checkout/create-order]', e);
-    res.status(500).json({ error: e.message });
+    if (!res.headersSent) res.status(500).json({ error: e.message });
   }
 };

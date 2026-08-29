@@ -1,5 +1,24 @@
 # BTS-Website — project memory
 
+## 2026-08-29 — abandoned-cart bridge (checkout-open, not just checkout-paid)
+Until now `recordOrderLead()` only fired from `api/checkout/verify.js`, after payment —
+an order that opened checkout but never paid sat in `bts.orders` as `'pending'` with
+**zero visibility to Dhanveer**, no equivalent of dhanveer-core's own
+`recoverStuckPayments()` OTP-harvest for its native checkout. Fixed by calling
+`recordOrderLead()` a second place, `api/checkout/create-order.js`, the moment the order
+row is inserted (after the response is sent, same best-effort/never-blocks-checkout
+pattern as `verify.js`) — so a cart is mirrored to Dhanveer as soon as name+phone are in
+hand, whether or not it ever converts.
+`recordOrderLead()` now takes a `stage` param (`'cart'` | default `'paid'`) that only
+changes the `source` string sent to dhanveer-core's bridge endpoint (`'bts-website
+(checkout started)'` vs `'bts-website'`) — the endpoint's own phone-then-email dedupe
+means a later paid call appends a second activity note to the **same** lead rather than
+creating a duplicate, so Sales sees the progression (opened → paid) on one row, not two.
+Still blocked on the same two env gaps noted below: `DHANVEER_BRIDGE_KEY` unset, and the
+bridge endpoint itself only lives on dhanveer-core's `claude/bts-website-migration-op900p`
+branch, not `main` — so today this logs a loud `console.error` and no-ops until both are
+resolved, same as the paid-order path already did.
+
 ## State as of 2026-08-28 — the migration is built, RESOLVES the 08-25 "Open" items below
 **This repo now IS the replacement for `thebubbleteastore.com`** (the Shopify store) —
 resolving the "do not conflate" open question from 2026-08-25: the founder confirmed this
