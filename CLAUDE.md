@@ -1,5 +1,42 @@
 # BTS-Website — project memory
 
+## 2026-09-07 — GSC flagged indexing blockers; vercel.json `redirects` deployed but NOT firing live ⚠️
+Founder forwarded a live Google Search Console email for `thebubbleteastore.com`: new
+"Page with redirect" / "Not found (404)" / "Blocked due to other 4xx issue" reasons keeping
+pages out of the index. Root cause almost certainly the Shopify → static-site cutover
+(2026-08-28): Google still holds this domain's old Shopify-indexed URLs, and this site never
+had any `redirects` config at all. Confirmed live before touching anything: `/collections/all`
+and `/cart` — universal Shopify defaults every store has, not something specific to this
+store's catalog — both hard-404 on the new site (`NOT_FOUND`, no routing anywhere).
+
+Added a `redirects` array to `vercel.json`: `/collections/*` + `/search` → `/products/`,
+`/cart/*` → `/checkout/`, `/account/*` + `/pages/*` + `/blogs/*` + `/apps/*` + `/policies/*`
+→ `/`. Valid syntax (matches Vercel's own documented examples exactly, verified via
+`search_vercel_documentation`), valid JSON, deployed cleanly to production (READY, aliased to
+`thebubbleteastore.com`).
+
+⚠️ **It does not work.** Re-fetched the live domain repeatedly after the deploy (with a
+cache-busting query string, and after a full extra deploy cycle) — `/cart`, `/collections/all`,
+`/collections/all/`, `/search` all still return a hard 404, never a 3xx. Ruled out, in order:
+build/propagation delay (re-tested well after `READY`, and again after a second full deploy);
+CDN caching (no `age`/`x-vercel-cache` on the 404 responses — these are freshly computed, not
+stale); trailing-slash normalization eating the match (tested both slash and no-slash forms,
+and a path with an unambiguous `:path*` segment — `/collections/all/` — still 404s); array-size
+or rule-conflict inside the 11-rule set (reduced to a SINGLE rule, `/cart` → `/checkout/`,
+redeployed, still 404s). The SAME `vercel.json`'s `headers` block IS being honored on every one
+of these responses (`x-content-type-options`, `x-frame-options`, etc. all present) — so the
+file is being read; specifically the `redirects` array is inert on this project.
+
+Left the full 11-rule set in place (no harm keeping it — if whatever is suppressing it gets
+fixed, it's already there) rather than reverting to zero, but **this needs a human with
+Vercel dashboard access**, not further guessing from the agent sandbox: check
+Project → thebubbleteastore.com → Settings → Redirects/Domains for a project-level "Bulk
+Redirects" feature that might be shadowing or conflicting with `vercel.json`'s own `redirects`
+(Vercel's own docs reference a separate `bulk-redirects` REST API with its own staged/published
+versioning, distinct from `vercel.json` — plausible candidate, unconfirmed), or open a Vercel
+support ticket citing this exact repro. Until resolved, the specific old-Shopify-path 404s GSC
+flagged remain live 404s on real traffic, not just a search-console cosmetic issue.
+
 ## 2026-08-29 — abandoned-cart bridge (checkout-open, not just checkout-paid)
 Until now `recordOrderLead()` only fired from `api/checkout/verify.js`, after payment —
 an order that opened checkout but never paid sat in `bts.orders` as `'pending'` with
