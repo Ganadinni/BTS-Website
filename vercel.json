@@ -2,17 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": true,
   "redirects": [
-    { "source": "/collections", "destination": "/products/", "permanent": true },
-    { "source": "/collections/:path*", "destination": "/products/", "permanent": true },
-    { "source": "/cart", "destination": "/checkout/", "permanent": true },
-    { "source": "/cart/:path*", "destination": "/checkout/", "permanent": true },
-    { "source": "/account", "destination": "/", "permanent": true },
-    { "source": "/account/:path*", "destination": "/", "permanent": true },
-    { "source": "/search", "destination": "/products/", "permanent": true },
-    { "source": "/pages/:path*", "destination": "/", "permanent": true },
-    { "source": "/blogs/:path*", "destination": "/", "permanent": true },
-    { "source": "/apps/:path*", "destination": "/", "permanent": true },
-    { "source": "/policies/:path*", "destination": "/", "permanent": true }
+    { "source": "/cart", "destination": "/checkout/", "permanent": true }
   ],
   "headers": [
     {
