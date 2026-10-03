@@ -1,0 +1,9 @@
+# 2026-10-03 security pass — never serve internal files from this static root.
+# CLAUDE.md (internal ops notes incl. the Razorpay key id and Zoho org id),
+# .env.example and the 11 MB Shopify theme archive were all publicly
+# downloadable because this project had no .vercelignore at all. Nothing at
+# runtime references any of these (api/ functions still deploy — Vercel's
+# functions are built from source, not served from the static output).
+archive/
+*.md
+.env.example
